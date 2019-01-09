@@ -5,24 +5,22 @@ import android.os.Parcelable;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import id.fathonyfath.quranreader.Res;
 import id.fathonyfath.quranreader.models.Surah;
+import id.fathonyfath.quranreader.utils.ViewCallback;
 
-public class SurahDetailView extends FrameLayout {
+public class SurahDetailView extends FrameLayout implements ViewCallback {
 
-    private final Surah selectedSurah;
+    private final TextView textView;
 
-    public SurahDetailView(Context context, Surah selectedSurah) {
+    public SurahDetailView(Context context) {
         super(context);
+        setId(Res.Id.surahDetailView);
 
-        this.selectedSurah = selectedSurah;
+        this.textView = new TextView(getContext());
+        this.textView.setId(Res.Id.surahDetailView_textView);
 
         initView();
-    }
-
-    private void initView() {
-        TextView textView = new TextView(getContext());
-        textView.setText(this.selectedSurah.getName());
-        addView(textView);
     }
 
     @Override
@@ -33,5 +31,23 @@ public class SurahDetailView extends FrameLayout {
     @Override
     protected void onRestoreInstanceState(Parcelable state) {
         super.onRestoreInstanceState(state);
+    }
+
+    @Override
+    public void onResume() {
+
+    }
+
+    @Override
+    public void onPause() {
+
+    }
+
+    public void updateView(Surah selectedSurah) {
+        this.textView.setText(selectedSurah.getName());
+    }
+
+    private void initView() {
+        addView(this.textView);
     }
 }

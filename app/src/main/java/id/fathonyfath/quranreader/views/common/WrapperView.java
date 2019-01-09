@@ -3,7 +3,6 @@ package id.fathonyfath.quranreader.views.common;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
@@ -13,8 +12,12 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import id.fathonyfath.quranreader.Res;
 import id.fathonyfath.quranreader.utils.UnitConverter;
+import id.fathonyfath.quranreader.utils.ViewCallback;
 
 public class WrapperView extends RelativeLayout {
 
@@ -32,7 +35,7 @@ public class WrapperView extends RelativeLayout {
         }
     };
 
-    private Runnable removeViewRunnable = null;
+    private final List<Runnable> removeViewRunnables;
 
     public WrapperView(Context context) {
         super(context);
@@ -41,6 +44,8 @@ public class WrapperView extends RelativeLayout {
         this.overlayView = new OverlayView(getContext());
         this.containerView = new FrameLayout(getContext());
 
+        this.removeViewRunnables = new ArrayList<>();
+
         initConfiguration();
         initView();
     }
@@ -48,7 +53,10 @@ public class WrapperView extends RelativeLayout {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        removeCallbacks(this.removeViewRunnable);
+
+        for (Runnable runnable : this.removeViewRunnables) {
+            removeCallbacks(runnable);
+        }
     }
 
     public void setToolbarTitle(String title) {
@@ -82,48 +90,64 @@ public class WrapperView extends RelativeLayout {
         }
     }
 
-    public void wrapView(View view) {
-        removeContentView();
-        addView(view);
-
-        RelativeLayout.LayoutParams params = new LayoutParams(
+    public int addViewToContainer(View view) {
+        this.containerView.addView(view, new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
-        );
+        ));
 
-        if (this.toolbarView != null) {
-            params.addRule(RelativeLayout.BELOW, this.toolbarView.getId());
-        }
+        view.setVisibility(View.GONE);
 
-        view.setLayoutParams(params);
-        this.overlayView.bringToFront();
-
-        Animation fadeIn = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_in);
-        fadeIn.setDuration(250);
-        fadeIn.setInterpolator(new AccelerateInterpolator());
-
-        view.startAnimation(fadeIn);
+        return this.containerView.getChildCount() - 1;
     }
 
-    public void removeContentView() {
-        removeCallbacks(this.removeViewRunnable);
+    public void showViewAtIndex(int index) {
+        View selectedView = this.containerView.getChildAt(index);
+        if (selectedView != null) {
+            animateHideAllVisibleChild();
 
-        for (int i = 0; i < getChildCount(); i++) {
-            View current = getChildAt(i);
-            if (!(current instanceof ToolbarView) && !(current instanceof OverlayView)) {
+            Animation fadeIn = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_in);
+            fadeIn.setDuration(250);
+            fadeIn.setInterpolator(new AccelerateInterpolator());
+
+            selectedView.setVisibility(View.VISIBLE);
+            selectedView.startAnimation(fadeIn);
+
+            if (selectedView instanceof ViewCallback) {
+                ((ViewCallback) selectedView).onResume();
+            }
+        }
+    }
+
+    public <T extends View> T findChildViewAtIndex(int index) {
+        return (T) this.containerView.getChildAt(index);
+    }
+
+    private void animateHideAllVisibleChild() {
+        for (int i = 0; i < this.containerView.getChildCount(); i++) {
+            View currentView = this.containerView.getChildAt(i);
+            if (currentView.getVisibility() != View.GONE) {
                 Animation fadeOut = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_out);
                 fadeOut.setDuration(200);
                 fadeOut.setInterpolator(new DecelerateInterpolator());
-                current.startAnimation(fadeOut);
 
-                this.removeViewRunnable = new RemoveViewAtIndexRunnable(i) {
+                currentView.startAnimation(fadeOut);
+
+                Runnable runnable = new HideViewRunnable(currentView) {
                     @Override
                     public void run() {
-                        removeViewAt(this.indexViewToRemove);
+                        this.viewToHide.setVisibility(View.GONE);
+                        WrapperView.this.removeViewRunnables.remove(this);
+                        removeCallbacks(this);
                     }
                 };
 
-                postDelayed(this.removeViewRunnable, 200);
+                this.removeViewRunnables.add(runnable);
+                postDelayed(runnable, 200);
+
+                if (currentView instanceof ViewCallback) {
+                    ((ViewCallback) currentView).onPause();
+                }
             }
         }
     }
@@ -172,12 +196,12 @@ public class WrapperView extends RelativeLayout {
         this.containerView.setLayoutParams(containerParams);
     }
 
-    private abstract static class RemoveViewAtIndexRunnable implements Runnable {
+    private abstract static class HideViewRunnable implements Runnable {
 
-        protected final int indexViewToRemove;
+        protected final View viewToHide;
 
-        private RemoveViewAtIndexRunnable(int indexViewToRemove) {
-            this.indexViewToRemove = indexViewToRemove;
+        private HideViewRunnable(View viewToHide) {
+            this.viewToHide = viewToHide;
         }
     }
 }

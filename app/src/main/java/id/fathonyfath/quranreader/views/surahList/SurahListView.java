@@ -24,8 +24,9 @@ import id.fathonyfath.quranreader.Res;
 import id.fathonyfath.quranreader.models.Surah;
 import id.fathonyfath.quranreader.tasks.FetchAllSurahTask;
 import id.fathonyfath.quranreader.tasks.OnTaskFinishedListener;
+import id.fathonyfath.quranreader.utils.ViewCallback;
 
-public class SurahListView extends FrameLayout {
+public class SurahListView extends FrameLayout implements ViewCallback {
 
     private final Hashtable<Integer, Integer> listViewItemHeights = new Hashtable<>();
     private final List<Surah> surahList = new ArrayList<>();
@@ -91,7 +92,7 @@ public class SurahListView extends FrameLayout {
 
     @Override
     protected Parcelable onSaveInstanceState() {
-        SurahListViewState viewState = new SurahListViewState(super.onSaveInstanceState());
+        final SurahListViewState viewState = new SurahListViewState(super.onSaveInstanceState());
         viewState.listViewItemHeights = this.listViewItemHeights;
         viewState.surahList = this.surahList;
         return viewState;
@@ -99,25 +100,23 @@ public class SurahListView extends FrameLayout {
 
     @Override
     protected void onRestoreInstanceState(Parcelable state) {
-        SurahListViewState viewState = (SurahListViewState) state;
+        final SurahListViewState viewState = (SurahListViewState) state;
         super.onRestoreInstanceState(viewState.getSuperState());
         restoreListViewItemHeights(viewState.listViewItemHeights);
         restoreSurahList(viewState.surahList);
     }
 
     @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-
+    public void onResume() {
+        this.surahListView.setOnItemClickListener(onSurahItemClickListener);
         if (this.surahList.isEmpty()) {
             fetchAllSurahs();
         }
     }
 
     @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-
+    public void onPause() {
+        this.surahListView.setOnItemClickListener(null);
         this.fetchAllSurahTask.cancel(true);
         this.fetchAllSurahTask.removeCallbackListener();
     }
@@ -134,7 +133,6 @@ public class SurahListView extends FrameLayout {
         this.surahListView.setId(Res.Id.surahListView_surahListView);
         this.surahListView.setAdapter(this.surahAdapter);
         this.surahListView.setOnScrollListener(scrollChangeListener);
-        this.surahListView.setOnItemClickListener(onSurahItemClickListener);
 
         addView(this.surahListView);
 
@@ -263,6 +261,7 @@ public class SurahListView extends FrameLayout {
 
     public interface OnViewEventListener {
         void onSurahListScroll(float scrollY);
+
         void onSurahSelected(Surah selectedSurah);
     }
 }

@@ -12,7 +12,6 @@ import id.fathonyfath.quranreader.models.Surah;
 
 public class SurahAdapter extends ArrayAdapter<Surah> {
 
-
     public SurahAdapter(Context context, List<Surah> surahList) {
         super(context, 0, surahList);
     }
