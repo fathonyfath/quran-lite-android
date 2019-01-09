@@ -4,10 +4,14 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -36,12 +40,23 @@ public class SurahListView extends FrameLayout {
         public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
             if (SurahListView.this.surahListView.getChildCount() > 0) {
                 int scrollY = getScrollYListView();
-                if (SurahListView.this.onScrollListener != null) {
-                    SurahListView.this.onScrollListener.onScroll(scrollY);
+                if (SurahListView.this.onViewEventListener != null) {
+                    SurahListView.this.onViewEventListener.onSurahListScroll(scrollY);
                 }
             }
         }
     };
+
+    private final AdapterView.OnItemClickListener onSurahItemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            if (SurahListView.this.onViewEventListener != null) {
+                Surah selectedSurah = SurahListView.this.surahAdapter.getItem(position);
+                SurahListView.this.onViewEventListener.onSurahSelected(selectedSurah);
+            }
+        }
+    };
+
     private final OnTaskFinishedListener<List<Surah>> fetchAllSurahCallback = new OnTaskFinishedListener<List<Surah>>() {
         @Override
         public void onFinished(List<Surah> result) {
@@ -52,9 +67,11 @@ public class SurahListView extends FrameLayout {
     private final ListView surahListView;
     private final SurahAdapter surahAdapter;
 
+    private final ProgressBar progressBar;
+
     private final FetchAllSurahTask fetchAllSurahTask;
 
-    private OnScrollListener onScrollListener;
+    private OnViewEventListener onViewEventListener;
 
     public SurahListView(Context context, FetchAllSurahTask fetchAllSurahTask) {
         super(context);
@@ -65,6 +82,8 @@ public class SurahListView extends FrameLayout {
 
         this.surahListView = new ListView(getContext());
         this.surahAdapter = new SurahAdapter(getContext(), this.surahList);
+
+        this.progressBar = new ProgressBar(getContext());
 
         initConfiguration();
         initView();
@@ -103,8 +122,8 @@ public class SurahListView extends FrameLayout {
         this.fetchAllSurahTask.removeCallbackListener();
     }
 
-    public void setOnScrollListener(OnScrollListener onScrollListener) {
-        this.onScrollListener = onScrollListener;
+    public void setOnViewEventListener(OnViewEventListener onViewEventListener) {
+        this.onViewEventListener = onViewEventListener;
     }
 
     private void initConfiguration() {
@@ -113,21 +132,37 @@ public class SurahListView extends FrameLayout {
 
     private void initView() {
         this.surahListView.setId(Res.Id.surahListView_surahListView);
-
         this.surahListView.setAdapter(this.surahAdapter);
-
         this.surahListView.setOnScrollListener(scrollChangeListener);
+        this.surahListView.setOnItemClickListener(onSurahItemClickListener);
 
         addView(this.surahListView);
+
+        this.progressBar.setId(Res.Id.surahListView_progressBar);
+        this.progressBar.setIndeterminate(true);
+
+        final FrameLayout.LayoutParams progressParams = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        progressParams.gravity = Gravity.CENTER;
+        this.progressBar.setLayoutParams(progressParams);
+        this.progressBar.setVisibility(View.GONE);
+
+        addView(this.progressBar);
     }
 
     private void fetchAllSurahs() {
+        this.progressBar.setVisibility(View.VISIBLE);
+
         this.fetchAllSurahTask.removeCallbackListener();
         this.fetchAllSurahTask.setOnFinishCallbackListener(fetchAllSurahCallback);
         this.fetchAllSurahTask.execute();
     }
 
     private void updateSurahList(List<Surah> surahList) {
+        this.progressBar.setVisibility(View.GONE);
+
         this.surahAdapter.clear();
         this.surahAdapter.addAll(surahList);
         this.surahAdapter.notifyDataSetChanged();
@@ -159,10 +194,6 @@ public class SurahListView extends FrameLayout {
     private void restoreSurahList(List<Surah> surahList) {
         this.surahList.clear();
         this.surahList.addAll(surahList);
-    }
-
-    public interface OnScrollListener {
-        void onScroll(float scrollY);
     }
 
     private static class SurahListViewState extends BaseSavedState {
@@ -228,5 +259,10 @@ public class SurahListView extends FrameLayout {
                 return new SurahListViewState[size];
             }
         };
+    }
+
+    public interface OnViewEventListener {
+        void onSurahListScroll(float scrollY);
+        void onSurahSelected(Surah selectedSurah);
     }
 }

@@ -5,8 +5,10 @@ import android.graphics.Color;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextSwitcher;
@@ -92,10 +94,12 @@ public class ToolbarView extends LinearLayout {
         Animation fadeIn = AnimationUtils.loadAnimation(getContext(),
                 android.R.anim.fade_in);
         fadeIn.setDuration(250);
+        fadeIn.setInterpolator(new AccelerateInterpolator());
 
         Animation fadeOut = AnimationUtils.loadAnimation(getContext(),
                 android.R.anim.fade_out);
         fadeOut.setDuration(200);
+        fadeOut.setInterpolator(new DecelerateInterpolator());
 
         this.titleSwitcher.setInAnimation(fadeIn);
         this.titleSwitcher.setOutAnimation(fadeOut);
