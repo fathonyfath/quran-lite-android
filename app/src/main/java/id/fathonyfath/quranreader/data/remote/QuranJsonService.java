@@ -40,6 +40,17 @@ public class QuranJsonService {
         return response;
     }
 
+    public SurahResponse getSurahDetailAtNumber(int surahNumber) {
+        try {
+            String httpResponse = doGetRequest(BASE_URL + surahNumber + ".json");
+            JSONObject responseJson = new JSONObject(httpResponse);
+
+        } catch (JSONException ignored) {
+
+        }
+        return null;
+    }
+
     private SurahResponse parseJSONObjectToSurahResponse(JSONObject jsonObject) throws JSONException {
         final SurahResponse surahResponse = new SurahResponse();
         surahResponse.number = jsonObject.getInt("number");

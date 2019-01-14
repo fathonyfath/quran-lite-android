@@ -1,6 +1,7 @@
 package id.fathonyfath.quranreader.views.common;
 
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.View;
@@ -119,6 +120,7 @@ public class WrapperView extends RelativeLayout {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends View> T findChildViewAtIndex(int index) {
         return (T) this.containerView.getChildAt(index);
     }
