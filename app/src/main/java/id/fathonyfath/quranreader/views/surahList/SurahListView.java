@@ -39,12 +39,7 @@ public class SurahListView extends FrameLayout implements ViewCallback {
 
         @Override
         public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-            if (SurahListView.this.surahListView.getChildCount() > 0) {
-                int scrollY = getScrollYListView();
-                if (SurahListView.this.onViewEventListener != null) {
-                    SurahListView.this.onViewEventListener.onSurahListScroll(scrollY);
-                }
-            }
+            SurahListView.this.triggerSurahListScroll();
         }
     };
 
@@ -117,6 +112,8 @@ public class SurahListView extends FrameLayout implements ViewCallback {
         if (this.surahList.isEmpty()) {
             fetchAllSurahs();
         }
+
+//        triggerSurahListScroll();
     }
 
     @Override
@@ -169,6 +166,15 @@ public class SurahListView extends FrameLayout implements ViewCallback {
 
     private void updateTextProgress(float progress) {
         this.progressView.updateProgress(progress);
+    }
+
+    private void triggerSurahListScroll() {
+        if (this.surahListView.getChildCount() > 0) {
+            int scrollY = getScrollYListView();
+            if (this.onViewEventListener != null) {
+                this.onViewEventListener.onSurahListScroll(scrollY);
+            }
+        }
     }
 
     private int getScrollYListView() {

@@ -120,7 +120,7 @@ public class MainView extends WrapperView {
         SurahDetailView surahDetailView = findChildViewAtIndex(this.mappedClassToIndex.get(SurahDetailView.class));
         surahDetailView.updateView(selectedSurah);
 
-        animateOverlayAlpha(0.05f);
+        updateIsToolbarFlying(false);
     }
 
     private void updateViewBasedOnBackStack() {
