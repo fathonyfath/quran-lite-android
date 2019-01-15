@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -179,17 +180,33 @@ public class QuranJsonService {
             urlConnection.setRequestProperty("Accept-Encoding", "identity");
             urlConnection.setRequestMethod("GET");
 
+            urlConnection.connect();
+
             int contentLength = urlConnection.getContentLength();
             int totalRead = 0;
+
+            String[] responseHeader = urlConnection.getContentType().split(";");
+            String charset = "";
+
+            for (String value : responseHeader) {
+                value = value.trim();
+                if (value.toLowerCase().startsWith("charset=")) {
+                    charset = value.substring("charset=".length());
+                    break;
+                }
+            }
+            if (charset.equals("")) charset = "utf-8";
 
             InputStream stream = new BufferedInputStream(urlConnection.getInputStream());
             final StringBuilder sb = new StringBuilder();
 
-            byte[] data = new byte[1024];
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+            byte[] buffer = new byte[1024];
             int bytesRead;
 
-            while ((bytesRead = stream.read(data)) > 0) {
-                sb.append(new String(data, 0, bytesRead));
+            while ((bytesRead = stream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
                 totalRead += bytesRead;
 
                 if (this.onDownloadProgressListener != null) {
@@ -198,6 +215,9 @@ public class QuranJsonService {
             }
 
             stream.close();
+
+            byte[] contentByteArray = outputStream.toByteArray();
+            sb.append(new String(contentByteArray, 0, contentByteArray.length, charset.toUpperCase()));
 
             return sb.toString();
         } catch (MalformedURLException ignored) {

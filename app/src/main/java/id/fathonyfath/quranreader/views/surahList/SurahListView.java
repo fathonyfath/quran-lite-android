@@ -77,9 +77,9 @@ public class SurahListView extends FrameLayout implements ViewCallback {
     public SurahListView(Context context, FetchAllSurahTask fetchAllSurahTask) {
         super(context);
 
-        setId(Res.Id.surahListView);
-
         this.fetchAllSurahTask = fetchAllSurahTask;
+
+        setId(Res.Id.surahListView);
 
         this.surahListView = new ListView(getContext());
         this.surahAdapter = new SurahAdapter(getContext(), this.surahList);
@@ -112,8 +112,6 @@ public class SurahListView extends FrameLayout implements ViewCallback {
         if (this.surahList.isEmpty()) {
             fetchAllSurahs();
         }
-
-//        triggerSurahListScroll();
     }
 
     @Override

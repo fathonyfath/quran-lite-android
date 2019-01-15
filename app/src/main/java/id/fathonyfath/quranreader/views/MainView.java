@@ -14,6 +14,7 @@ import id.fathonyfath.quranreader.Res;
 import id.fathonyfath.quranreader.data.QuranRepository;
 import id.fathonyfath.quranreader.models.Surah;
 import id.fathonyfath.quranreader.tasks.FetchAllSurahTask;
+import id.fathonyfath.quranreader.tasks.FetchSurahDetailTask;
 import id.fathonyfath.quranreader.views.common.WrapperView;
 import id.fathonyfath.quranreader.views.surahDetail.SurahDetailView;
 import id.fathonyfath.quranreader.views.surahList.SurahListView;
@@ -96,7 +97,7 @@ public class MainView extends WrapperView {
         final SurahListView surahListView = new SurahListView(getContext(), new FetchAllSurahTask(this.quranRepository));
         surahListView.setOnViewEventListener(this.surahListEventListener);
 
-        final SurahDetailView surahDetailView = new SurahDetailView(getContext());
+        final SurahDetailView surahDetailView = new SurahDetailView(getContext(), new FetchSurahDetailTask(this.quranRepository));
 
         this.mappedClassToIndex.put(SurahListView.class, addViewToContainer(surahListView));
         this.mappedClassToIndex.put(SurahDetailView.class, addViewToContainer(surahDetailView));
