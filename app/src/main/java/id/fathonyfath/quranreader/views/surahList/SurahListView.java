@@ -11,7 +11,6 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -23,8 +22,9 @@ import java.util.Map;
 import id.fathonyfath.quranreader.Res;
 import id.fathonyfath.quranreader.models.Surah;
 import id.fathonyfath.quranreader.tasks.FetchAllSurahTask;
-import id.fathonyfath.quranreader.tasks.OnTaskFinishedListener;
+import id.fathonyfath.quranreader.tasks.OnTaskListener;
 import id.fathonyfath.quranreader.utils.ViewCallback;
+import id.fathonyfath.quranreader.views.common.ProgressView;
 
 public class SurahListView extends FrameLayout implements ViewCallback {
 
@@ -58,7 +58,12 @@ public class SurahListView extends FrameLayout implements ViewCallback {
         }
     };
 
-    private final OnTaskFinishedListener<List<Surah>> fetchAllSurahCallback = new OnTaskFinishedListener<List<Surah>>() {
+    private final OnTaskListener<List<Surah>> fetchAllSurahCallback = new OnTaskListener<List<Surah>>() {
+        @Override
+        public void onProgress(float progress) {
+            updateTextProgress(progress);
+        }
+
         @Override
         public void onFinished(List<Surah> result) {
             updateSurahList(result);
@@ -68,7 +73,7 @@ public class SurahListView extends FrameLayout implements ViewCallback {
     private final ListView surahListView;
     private final SurahAdapter surahAdapter;
 
-    private final ProgressBar progressBar;
+    private final ProgressView progressView;
 
     private final FetchAllSurahTask fetchAllSurahTask;
 
@@ -84,7 +89,7 @@ public class SurahListView extends FrameLayout implements ViewCallback {
         this.surahListView = new ListView(getContext());
         this.surahAdapter = new SurahAdapter(getContext(), this.surahList);
 
-        this.progressBar = new ProgressBar(getContext());
+        this.progressView = new ProgressView(getContext());
 
         initConfiguration();
         initView();
@@ -118,7 +123,7 @@ public class SurahListView extends FrameLayout implements ViewCallback {
     public void onPause() {
         this.surahListView.setOnItemClickListener(null);
         this.fetchAllSurahTask.cancel(true);
-        this.fetchAllSurahTask.removeCallbackListener();
+        this.fetchAllSurahTask.setOnTaskListener(null);
     }
 
     public void setOnViewEventListener(OnViewEventListener onViewEventListener) {
@@ -136,34 +141,34 @@ public class SurahListView extends FrameLayout implements ViewCallback {
 
         addView(this.surahListView);
 
-        this.progressBar.setId(Res.Id.surahListView_progressBar);
-        this.progressBar.setIndeterminate(true);
-
         final FrameLayout.LayoutParams progressParams = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
         );
         progressParams.gravity = Gravity.CENTER;
-        this.progressBar.setLayoutParams(progressParams);
-        this.progressBar.setVisibility(View.GONE);
+        this.progressView.setLayoutParams(progressParams);
+        this.progressView.setVisibility(View.GONE);
 
-        addView(this.progressBar);
+        addView(this.progressView);
     }
 
     private void fetchAllSurahs() {
-        this.progressBar.setVisibility(View.VISIBLE);
+        this.progressView.setVisibility(View.VISIBLE);
 
-        this.fetchAllSurahTask.removeCallbackListener();
-        this.fetchAllSurahTask.setOnFinishCallbackListener(fetchAllSurahCallback);
+        this.fetchAllSurahTask.setOnTaskListener(fetchAllSurahCallback);
         this.fetchAllSurahTask.execute();
     }
 
     private void updateSurahList(List<Surah> surahList) {
-        this.progressBar.setVisibility(View.GONE);
+        this.progressView.setVisibility(View.GONE);
 
         this.surahAdapter.clear();
         this.surahAdapter.addAll(surahList);
         this.surahAdapter.notifyDataSetChanged();
+    }
+
+    private void updateTextProgress(float progress) {
+        this.progressView.updateProgress(progress);
     }
 
     private int getScrollYListView() {

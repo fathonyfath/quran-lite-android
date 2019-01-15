@@ -1,5 +1,6 @@
 package id.fathonyfath.quranreader.tasks;
 
-public interface OnTaskFinishedListener<T> {
+public interface OnTaskListener<T> {
+    void onProgress(float progress);
     void onFinished(T result);
 }

@@ -7,16 +7,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 import java.util.TreeMap;
-
-import javax.net.ssl.HttpsURLConnection;
 
 import id.fathonyfath.quranreader.data.remote.models.SurahDetailResponse;
 import id.fathonyfath.quranreader.data.remote.models.SurahResponse;
@@ -30,6 +27,8 @@ public class QuranJsonService {
 
     private final String BASE_URL = "https://fathonyfath.github.io/quran-json/surah/";
 
+    private OnDownloadProgressListener onDownloadProgressListener;
+
     public Map<Integer, SurahResponse> getSurahIndex() {
         try {
             String httpResponse = doGetRequest(BASE_URL + "index.json");
@@ -39,6 +38,10 @@ public class QuranJsonService {
 
         }
         return null;
+    }
+
+    public void setOnDownloadProgressListener(OnDownloadProgressListener onDownloadProgressListener) {
+        this.onDownloadProgressListener = onDownloadProgressListener;
     }
 
     public Pair<String, SurahDetailResponse> getSurahDetailAtNumber(int surahNumber) {
@@ -169,15 +172,34 @@ public class QuranJsonService {
     }
 
     private String doGetRequest(String url) {
-        HttpsURLConnection urlConnection = null;
+        HttpURLConnection urlConnection = null;
         try {
             URL indexUrl = new URL(url);
-            urlConnection = (HttpsURLConnection) indexUrl.openConnection();
+            urlConnection = (HttpURLConnection) indexUrl.openConnection();
+            urlConnection.setRequestProperty("Accept-Encoding", "identity");
             urlConnection.setRequestMethod("GET");
 
-            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+            int contentLength = urlConnection.getContentLength();
+            int totalRead = 0;
 
-            return readStream(in);
+            InputStream stream = new BufferedInputStream(urlConnection.getInputStream());
+            final StringBuilder sb = new StringBuilder();
+
+            byte[] data = new byte[1024];
+            int bytesRead;
+
+            while ((bytesRead = stream.read(data)) > 0) {
+                sb.append(new String(data, 0, bytesRead));
+                totalRead += bytesRead;
+
+                if (this.onDownloadProgressListener != null) {
+                    this.onDownloadProgressListener.onDownloadProgress(totalRead, contentLength);
+                }
+            }
+
+            stream.close();
+
+            return sb.toString();
         } catch (MalformedURLException ignored) {
 
         } catch (IOException ignored) {
@@ -189,15 +211,5 @@ public class QuranJsonService {
         }
 
         return "";
-    }
-
-    private String readStream(InputStream is) throws IOException {
-        final StringBuilder sb = new StringBuilder();
-        final BufferedReader r = new BufferedReader(new InputStreamReader(is), 1000);
-        for (String line = r.readLine(); line != null; line = r.readLine()) {
-            sb.append(line);
-        }
-        is.close();
-        return sb.toString();
     }
 }

@@ -22,7 +22,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         this.mainView = new MainView(this);
-        setContentView(mainView);
+        setContentView(this.mainView);
     }
 
     @Override

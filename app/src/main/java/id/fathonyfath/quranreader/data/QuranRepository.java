@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import id.fathonyfath.quranreader.data.remote.OnDownloadProgressListener;
 import id.fathonyfath.quranreader.data.remote.QuranJsonService;
 import id.fathonyfath.quranreader.data.remote.models.SurahDetailResponse;
 import id.fathonyfath.quranreader.data.remote.models.SurahResponse;
@@ -22,9 +23,25 @@ import id.fathonyfath.quranreader.models.SurahTranslation;
 public class QuranRepository {
 
     private final QuranJsonService quranJsonService;
+    private final OnDownloadProgressListener onDownloadProgressListener = new OnDownloadProgressListener() {
+        @Override
+        public void onDownloadProgress(int currentProgress, int maxProgress) {
+            if (QuranRepository.this.onProgressListener != null) {
+                float progress = ((float) currentProgress) / ((float) maxProgress) * 100.0f;
+                QuranRepository.this.onProgressListener.onProgress(progress);
+            }
+        }
+    };
+
+    private OnProgressListener onProgressListener;
 
     public QuranRepository(QuranJsonService quranJsonService) {
         this.quranJsonService = quranJsonService;
+        this.quranJsonService.setOnDownloadProgressListener(onDownloadProgressListener);
+    }
+
+    public void setOnProgressListener(OnProgressListener onProgressListener) {
+        this.onProgressListener = onProgressListener;
     }
 
     public List<Surah> fetchAllSurah() {
@@ -94,6 +111,4 @@ public class QuranRepository {
 
         return null;
     }
-
-
 }

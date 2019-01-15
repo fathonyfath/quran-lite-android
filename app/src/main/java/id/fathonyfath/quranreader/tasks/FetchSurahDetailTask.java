@@ -2,38 +2,59 @@ package id.fathonyfath.quranreader.tasks;
 
 import android.os.AsyncTask;
 
+import id.fathonyfath.quranreader.data.OnProgressListener;
 import id.fathonyfath.quranreader.data.QuranRepository;
 import id.fathonyfath.quranreader.models.Surah;
 import id.fathonyfath.quranreader.models.SurahDetail;
 
-public class FetchSurahDetailTask extends AsyncTask<Surah, Void, SurahDetail> {
+public class FetchSurahDetailTask extends AsyncTask<Surah, Float, SurahDetail> {
 
     private final QuranRepository quranRepository;
+    private final OnProgressListener onProgressListener = new OnProgressListener() {
+        @Override
+        public void onProgress(float progress) {
+            FetchSurahDetailTask.this.publishProgress(progress);
+        }
+    };
 
-    private OnTaskFinishedListener<SurahDetail> onFinishCallback;
+    private OnTaskListener<SurahDetail> onTaskListener;
 
     public FetchSurahDetailTask(QuranRepository quranRepository) {
         this.quranRepository = quranRepository;
+        this.quranRepository.setOnProgressListener(onProgressListener);
     }
 
-    public void setOnFinishCallback(OnTaskFinishedListener<SurahDetail> onFinishCallback) {
-        this.onFinishCallback = onFinishCallback;
+    public void setOnTaskListener(OnTaskListener<SurahDetail> onTaskListener) {
+        this.onTaskListener = onTaskListener;
     }
 
     @Override
     protected SurahDetail doInBackground(Surah... surahs) {
         if (surahs != null) {
-            return this.quranRepository.fetchSurahDetail(surahs[0]);
+            try {
+                return this.quranRepository.fetchSurahDetail(surahs[0]);
+            } catch (Exception ignored) {
+
+            }
         }
         return null;
+    }
+
+    @Override
+    protected void onProgressUpdate(Float... values) {
+        super.onProgressUpdate(values);
+
+        if (this.onTaskListener != null) {
+            this.onTaskListener.onProgress(values[0]);
+        }
     }
 
     @Override
     protected void onPostExecute(SurahDetail s) {
         super.onPostExecute(s);
 
-        if (onFinishCallback != null) {
-            onFinishCallback.onFinished(s);
+        if (this.onTaskListener != null) {
+            this.onTaskListener.onFinished(s);
         }
     }
 }
