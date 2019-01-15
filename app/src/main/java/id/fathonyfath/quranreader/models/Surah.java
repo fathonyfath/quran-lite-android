@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Surah implements Parcelable {
+
     private final int number;
     private final String name;
     private final String nameInLatin;
@@ -14,13 +15,6 @@ public class Surah implements Parcelable {
         this.name = name;
         this.nameInLatin = nameInLatin;
         this.numberOfAyah = numberOfAyah;
-    }
-
-    protected Surah(Parcel in) {
-        this.number = in.readInt();
-        this.name = in.readString();
-        this.nameInLatin = in.readString();
-        this.numberOfAyah = in.readInt();
     }
 
     public int getNumber() {
@@ -59,6 +53,18 @@ public class Surah implements Parcelable {
         result = 31 * result + nameInLatin.hashCode();
         result = 31 * result + numberOfAyah;
         return result;
+    }
+
+    /**
+     * Parcelable implementation.
+     *
+     */
+
+    protected Surah(Parcel in) {
+        this.number = in.readInt();
+        this.name = in.readString();
+        this.nameInLatin = in.readString();
+        this.numberOfAyah = in.readInt();
     }
 
     @Override
