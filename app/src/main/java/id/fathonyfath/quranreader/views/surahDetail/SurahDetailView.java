@@ -2,7 +2,6 @@ package id.fathonyfath.quranreader.views.surahDetail;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ListView;
@@ -24,12 +23,12 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
     private final ListView ayahListView;
     private final AyahAdapter ayahAdapter;
 
-    private final FetchSurahDetailTask fetchSurahDetailTask;
+    private final FetchSurahDetailTask.Factory fetchSurahDetailTaskFactory;
 
-    public SurahDetailView(Context context, FetchSurahDetailTask fetchSurahDetailTask) {
+    public SurahDetailView(Context context, FetchSurahDetailTask.Factory fetchSurahDetailTaskFactory) {
         super(context);
 
-        this.fetchSurahDetailTask = fetchSurahDetailTask;
+        this.fetchSurahDetailTaskFactory = fetchSurahDetailTaskFactory;
 
         setId(Res.Id.surahDetailView);
 
@@ -47,14 +46,16 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
 
     @Override
     public void onPause() {
-
+        clearView();
     }
 
     public void updateView(Surah selectedSurah) {
-        this.fetchSurahDetailTask.setOnTaskListener(new OnTaskListener<SurahDetail>() {
+        final FetchSurahDetailTask fetchSurahDetailTask = this.fetchSurahDetailTaskFactory.create();
+
+        fetchSurahDetailTask.setOnTaskListener(new OnTaskListener<SurahDetail>() {
             @Override
             public void onProgress(float progress) {
-                Log.d("SurahDetailView", "Progress; " + progress);
+
             }
 
             @Override
@@ -64,7 +65,7 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
                 ayahAdapter.notifyDataSetChanged();
             }
         });
-        this.fetchSurahDetailTask.execute(selectedSurah);
+        fetchSurahDetailTask.execute(selectedSurah);
     }
 
     private void initConfiguration() {
@@ -79,5 +80,10 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
         ));
+    }
+
+    private void clearView() {
+        this.ayahList.clear();
+        this.ayahAdapter.clear();
     }
 }

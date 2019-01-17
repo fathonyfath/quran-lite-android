@@ -70,14 +70,15 @@ public class SurahListView extends FrameLayout implements ViewCallback {
 
     private final ProgressView progressView;
 
-    private final FetchAllSurahTask fetchAllSurahTask;
+    private final FetchAllSurahTask.Factory fetchAllSurahTaskFactory;
+    private FetchAllSurahTask fetchAllSurahTask;
 
     private OnViewEventListener onViewEventListener;
 
-    public SurahListView(Context context, FetchAllSurahTask fetchAllSurahTask) {
+    public SurahListView(Context context, FetchAllSurahTask.Factory fetchAllSurahTaskFactory) {
         super(context);
 
-        this.fetchAllSurahTask = fetchAllSurahTask;
+        this.fetchAllSurahTaskFactory = fetchAllSurahTaskFactory;
 
         setId(Res.Id.surahListView);
 
@@ -117,8 +118,8 @@ public class SurahListView extends FrameLayout implements ViewCallback {
     @Override
     public void onPause() {
         this.surahListView.setOnItemClickListener(null);
-        this.fetchAllSurahTask.cancel(true);
-        this.fetchAllSurahTask.setOnTaskListener(null);
+
+        clearTask();
     }
 
     public void setOnViewEventListener(OnViewEventListener onViewEventListener) {
@@ -149,6 +150,9 @@ public class SurahListView extends FrameLayout implements ViewCallback {
 
     private void fetchAllSurahs() {
         this.progressView.setVisibility(View.VISIBLE);
+
+        clearTask();
+        this.fetchAllSurahTask = this.fetchAllSurahTaskFactory.create();
 
         this.fetchAllSurahTask.setOnTaskListener(fetchAllSurahCallback);
         this.fetchAllSurahTask.execute();
@@ -201,6 +205,14 @@ public class SurahListView extends FrameLayout implements ViewCallback {
     private void restoreSurahList(List<Surah> surahList) {
         this.surahList.clear();
         this.surahList.addAll(surahList);
+    }
+
+    private void clearTask() {
+        if (this.fetchAllSurahTask != null) {
+            this.fetchAllSurahTask.cancel(true);
+            this.fetchAllSurahTask.setOnTaskListener(null);
+            this.fetchAllSurahTask = null;
+        }
     }
 
     private static class SurahListViewState extends BaseSavedState {

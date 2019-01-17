@@ -16,7 +16,7 @@ public class ProgressView extends LinearLayout {
         super(context);
 
         this.progressBar = new ProgressBar(context);
-        this.progressText = new TextView(context);
+        this.progressText = new LpmqTextView(context);
 
         initConfiguration();
         initView();

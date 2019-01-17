@@ -94,10 +94,10 @@ public class MainView extends WrapperView {
     }
 
     private void initView() {
-        final SurahListView surahListView = new SurahListView(getContext(), new FetchAllSurahTask(this.quranRepository));
+        final SurahListView surahListView = new SurahListView(getContext(), new FetchAllSurahTask.Factory(this.quranRepository));
         surahListView.setOnViewEventListener(this.surahListEventListener);
 
-        final SurahDetailView surahDetailView = new SurahDetailView(getContext(), new FetchSurahDetailTask(this.quranRepository));
+        final SurahDetailView surahDetailView = new SurahDetailView(getContext(), new FetchSurahDetailTask.Factory(this.quranRepository));
 
         this.mappedClassToIndex.put(SurahListView.class, addViewToContainer(surahListView));
         this.mappedClassToIndex.put(SurahDetailView.class, addViewToContainer(surahDetailView));

@@ -57,4 +57,18 @@ public class FetchSurahDetailTask extends AsyncTask<Surah, Float, SurahDetail> {
             this.onTaskListener.onFinished(s);
         }
     }
+
+    public static class Factory implements AsyncTaskFactory<FetchSurahDetailTask> {
+
+        private final QuranRepository quranRepository;
+
+        public Factory(QuranRepository quranRepository) {
+            this.quranRepository = quranRepository;
+        }
+
+        @Override
+        public FetchSurahDetailTask create() {
+            return new FetchSurahDetailTask(this.quranRepository);
+        }
+    }
 }

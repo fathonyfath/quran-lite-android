@@ -12,8 +12,8 @@ public class TwoLineTextView extends LinearLayout {
 
     public TwoLineTextView(Context context) {
         super(context);
-        this.firstLineTextView = new TextView(context);
-        this.secondLineTextView = new TextView(context);
+        this.firstLineTextView = new LpmqTextView(context);
+        this.secondLineTextView = new LpmqTextView(context);
 
         initConfiguration();
         initView();

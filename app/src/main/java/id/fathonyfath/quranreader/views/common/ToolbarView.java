@@ -23,7 +23,7 @@ public class ToolbarView extends LinearLayout {
     private final ViewSwitcher.ViewFactory titleTextFactory = new ViewSwitcher.ViewFactory() {
         @Override
         public View makeView() {
-            TextView titleView = new TextView(getContext());
+            TextView titleView = new LpmqTextView(getContext());
             titleView.setLayoutParams(new FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT

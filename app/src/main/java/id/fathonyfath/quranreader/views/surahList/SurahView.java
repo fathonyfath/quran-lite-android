@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import id.fathonyfath.quranreader.models.Surah;
 import id.fathonyfath.quranreader.utils.UnitConverter;
+import id.fathonyfath.quranreader.views.common.LpmqTextView;
 import id.fathonyfath.quranreader.views.common.TwoLineTextView;
 
 public class SurahView extends RelativeLayout {
@@ -18,7 +19,7 @@ public class SurahView extends RelativeLayout {
         super(context);
 
         this.twoLineTextView = new TwoLineTextView(getContext());
-        this.surahNumberTextView = new TextView(getContext());
+        this.surahNumberTextView = new LpmqTextView(getContext());
 
         initConfiguration();
         initView();

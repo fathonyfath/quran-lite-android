@@ -8,6 +8,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import id.fathonyfath.quranreader.utils.UnitConverter;
+import id.fathonyfath.quranreader.views.common.LpmqTextView;
 
 public class AyahView extends RelativeLayout {
 
@@ -17,8 +18,8 @@ public class AyahView extends RelativeLayout {
     public AyahView(Context context) {
         super(context);
 
-        this.ayahText = new TextView(context);
-        this.ayahNumberText = new TextView(context);
+        this.ayahText = new LpmqTextView(context);
+        this.ayahNumberText = new LpmqTextView(context);
 
         initConfiguration();
         initView();
@@ -41,9 +42,6 @@ public class AyahView extends RelativeLayout {
         this.ayahText.setTextSize(28f);
 
         this.ayahText.setLineSpacing(UnitConverter.fromDpToPx(getContext(), 30f), 1f);
-
-        Typeface typeface = Typeface.createFromAsset(getContext().getAssets(), "lpmq.otf");
-        this.ayahText.setTypeface(typeface);
 
         int numberPadding = (int) UnitConverter.fromDpToPx(getContext(), 2f);
         this.ayahNumberText.setPadding(numberPadding, numberPadding, numberPadding, numberPadding);

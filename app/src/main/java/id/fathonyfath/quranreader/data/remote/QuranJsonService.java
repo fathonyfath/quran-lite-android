@@ -1,5 +1,6 @@
 package id.fathonyfath.quranreader.data.remote;
 
+import android.util.Log;
 import android.util.Pair;
 
 import org.json.JSONArray;
@@ -212,6 +213,7 @@ public class QuranJsonService {
                 if (this.onDownloadProgressListener != null) {
                     this.onDownloadProgressListener.onDownloadProgress(totalRead, contentLength);
                 }
+                Log.d("QuranJsonService", "Current: " + totalRead + " Total: " + contentLength);
             }
 
             stream.close();
