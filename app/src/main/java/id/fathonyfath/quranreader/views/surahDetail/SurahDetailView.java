@@ -2,7 +2,8 @@ package id.fathonyfath.quranreader.views.surahDetail;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Pair;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +25,10 @@ import id.fathonyfath.quranreader.views.common.ProgressView;
 
 public class SurahDetailView extends FrameLayout implements ViewCallback {
 
-    private Surah selectedSurah;
+    private Surah currentSurah;
+    private Parcelable listViewState;
+
+    private boolean newPage = false;
 
     private final List<AyahDetailViewType> ayahViewTypeList = new ArrayList<>();
 
@@ -50,11 +54,12 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
     public SurahDetailView(Context context, FetchSurahDetailTask.Factory fetchSurahDetailTaskFactory) {
         super(context);
 
-        this.fetchSurahDetailTaskFactory = fetchSurahDetailTaskFactory;
-
         setId(Res.Id.surahDetailView);
 
+        this.fetchSurahDetailTaskFactory = fetchSurahDetailTaskFactory;
+
         this.ayahListView = new ListView(context);
+        this.ayahListView.setId(Res.Id.surahDetailView_ayahListView);
         this.ayahDetailAdapter = new AyahDetailAdapter(context, this.ayahViewTypeList);
 
         this.progressView = new ProgressView(getContext());
@@ -64,9 +69,25 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
     }
 
     @Override
+    protected Parcelable onSaveInstanceState() {
+        final SurahDetailViewState surahDetailViewState = new SurahDetailViewState(super.onSaveInstanceState());
+        surahDetailViewState.currentSurah = this.currentSurah;
+        surahDetailViewState.listViewState = this.ayahListView.onSaveInstanceState();
+        return surahDetailViewState;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        final SurahDetailViewState surahDetailViewState = (SurahDetailViewState) state;
+        super.onRestoreInstanceState(surahDetailViewState.getSuperState());
+        this.currentSurah = surahDetailViewState.currentSurah;
+        this.listViewState = surahDetailViewState.listViewState;
+    }
+
+    @Override
     public void onResume() {
-        if (this.selectedSurah != null) {
-            fetchSurahDetail(this.selectedSurah);
+        if (this.currentSurah != null) {
+            fetchSurahDetail(this.currentSurah);
         } else {
             ViewUtil.onBackPressed(this);
         }
@@ -78,7 +99,8 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
     }
 
     public void setState(Surah selectedSurah) {
-        this.selectedSurah = selectedSurah;
+        this.currentSurah = selectedSurah;
+        this.newPage = true;
     }
 
     private void initConfiguration() {
@@ -129,6 +151,10 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
         }
 
         this.ayahDetailAdapter.notifyDataSetChanged();
+
+        if (this.listViewState != null && !newPage) {
+            this.ayahListView.onRestoreInstanceState(this.listViewState);
+        }
     }
 
     private void updateTextProgress(float progress) {
@@ -146,5 +172,48 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
     private void clearView() {
         this.ayahViewTypeList.clear();
         this.ayahDetailAdapter.clear();
+    }
+
+    private static class SurahDetailViewState extends BaseSavedState {
+
+        private Surah currentSurah;
+        private Parcelable listViewState;
+
+        public SurahDetailViewState(Parcel source, ClassLoader loader) {
+            super(source);
+
+            this.currentSurah = source.readParcelable(Surah.class.getClassLoader());
+            this.listViewState = source.readParcelable(loader);
+        }
+
+        public SurahDetailViewState(Parcelable superState) {
+            super(superState);
+        }
+
+        @Override
+        public void writeToParcel(Parcel out, int flags) {
+            super.writeToParcel(out, flags);
+
+            out.writeParcelable(this.currentSurah, flags);
+            out.writeParcelable(this.listViewState, flags);
+        }
+
+        public static final Parcelable.Creator<SurahDetailViewState> CREATOR
+                = new Parcelable.ClassLoaderCreator<SurahDetailViewState>() {
+            @Override
+            public SurahDetailViewState createFromParcel(Parcel in) {
+                return new SurahDetailViewState(in, null);
+            }
+
+            @Override
+            public SurahDetailViewState createFromParcel(Parcel in, ClassLoader loader) {
+                return new SurahDetailViewState(in, loader);
+            }
+
+            @Override
+            public SurahDetailViewState[] newArray(int size) {
+                return new SurahDetailViewState[size];
+            }
+        };
     }
 }

@@ -10,7 +10,8 @@ public final class Res {
         public static final int surahListView = 0x00000004;
         public static final int surahListView_surahListView = 0x00000005;
 
-        public static final int surahDetailView = 0x00000007;
+        public static final int surahDetailView = 0x00000006;
+        public static final int surahDetailView_ayahListView = 0x00000007;
         public static final int surahDetailView_ayahView_ayahTextView = 0x00000008;
     }
 }
