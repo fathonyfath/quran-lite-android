@@ -162,7 +162,7 @@ public class MainView extends WrapperView {
 
     private void routeToSurahDetailView(Surah selectedSurah) {
         SurahDetailView surahDetailView = findChildViewAtIndex(this.mappedClassToIndex.get(SurahDetailView.class));
-        surahDetailView.updateView(selectedSurah);
+        surahDetailView.setState(selectedSurah);
 
         this.viewBackStack.push(SurahDetailView.class);
         updateViewBasedOnBackStack();
