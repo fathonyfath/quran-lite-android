@@ -18,6 +18,8 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
     private final TextView informationTextView;
     private final ProgressView progressView;
 
+    private OnViewEventListener onViewEventListener;
+
     public FontDownloaderView(Context context) {
         super(context);
 
@@ -39,6 +41,10 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
 
     }
 
+    public void setOnViewEventListener(OnViewEventListener onViewEventListener) {
+        this.onViewEventListener = onViewEventListener;
+    }
+
     private void initConfiguration() {
         setBackgroundColor(Color.WHITE);
 
@@ -46,7 +52,7 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
     }
 
     private void initView() {
-        this.informationTextView.setText("Mohon menunggu. Sedang mengunduh font untuk huruf arab...");
+        this.informationTextView.setText("Mohon menunggu. Sedang mengunduh font untuk tampilan huruf arab...");
         this.informationTextView.setTextSize(16f);
         this.informationTextView.setGravity(Gravity.CENTER_HORIZONTAL);
         this.containerLayout.addView(this.informationTextView, new LinearLayout.LayoutParams(
@@ -89,5 +95,9 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
         final LayoutParams containerParams = (LayoutParams) this.containerLayout.getLayoutParams();
         containerParams.gravity = Gravity.CENTER;
         this.containerLayout.setLayoutParams(containerParams);
+    }
+
+    public interface OnViewEventListener {
+        void onDownloadCompleted();
     }
 }

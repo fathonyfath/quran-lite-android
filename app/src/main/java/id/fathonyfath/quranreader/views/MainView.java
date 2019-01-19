@@ -16,6 +16,7 @@ import id.fathonyfath.quranreader.models.Surah;
 import id.fathonyfath.quranreader.tasks.FetchAllSurahTask;
 import id.fathonyfath.quranreader.tasks.FetchSurahDetailTask;
 import id.fathonyfath.quranreader.views.common.WrapperView;
+import id.fathonyfath.quranreader.views.fontDownloader.FontDownloaderView;
 import id.fathonyfath.quranreader.views.surahDetail.SurahDetailView;
 import id.fathonyfath.quranreader.views.surahList.SurahListView;
 
@@ -30,6 +31,14 @@ public class MainView extends WrapperView {
     @SuppressLint("WrongConstant")
     private final QuranRepository quranRepository = (QuranRepository) getContext()
             .getSystemService(MainActivity.QURAN_REPOSITORY_SERVICE);
+
+    private final FontDownloaderView.OnViewEventListener fontDownloaderEventListener = new FontDownloaderView.OnViewEventListener() {
+        @Override
+        public void onDownloadCompleted() {
+            MainView.this.viewBackStack.pop();
+            routeToSurahListView();
+        }
+    };
 
     private final SurahListView.OnViewEventListener surahListEventListener = new SurahListView.OnViewEventListener() {
         @Override
@@ -87,18 +96,28 @@ public class MainView extends WrapperView {
         super.onAttachedToWindow();
 
         if (this.viewBackStack.isEmpty()) {
-            this.viewBackStack.push(SurahListView.class);
+            this.viewBackStack.push(FontDownloaderView.class);
         }
 
         updateViewBasedOnBackStack();
     }
 
     private void initView() {
-        final SurahListView surahListView = new SurahListView(getContext(), new FetchAllSurahTask.Factory(this.quranRepository));
+        final FontDownloaderView fontDownloaderView = new FontDownloaderView(getContext());
+        fontDownloaderView.setOnViewEventListener(this.fontDownloaderEventListener);
+
+        final SurahListView surahListView = new SurahListView(
+                getContext(),
+                new FetchAllSurahTask.Factory(this.quranRepository)
+        );
         surahListView.setOnViewEventListener(this.surahListEventListener);
 
-        final SurahDetailView surahDetailView = new SurahDetailView(getContext(), new FetchSurahDetailTask.Factory(this.quranRepository));
+        final SurahDetailView surahDetailView = new SurahDetailView(
+                getContext(),
+                new FetchSurahDetailTask.Factory(this.quranRepository)
+        );
 
+        this.mappedClassToIndex.put(FontDownloaderView.class, addViewToContainer(fontDownloaderView));
         this.mappedClassToIndex.put(SurahListView.class, addViewToContainer(surahListView));
         this.mappedClassToIndex.put(SurahDetailView.class, addViewToContainer(surahDetailView));
 
@@ -114,12 +133,17 @@ public class MainView extends WrapperView {
         }
     }
 
-    private void routeToSurahDetailView(Surah selectedSurah) {
-        this.viewBackStack.push(SurahDetailView.class);
+    private void routeToSurahListView() {
+        this.viewBackStack.push(SurahListView.class);
         updateViewBasedOnBackStack();
+    }
 
+    private void routeToSurahDetailView(Surah selectedSurah) {
         SurahDetailView surahDetailView = findChildViewAtIndex(this.mappedClassToIndex.get(SurahDetailView.class));
         surahDetailView.updateView(selectedSurah);
+
+        this.viewBackStack.push(SurahDetailView.class);
+        updateViewBasedOnBackStack();
 
         updateIsToolbarFlying(false);
     }

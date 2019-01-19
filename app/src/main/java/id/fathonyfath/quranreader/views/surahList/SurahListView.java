@@ -282,7 +282,6 @@ public class SurahListView extends FrameLayout implements ViewCallback {
 
     public interface OnViewEventListener {
         void onSurahListScroll(float scrollY);
-
         void onSurahSelected(Surah selectedSurah);
     }
 }
