@@ -58,7 +58,7 @@ public class AyahView extends RelativeLayout {
         int leftRightNumberPadding = (int) UnitConverter.fromDpToPx(getContext(), 4f);
         this.ayahNumberText.setPadding(leftRightNumberPadding, 0, leftRightNumberPadding, 0);
         this.ayahNumberText.setBackgroundColor(Color.parseColor("#e5e5e5"));
-        this.ayahNumberText.setTextSize(12f);
+        this.ayahNumberText.setTextSize(14f);
 
         this.ayahTranslationText.setTextSize(16f);
         this.ayahTranslationText.setTypeface(this.ayahTranslationText.getTypeface(), Typeface.ITALIC);

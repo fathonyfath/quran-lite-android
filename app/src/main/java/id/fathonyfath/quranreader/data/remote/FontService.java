@@ -3,6 +3,7 @@ package id.fathonyfath.quranreader.data.remote;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -39,22 +40,27 @@ public class FontService {
             int totalRead = 0;
 
             InputStream stream = new BufferedInputStream(urlConnection.getInputStream());
-            FileOutputStream fileOutputStream = new FileOutputStream(destination);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
             byte[] buffer = new byte[1024];
             int bytesRead;
 
             while ((bytesRead = stream.read(buffer)) != -1) {
-                fileOutputStream.write(buffer, 0, bytesRead);
+                outputStream.write(buffer, 0, bytesRead);
                 totalRead += bytesRead;
 
                 if (this.onDownloadProgressListener != null) {
                     this.onDownloadProgressListener.onDownloadProgress(totalRead, contentLength);
                 }
+
                 Log.d("FontService", "Current: " + totalRead + " Total: " + contentLength);
             }
 
+            FileOutputStream fileOutputStream = new FileOutputStream(destination);
+            fileOutputStream.write(outputStream.toByteArray());
+
             stream.close();
+            outputStream.close();
             fileOutputStream.close();
 
             return true;

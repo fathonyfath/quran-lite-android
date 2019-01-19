@@ -8,6 +8,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import id.fathonyfath.quranreader.tasks.AsyncTaskHolder;
 import id.fathonyfath.quranreader.tasks.DownloadFontTask;
 import id.fathonyfath.quranreader.tasks.HasFontInstalledTask;
 import id.fathonyfath.quranreader.tasks.OnTaskListener;
@@ -22,7 +23,6 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
     private final ProgressView progressView;
 
     private final HasFontInstalledTask.Factory hasFontInstalledTaskFactory;
-    private HasFontInstalledTask hasFontInstalledTask;
     private final OnTaskListener<Boolean> hasFontInstalledCallback = new OnTaskListener<Boolean>() {
         @Override
         public void onProgress(float progress) {
@@ -36,15 +36,16 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
             } else {
                 FontDownloaderView.this.downloadFont();
             }
+
+            clearHasFontInstalledTask();
         }
     };
 
     private final DownloadFontTask.Factory downloadFontTaskFactory;
-    private DownloadFontTask downloadFontTask;
     private final OnTaskListener<Boolean> downloadFontCallback = new OnTaskListener<Boolean>() {
         @Override
         public void onProgress(float progress) {
-
+            updateTextProgress(progress);
         }
 
         @Override
@@ -54,6 +55,8 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
             } else {
                 FontDownloaderView.this.notifyDownloadFailed();
             }
+
+            clearDownloadFontTask();
         }
     };
 
@@ -76,13 +79,13 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
 
     @Override
     public void onResume() {
+        registerTaskCallbacks();
         checkIfHasFontInstalled();
     }
 
     @Override
     public void onPause() {
-        clearHasFontInstalledTask();
-        clearDownloadFontTask();
+        clearTaskCallbacks();
     }
 
     public void setOnViewEventListener(OnViewEventListener onViewEventListener) {
@@ -134,45 +137,64 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
                 ViewGroup.LayoutParams.WRAP_CONTENT
         ));
 
-        this.progressView.updateProgress(20f);
-
         final LayoutParams containerParams = (LayoutParams) this.containerLayout.getLayoutParams();
         containerParams.gravity = Gravity.CENTER;
         this.containerLayout.setLayoutParams(containerParams);
     }
 
     private void checkIfHasFontInstalled() {
-        clearHasFontInstalledTask();
-
-        this.hasFontInstalledTask = this.hasFontInstalledTaskFactory.create();
-
-        this.hasFontInstalledTask.setOnTaskListener(this.hasFontInstalledCallback);
-        this.hasFontInstalledTask.execute();
+        if (AsyncTaskHolder.hasFontInstalledTaskInstance == null) {
+            AsyncTaskHolder.hasFontInstalledTaskInstance = this.hasFontInstalledTaskFactory.create();
+            AsyncTaskHolder.hasFontInstalledTaskInstance.setOnTaskListener(this.hasFontInstalledCallback);
+            AsyncTaskHolder.hasFontInstalledTaskInstance.execute();
+        }
     }
 
     private void downloadFont() {
-        clearDownloadFontTask();
-
-        this.downloadFontTask = this.downloadFontTaskFactory.create();
-
-        this.downloadFontTask.setOnTaskListener(this.downloadFontCallback);
-        this.downloadFontTask.execute();
+        if (AsyncTaskHolder.downloadFontTaskInstance == null) {
+            AsyncTaskHolder.downloadFontTaskInstance = this.downloadFontTaskFactory.create();
+            AsyncTaskHolder.downloadFontTaskInstance.setOnTaskListener(this.downloadFontCallback);
+            AsyncTaskHolder.downloadFontTaskInstance.execute();
+        }
     }
 
     private void clearHasFontInstalledTask() {
-        if (this.hasFontInstalledTask != null) {
-            this.hasFontInstalledTask.cancel(true);
-            this.hasFontInstalledTask.setOnTaskListener(null);
-            this.hasFontInstalledTask = null;
+        if (AsyncTaskHolder.hasFontInstalledTaskInstance != null) {
+            AsyncTaskHolder.hasFontInstalledTaskInstance.setOnTaskListener(null);
+            AsyncTaskHolder.hasFontInstalledTaskInstance = null;
+
         }
     }
 
     private void clearDownloadFontTask() {
-        if (this.downloadFontTask != null) {
-            this.downloadFontTask.cancel(true);
-            this.downloadFontTask.setOnTaskListener(null);
-            this.downloadFontTask = null;
+        if (AsyncTaskHolder.downloadFontTaskInstance != null) {
+            AsyncTaskHolder.downloadFontTaskInstance.setOnTaskListener(null);
+            AsyncTaskHolder.downloadFontTaskInstance = null;
         }
+    }
+
+    private void registerTaskCallbacks() {
+        if (AsyncTaskHolder.hasFontInstalledTaskInstance != null) {
+            AsyncTaskHolder.hasFontInstalledTaskInstance.setOnTaskListener(this.hasFontInstalledCallback);
+        }
+
+        if (AsyncTaskHolder.downloadFontTaskInstance != null) {
+            AsyncTaskHolder.downloadFontTaskInstance.setOnTaskListener(this.downloadFontCallback);
+        }
+    }
+
+    private void clearTaskCallbacks() {
+        if (AsyncTaskHolder.hasFontInstalledTaskInstance != null) {
+            AsyncTaskHolder.hasFontInstalledTaskInstance.setOnTaskListener(null);
+        }
+
+        if (AsyncTaskHolder.downloadFontTaskInstance != null) {
+            AsyncTaskHolder.downloadFontTaskInstance.setOnTaskListener(null);
+        }
+    }
+
+    private void updateTextProgress(float progress) {
+        this.progressView.updateProgress(progress);
     }
 
     private void notifyDownloadComplete() {

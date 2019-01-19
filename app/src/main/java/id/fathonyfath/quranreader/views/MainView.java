@@ -160,7 +160,7 @@ public class MainView extends WrapperView {
 
     private void showTitleForClass(Class classOfView) {
         if (classOfView == FontDownloaderView.class) {
-            setToolbarTitle("Download Font");
+            setToolbarTitle("Mengunduh font");
         } else if (classOfView == SurahListView.class) {
             setToolbarTitle("Baca Al-Qur'an");
         } else if (classOfView == SurahDetailView.class) {
