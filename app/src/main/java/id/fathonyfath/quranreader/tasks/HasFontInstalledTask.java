@@ -20,7 +20,11 @@ public class HasFontInstalledTask extends AsyncTask<Void, Float, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... voids) {
-        return this.fontProvider.hasFontInstalled();
+        try {
+            return this.fontProvider.hasFontInstalled();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override

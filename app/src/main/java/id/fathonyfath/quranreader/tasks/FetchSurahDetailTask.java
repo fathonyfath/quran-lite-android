@@ -35,7 +35,7 @@ public class FetchSurahDetailTask extends AsyncTask<Surah, Float, SurahDetail> {
             try {
                 return this.quranRepository.fetchSurahDetail(surahs[0]);
             } catch (Exception ignored) {
-
+                return null;
             }
         }
         return null;

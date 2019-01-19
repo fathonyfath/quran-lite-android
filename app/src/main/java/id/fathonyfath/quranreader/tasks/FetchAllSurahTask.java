@@ -32,7 +32,11 @@ public class FetchAllSurahTask extends AsyncTask<Void, Float, List<Surah>> {
     @Override
     protected List<Surah> doInBackground(Void... voids) {
         publishProgress(0f);
-        return this.quranRepository.fetchAllSurah();
+        try {
+            return this.quranRepository.fetchAllSurah();
+        } catch (Exception ignored) {
+            return null;
+        }
     }
 
     @Override

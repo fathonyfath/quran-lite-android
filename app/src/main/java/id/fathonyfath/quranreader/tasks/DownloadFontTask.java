@@ -29,7 +29,11 @@ public class DownloadFontTask extends AsyncTask<Void, Float, Boolean> {
     @Override
     protected Boolean doInBackground(Void... voids) {
         publishProgress(0f);
-        return this.fontProvider.downloadFont();
+        try {
+            return this.fontProvider.downloadFont();
+        } catch (Exception ignored) {
+            return false;
+        }
     }
 
     @Override
