@@ -47,4 +47,12 @@ public class FontProvider {
     public boolean hasFontInstalled() {
         return this.fontFile.exists();
     }
+
+    public File getFontFile() {
+        return this.fontFile;
+    }
+
+    public boolean deleteFontFile() {
+        return this.fontFile.delete();
+    }
 }

@@ -3,21 +3,27 @@ package id.fathonyfath.quranreader.utils;
 import android.content.Context;
 import android.graphics.Typeface;
 
+import id.fathonyfath.quranreader.data.FontProvider;
+
 public class TypefaceLoader {
 
     private static TypefaceLoader instance;
 
-    public static TypefaceLoader getInstance(Context context) {
+    public static TypefaceLoader getInstance(FontProvider fontProvider) {
         if (TypefaceLoader.instance == null) {
-            TypefaceLoader.instance = new TypefaceLoader(context);
+            TypefaceLoader.instance = new TypefaceLoader(fontProvider);
         }
         return TypefaceLoader.instance;
     }
 
-    private final Typeface defaultTypeface;
+    private Typeface defaultTypeface;
 
-    private TypefaceLoader(Context context) {
-        this.defaultTypeface = Typeface.createFromAsset(context.getAssets(), "lpmq.otf");
+    private TypefaceLoader(FontProvider fontProvider) {
+        try {
+            this.defaultTypeface = Typeface.createFromFile(fontProvider.getFontFile());
+        } catch (RuntimeException ignored) {
+            this.defaultTypeface = Typeface.DEFAULT;
+        }
     }
 
     public Typeface getDefaultTypeface() {
