@@ -1,6 +1,7 @@
 package id.fathonyfath.quranreader.views.surahDetail;
 
 import android.content.Context;
+import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -8,15 +9,15 @@ import android.widget.ArrayAdapter;
 
 import java.util.List;
 
-public class AyahAdapter extends ArrayAdapter<String> {
+public class AyahDetailAdapter extends ArrayAdapter<AyahDetailViewType> {
 
-    public AyahAdapter(Context context, List<String> surahList) {
+    public AyahDetailAdapter(Context context, List<AyahDetailViewType> surahList) {
         super(context, 0, surahList);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        String currentAyah = getItem(position);
+        AyahDetailViewType currentItem = getItem(position);
 
         if (convertView == null) {
             AyahView ayahView = new AyahView(getContext());
@@ -27,9 +28,10 @@ public class AyahAdapter extends ArrayAdapter<String> {
             convertView = ayahView;
         }
 
-        if (convertView instanceof AyahView) {
+        if (convertView instanceof AyahView && currentItem instanceof AyahDetailViewType.AyahViewModel) {
             AyahView ayahView = (AyahView) convertView;
-            ayahView.updateAyah(currentAyah);
+            AyahDetailViewType.AyahViewModel ayahViewModel = (AyahDetailViewType.AyahViewModel) currentItem;
+            ayahView.updateAyah(ayahViewModel);
         }
 
         return convertView;

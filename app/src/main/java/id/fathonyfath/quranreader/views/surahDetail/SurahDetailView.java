@@ -2,12 +2,14 @@ package id.fathonyfath.quranreader.views.surahDetail;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Pair;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import id.fathonyfath.quranreader.Res;
 import id.fathonyfath.quranreader.models.Surah;
@@ -18,10 +20,10 @@ import id.fathonyfath.quranreader.utils.ViewCallback;
 
 public class SurahDetailView extends FrameLayout implements ViewCallback {
 
-    private final List<String> ayahList = new ArrayList<>();
+    private final List<AyahDetailViewType> ayahViewTypeList = new ArrayList<>();
 
     private final ListView ayahListView;
-    private final AyahAdapter ayahAdapter;
+    private final AyahDetailAdapter ayahDetailAdapter;
 
     private final FetchSurahDetailTask.Factory fetchSurahDetailTaskFactory;
 
@@ -33,7 +35,7 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
         setId(Res.Id.surahDetailView);
 
         this.ayahListView = new ListView(context);
-        this.ayahAdapter = new AyahAdapter(context, this.ayahList);
+        this.ayahDetailAdapter = new AyahDetailAdapter(context, this.ayahViewTypeList);
 
         initConfiguration();
         initView();
@@ -60,9 +62,17 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
 
             @Override
             public void onFinished(SurahDetail result) {
-                ayahList.clear();
-                ayahList.addAll(result.getContents().values());
-                ayahAdapter.notifyDataSetChanged();
+                ayahViewTypeList.clear();
+
+                for (Map.Entry<Integer, String> entry : result.getContents().entrySet()) {
+                    String translation = result.getSurahTranslation().getContents().get(entry.getKey());
+                    if (translation == null) {
+                        translation = "";
+                    }
+                    ayahViewTypeList.add(new AyahDetailViewType.AyahViewModel(entry.getKey(), entry.getValue(), translation));
+                }
+
+                ayahDetailAdapter.notifyDataSetChanged();
             }
         });
         fetchSurahDetailTask.execute(selectedSurah);
@@ -73,7 +83,7 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
     }
 
     private void initView() {
-        this.ayahListView.setAdapter(this.ayahAdapter);
+        this.ayahListView.setAdapter(this.ayahDetailAdapter);
         this.ayahListView.setDivider(null);
 
         addView(this.ayahListView, new FrameLayout.LayoutParams(
@@ -83,7 +93,7 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
     }
 
     private void clearView() {
-        this.ayahList.clear();
-        this.ayahAdapter.clear();
+        this.ayahViewTypeList.clear();
+        this.ayahDetailAdapter.clear();
     }
 }
