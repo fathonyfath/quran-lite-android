@@ -52,8 +52,6 @@ public class FontService {
                 if (this.onDownloadProgressListener != null) {
                     this.onDownloadProgressListener.onDownloadProgress(totalRead, contentLength);
                 }
-
-                Log.d("FontService", "Current: " + totalRead + " Total: " + contentLength);
             }
 
             FileOutputStream fileOutputStream = new FileOutputStream(destination);

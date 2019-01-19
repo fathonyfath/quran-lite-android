@@ -17,6 +17,7 @@ import java.util.Map;
 import id.fathonyfath.quranreader.Res;
 import id.fathonyfath.quranreader.models.Surah;
 import id.fathonyfath.quranreader.models.SurahDetail;
+import id.fathonyfath.quranreader.tasks.AsyncTaskHolder;
 import id.fathonyfath.quranreader.tasks.FetchSurahDetailTask;
 import id.fathonyfath.quranreader.tasks.OnTaskListener;
 import id.fathonyfath.quranreader.utils.ViewCallback;
@@ -38,7 +39,6 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
     private final ProgressView progressView;
 
     private final FetchSurahDetailTask.Factory fetchSurahDetailTaskFactory;
-    private FetchSurahDetailTask fetchSurahDetailTask;
     private final OnTaskListener<SurahDetail> fetchSurahDetailCallback = new OnTaskListener<SurahDetail>() {
         @Override
         public void onProgress(float progress) {
@@ -47,7 +47,13 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
 
         @Override
         public void onFinished(SurahDetail result) {
-            processSurahDetail(result);
+            if (result != null) {
+                processSurahDetail(result);
+            } else {
+                // TODO: 19/01/19 Handle null value
+            }
+
+            clearFetchSurahDetailTask();
         }
     };
 
@@ -87,6 +93,7 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
     @Override
     public void onResume() {
         if (this.currentSurah != null) {
+            registerTaskCallbacks();
             fetchSurahDetail(this.currentSurah);
         } else {
             ViewUtil.onBackPressed(this);
@@ -96,6 +103,7 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
     @Override
     public void onPause() {
         clearView();
+        clearTaskCallbacks();
     }
 
     public void setState(Surah selectedSurah) {
@@ -135,13 +143,13 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
     }
 
     private void fetchSurahDetail(Surah selectedSurah) {
-        clearFetchSurahDetailTask();
-
         this.progressView.setVisibility(View.VISIBLE);
 
-        this.fetchSurahDetailTask = this.fetchSurahDetailTaskFactory.create();
-        this.fetchSurahDetailTask.setOnTaskListener(this.fetchSurahDetailCallback);
-        this.fetchSurahDetailTask.execute(selectedSurah);
+        if (AsyncTaskHolder.fetchSurahDetailTaskInstance == null) {
+            AsyncTaskHolder.fetchSurahDetailTaskInstance = this.fetchSurahDetailTaskFactory.create();
+            AsyncTaskHolder.fetchSurahDetailTaskInstance.setOnTaskListener(this.fetchSurahDetailCallback);
+            AsyncTaskHolder.fetchSurahDetailTaskInstance.execute(selectedSurah);
+        }
     }
 
     private void processSurahDetail(SurahDetail surahDetail) {
@@ -169,10 +177,21 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
     }
 
     private void clearFetchSurahDetailTask() {
-        if (this.fetchSurahDetailTask != null) {
-            this.fetchSurahDetailTask.cancel(true);
-            this.fetchSurahDetailTask.setOnTaskListener(null);
-            this.fetchSurahDetailTask = null;
+        if (AsyncTaskHolder.fetchSurahDetailTaskInstance != null) {
+            AsyncTaskHolder.fetchSurahDetailTaskInstance.setOnTaskListener(null);
+            AsyncTaskHolder.fetchSurahDetailTaskInstance = null;
+        }
+    }
+
+    private void registerTaskCallbacks() {
+        if (AsyncTaskHolder.fetchSurahDetailTaskInstance != null) {
+            AsyncTaskHolder.fetchSurahDetailTaskInstance.setOnTaskListener(this.fetchSurahDetailCallback);
+        }
+    }
+
+    private void clearTaskCallbacks() {
+        if (AsyncTaskHolder.fetchSurahDetailTaskInstance != null) {
+            AsyncTaskHolder.fetchSurahDetailTaskInstance.setOnTaskListener(null);
         }
     }
 

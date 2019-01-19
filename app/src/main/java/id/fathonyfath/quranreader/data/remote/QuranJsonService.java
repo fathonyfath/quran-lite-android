@@ -213,7 +213,6 @@ public class QuranJsonService {
                 if (this.onDownloadProgressListener != null) {
                     this.onDownloadProgressListener.onDownloadProgress(totalRead, contentLength);
                 }
-                Log.d("QuranJsonService", "Current: " + totalRead + " Total: " + contentLength);
             }
 
             stream.close();
