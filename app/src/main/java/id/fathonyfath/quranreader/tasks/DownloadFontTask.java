@@ -4,7 +4,6 @@ import android.os.AsyncTask;
 
 import id.fathonyfath.quranreader.data.FontProvider;
 import id.fathonyfath.quranreader.data.OnProgressListener;
-import id.fathonyfath.quranreader.data.remote.FontService;
 
 public class DownloadFontTask extends AsyncTask<Void, Float, Boolean> {
 
@@ -29,6 +28,7 @@ public class DownloadFontTask extends AsyncTask<Void, Float, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... voids) {
+        publishProgress(0f);
         return this.fontProvider.downloadFont();
     }
 

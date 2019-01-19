@@ -7,17 +7,13 @@ import android.os.Parcelable;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 
 import id.fathonyfath.quranreader.Res;
 import id.fathonyfath.quranreader.models.Surah;
@@ -104,7 +100,7 @@ public class SurahListView extends FrameLayout implements ViewCallback {
     public void onPause() {
         this.surahListView.setOnItemClickListener(null);
 
-        clearTask();
+        clearFetchAllSurahTask();
     }
 
     public void setOnViewEventListener(OnViewEventListener onViewEventListener) {
@@ -135,7 +131,7 @@ public class SurahListView extends FrameLayout implements ViewCallback {
     private void fetchAllSurahs() {
         this.progressView.setVisibility(View.VISIBLE);
 
-        clearTask();
+        clearFetchAllSurahTask();
         this.fetchAllSurahTask = this.fetchAllSurahTaskFactory.create();
 
         this.fetchAllSurahTask.setOnTaskListener(this.fetchAllSurahCallback);
@@ -159,7 +155,7 @@ public class SurahListView extends FrameLayout implements ViewCallback {
         this.surahList.addAll(surahList);
     }
 
-    private void clearTask() {
+    private void clearFetchAllSurahTask() {
         if (this.fetchAllSurahTask != null) {
             this.fetchAllSurahTask.cancel(true);
             this.fetchAllSurahTask.setOnTaskListener(null);

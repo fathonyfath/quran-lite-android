@@ -58,10 +58,6 @@ public class MainView extends WrapperView {
 
     private final SurahListView.OnViewEventListener surahListEventListener = new SurahListView.OnViewEventListener() {
         @Override
-        public void onSurahListScroll(float scrollY) {
-        }
-
-        @Override
         public void onSurahSelected(Surah selectedSurah) {
             routeToSurahDetailView(selectedSurah);
         }

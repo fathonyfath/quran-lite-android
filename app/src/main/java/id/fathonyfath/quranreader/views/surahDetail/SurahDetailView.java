@@ -3,6 +3,8 @@ package id.fathonyfath.quranreader.views.surahDetail;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.Pair;
+import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ListView;
@@ -18,6 +20,7 @@ import id.fathonyfath.quranreader.tasks.FetchSurahDetailTask;
 import id.fathonyfath.quranreader.tasks.OnTaskListener;
 import id.fathonyfath.quranreader.utils.ViewCallback;
 import id.fathonyfath.quranreader.utils.ViewUtil;
+import id.fathonyfath.quranreader.views.common.ProgressView;
 
 public class SurahDetailView extends FrameLayout implements ViewCallback {
 
@@ -28,12 +31,14 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
     private final ListView ayahListView;
     private final AyahDetailAdapter ayahDetailAdapter;
 
+    private final ProgressView progressView;
+
     private final FetchSurahDetailTask.Factory fetchSurahDetailTaskFactory;
     private FetchSurahDetailTask fetchSurahDetailTask;
     private final OnTaskListener<SurahDetail> fetchSurahDetailCallback = new OnTaskListener<SurahDetail>() {
         @Override
         public void onProgress(float progress) {
-
+            updateTextProgress(progress);
         }
 
         @Override
@@ -51,6 +56,8 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
 
         this.ayahListView = new ListView(context);
         this.ayahDetailAdapter = new AyahDetailAdapter(context, this.ayahViewTypeList);
+
+        this.progressView = new ProgressView(getContext());
 
         initConfiguration();
         initView();
@@ -86,10 +93,22 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
         ));
+
+        final FrameLayout.LayoutParams progressParams = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        progressParams.gravity = Gravity.CENTER;
+        this.progressView.setLayoutParams(progressParams);
+        this.progressView.setVisibility(View.GONE);
+
+        addView(this.progressView);
     }
 
     private void fetchSurahDetail(Surah selectedSurah) {
         clearFetchSurahDetailTask();
+
+        this.progressView.setVisibility(View.VISIBLE);
 
         this.fetchSurahDetailTask = this.fetchSurahDetailTaskFactory.create();
         this.fetchSurahDetailTask.setOnTaskListener(this.fetchSurahDetailCallback);
@@ -97,6 +116,8 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
     }
 
     private void processSurahDetail(SurahDetail surahDetail) {
+        this.progressView.setVisibility(View.GONE);
+
         this.ayahViewTypeList.clear();
 
         for (Map.Entry<Integer, String> entry : surahDetail.getContents().entrySet()) {
@@ -108,6 +129,10 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
         }
 
         this.ayahDetailAdapter.notifyDataSetChanged();
+    }
+
+    private void updateTextProgress(float progress) {
+        this.progressView.updateProgress(progress);
     }
 
     private void clearFetchSurahDetailTask() {

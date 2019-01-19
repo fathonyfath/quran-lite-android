@@ -30,6 +30,7 @@ public class FetchSurahDetailTask extends AsyncTask<Surah, Float, SurahDetail> {
 
     @Override
     protected SurahDetail doInBackground(Surah... surahs) {
+        publishProgress(0f);
         if (surahs != null) {
             try {
                 return this.quranRepository.fetchSurahDetail(surahs[0]);
