@@ -1,7 +1,5 @@
 package id.fathonyfath.quranreader.views.common;
 
-import android.animation.ValueAnimator;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.View;
@@ -25,16 +23,6 @@ public class WrapperView extends RelativeLayout {
     private final ToolbarView toolbarView;
     private final OverlayView overlayView;
     private final FrameLayout containerView;
-
-    private ValueAnimator currentAnimator;
-
-    private final ValueAnimator.AnimatorUpdateListener alphaAnimatorListener = new ValueAnimator.AnimatorUpdateListener() {
-        @Override
-        public void onAnimationUpdate(ValueAnimator animation) {
-            float value = (float) animation.getAnimatedValue();
-            setOverlayAlpha(value);
-        }
-    };
 
     private final List<Runnable> removeViewRunnables;
 
@@ -60,34 +48,9 @@ public class WrapperView extends RelativeLayout {
         }
     }
 
-    public void setToolbarTitle(String title) {
-        if (this.toolbarView != null) {
-            this.toolbarView.setTitle(title);
-        }
-    }
-
     public void setOverlayAlpha(float alpha) {
         if (this.overlayView != null) {
             this.overlayView.setAlpha(alpha);
-        }
-    }
-
-    public void animateOverlayAlpha(float alpha) {
-        if (this.currentAnimator != null) {
-            this.currentAnimator.removeAllListeners();
-            this.currentAnimator.cancel();
-        }
-
-        if (this.overlayView != null) {
-            this.currentAnimator = ValueAnimator.ofFloat(this.overlayView.getAlpha(), alpha);
-            if (this.overlayView.getAlpha() > alpha) {
-                this.currentAnimator.setInterpolator(new DecelerateInterpolator());
-            } else {
-                this.currentAnimator.setInterpolator(new AccelerateInterpolator());
-            }
-            this.currentAnimator.setDuration(200);
-            this.currentAnimator.addUpdateListener(alphaAnimatorListener);
-            this.currentAnimator.start();
         }
     }
 

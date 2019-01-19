@@ -31,8 +31,6 @@ public class MainView extends WrapperView {
 
     private Stack<Class> viewBackStack;
 
-    private boolean isToolbarFlying = false;
-
     @SuppressLint("WrongConstant")
     private final QuranRepository quranRepository = (QuranRepository) getContext()
             .getSystemService(MainActivity.QURAN_REPOSITORY_SERVICE);
@@ -61,11 +59,6 @@ public class MainView extends WrapperView {
     private final SurahListView.OnViewEventListener surahListEventListener = new SurahListView.OnViewEventListener() {
         @Override
         public void onSurahListScroll(float scrollY) {
-            if (scrollY > 0f) {
-                updateIsToolbarFlying(true);
-            } else {
-                updateIsToolbarFlying(false);
-            }
         }
 
         @Override
@@ -121,6 +114,8 @@ public class MainView extends WrapperView {
     }
 
     private void initView() {
+        setOverlayAlpha(0.1f);
+
         final FontDownloaderView fontDownloaderView = new FontDownloaderView(
                 getContext(),
                 new HasFontInstalledTask.Factory(this.fontProvider),
@@ -142,17 +137,6 @@ public class MainView extends WrapperView {
         this.mappedClassToIndex.put(FontDownloaderView.class, addViewToContainer(fontDownloaderView));
         this.mappedClassToIndex.put(SurahListView.class, addViewToContainer(surahListView));
         this.mappedClassToIndex.put(SurahDetailView.class, addViewToContainer(surahDetailView));
-
-        setOverlayAlpha(0.05f);
-    }
-
-    private void updateIsToolbarFlying(boolean isFlying) {
-        if (this.isToolbarFlying != isFlying) {
-            this.isToolbarFlying = isFlying;
-
-            float newAlpha = isFlying ? 0.5f : 0.05f;
-            animateOverlayAlpha(newAlpha);
-        }
     }
 
     private void routeToSurahListView() {
@@ -166,8 +150,6 @@ public class MainView extends WrapperView {
 
         this.viewBackStack.push(SurahDetailView.class);
         updateViewBasedOnBackStack();
-
-        updateIsToolbarFlying(false);
     }
 
     private void updateViewBasedOnBackStack() {

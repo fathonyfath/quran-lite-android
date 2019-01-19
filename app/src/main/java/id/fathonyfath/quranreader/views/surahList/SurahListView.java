@@ -28,20 +28,7 @@ import id.fathonyfath.quranreader.views.common.ProgressView;
 
 public class SurahListView extends FrameLayout implements ViewCallback {
 
-    private final Hashtable<Integer, Integer> listViewItemHeights = new Hashtable<>();
     private final List<Surah> surahList = new ArrayList<>();
-
-    private final AbsListView.OnScrollListener scrollChangeListener = new AbsListView.OnScrollListener() {
-        @Override
-        public void onScrollStateChanged(AbsListView view, int scrollState) {
-
-        }
-
-        @Override
-        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-            SurahListView.this.triggerSurahListScroll();
-        }
-    };
 
     private final AdapterView.OnItemClickListener onSurahItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
@@ -94,7 +81,6 @@ public class SurahListView extends FrameLayout implements ViewCallback {
     @Override
     protected Parcelable onSaveInstanceState() {
         final SurahListViewState viewState = new SurahListViewState(super.onSaveInstanceState());
-        viewState.listViewItemHeights = this.listViewItemHeights;
         viewState.surahList = this.surahList;
         return viewState;
     }
@@ -103,7 +89,6 @@ public class SurahListView extends FrameLayout implements ViewCallback {
     protected void onRestoreInstanceState(Parcelable state) {
         final SurahListViewState viewState = (SurahListViewState) state;
         super.onRestoreInstanceState(viewState.getSuperState());
-        restoreListViewItemHeights(viewState.listViewItemHeights);
         restoreSurahList(viewState.surahList);
     }
 
@@ -133,7 +118,6 @@ public class SurahListView extends FrameLayout implements ViewCallback {
     private void initView() {
         this.surahListView.setId(Res.Id.surahListView_surahListView);
         this.surahListView.setAdapter(this.surahAdapter);
-        this.surahListView.setOnScrollListener(scrollChangeListener);
 
         addView(this.surahListView);
 
@@ -170,38 +154,6 @@ public class SurahListView extends FrameLayout implements ViewCallback {
         this.progressView.updateProgress(progress);
     }
 
-    private void triggerSurahListScroll() {
-        if (this.surahListView.getChildCount() > 0) {
-            int scrollY = getScrollYListView();
-            if (this.onViewEventListener != null) {
-                this.onViewEventListener.onSurahListScroll(scrollY);
-            }
-        }
-    }
-
-    private int getScrollYListView() {
-        View child = this.surahListView.getChildAt(0);
-        if (child == null) return 0;
-
-        int scrollY = -child.getTop();
-
-        this.listViewItemHeights.put(this.surahListView.getFirstVisiblePosition(), child.getHeight());
-
-        for (int i = 0; i < this.surahListView.getFirstVisiblePosition(); ++i) {
-            Integer height = listViewItemHeights.get(i);
-
-            if (height != null)
-                scrollY += height;
-        }
-
-        return scrollY;
-    }
-
-    private void restoreListViewItemHeights(Hashtable<Integer, Integer> listViewItemHeights) {
-        this.listViewItemHeights.clear();
-        this.listViewItemHeights.putAll(listViewItemHeights);
-    }
-
     private void restoreSurahList(List<Surah> surahList) {
         this.surahList.clear();
         this.surahList.addAll(surahList);
@@ -217,27 +169,10 @@ public class SurahListView extends FrameLayout implements ViewCallback {
 
     private static class SurahListViewState extends BaseSavedState {
 
-        private Hashtable<Integer, Integer> listViewItemHeights = new Hashtable<>();
         private List<Surah> surahList = new ArrayList<>();
 
         public SurahListViewState(Parcel source, ClassLoader loader) {
             super(source);
-
-            Serializable serializable = source.readSerializable();
-
-            if (serializable instanceof Hashtable) {
-                Hashtable hashTable = (Hashtable) serializable;
-                for (Object iterate : hashTable.entrySet()) {
-                    if (iterate instanceof Map.Entry) {
-                        Map.Entry entry = (Map.Entry) iterate;
-                        if (entry.getKey() instanceof Integer && entry.getValue() instanceof Integer) {
-                            Integer key = (Integer) entry.getKey();
-                            Integer value = (Integer) entry.getValue();
-                            listViewItemHeights.put(key, value);
-                        }
-                    }
-                }
-            }
 
             int size = source.readInt();
             Surah[] surahArray = new Surah[size];
@@ -254,7 +189,6 @@ public class SurahListView extends FrameLayout implements ViewCallback {
         @Override
         public void writeToParcel(Parcel out, int flags) {
             super.writeToParcel(out, flags);
-            out.writeSerializable(this.listViewItemHeights);
 
             out.writeInt(this.surahList.size());
             Surah[] surahArray = this.surahList.toArray(new Surah[0]);
@@ -281,7 +215,6 @@ public class SurahListView extends FrameLayout implements ViewCallback {
     }
 
     public interface OnViewEventListener {
-        void onSurahListScroll(float scrollY);
         void onSurahSelected(Surah selectedSurah);
     }
 }
