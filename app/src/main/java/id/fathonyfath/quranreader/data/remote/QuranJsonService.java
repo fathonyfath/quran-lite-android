@@ -42,10 +42,6 @@ public class QuranJsonService {
         return null;
     }
 
-    public void setOnDownloadProgressListener(OnDownloadProgressListener onDownloadProgressListener) {
-        this.onDownloadProgressListener = onDownloadProgressListener;
-    }
-
     public Pair<String, SurahDetailResponse> getSurahDetailAtNumber(int surahNumber) {
         try {
             String httpResponse = doGetRequest(BASE_URL + surahNumber + ".json");
@@ -56,6 +52,10 @@ public class QuranJsonService {
 
         }
         return null;
+    }
+
+    public void setOnDownloadProgressListener(OnDownloadProgressListener onDownloadProgressListener) {
+        this.onDownloadProgressListener = onDownloadProgressListener;
     }
 
     private Map<Integer, SurahResponse> parseJSONObjectToMapOfIntegerSurahResponse(JSONObject jsonObject) throws JSONException {
