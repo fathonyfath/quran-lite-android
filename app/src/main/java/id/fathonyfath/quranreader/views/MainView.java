@@ -103,10 +103,10 @@ public class MainView extends WrapperView {
         super.onAttachedToWindow();
 
         if (this.viewBackStack.isEmpty()) {
-            this.viewBackStack.push(FontDownloaderView.class);
+            routeToFontDownloaderView();
+        } else {
+            updateViewBasedOnBackStack();
         }
-
-        updateViewBasedOnBackStack();
     }
 
     private void initView() {
@@ -135,6 +135,11 @@ public class MainView extends WrapperView {
         this.mappedClassToIndex.put(SurahDetailView.class, addViewToContainer(surahDetailView));
     }
 
+    private void routeToFontDownloaderView() {
+        this.viewBackStack.push(FontDownloaderView.class);
+        updateViewBasedOnBackStack();
+    }
+
     private void routeToSurahListView() {
         this.viewBackStack.push(SurahListView.class);
         updateViewBasedOnBackStack();
@@ -150,6 +155,18 @@ public class MainView extends WrapperView {
 
     private void updateViewBasedOnBackStack() {
         showViewAtIndex(this.mappedClassToIndex.get(this.viewBackStack.peek()));
+        showTitleForClass(this.viewBackStack.peek());
+    }
+
+    private void showTitleForClass(Class classOfView) {
+        if (classOfView == FontDownloaderView.class) {
+            setToolbarTitle("Download Font");
+        } else if (classOfView == SurahListView.class) {
+            setToolbarTitle("Baca Al-Qur'an");
+        } else if (classOfView == SurahDetailView.class) {
+            SurahDetailView surahDetailView = findChildViewAtIndex(this.mappedClassToIndex.get(SurahDetailView.class));
+            setToolbarTitle("Al-Qur'an Surah " + surahDetailView.getSurahName());
+        }
     }
 
     private static class MainViewState extends BaseSavedState {

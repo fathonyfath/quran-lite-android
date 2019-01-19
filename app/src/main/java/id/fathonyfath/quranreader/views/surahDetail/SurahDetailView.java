@@ -103,6 +103,13 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
         this.newPage = true;
     }
 
+    public String getSurahName() {
+        if (this.currentSurah != null) {
+            return this.currentSurah.getNameInLatin();
+        }
+        return "";
+    }
+
     private void initConfiguration() {
         setBackgroundColor(Color.WHITE);
     }

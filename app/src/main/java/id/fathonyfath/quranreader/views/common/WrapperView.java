@@ -48,6 +48,12 @@ public class WrapperView extends RelativeLayout {
         }
     }
 
+    public void setToolbarTitle(String title) {
+        if (this.toolbarView != null) {
+            this.toolbarView.setTitle(title);
+        }
+    }
+
     public void setOverlayAlpha(float alpha) {
         if (this.overlayView != null) {
             this.overlayView.setAlpha(alpha);
