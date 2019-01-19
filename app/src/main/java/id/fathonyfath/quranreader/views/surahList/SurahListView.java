@@ -154,7 +154,7 @@ public class SurahListView extends FrameLayout implements ViewCallback {
         clearTask();
         this.fetchAllSurahTask = this.fetchAllSurahTaskFactory.create();
 
-        this.fetchAllSurahTask.setOnTaskListener(fetchAllSurahCallback);
+        this.fetchAllSurahTask.setOnTaskListener(this.fetchAllSurahCallback);
         this.fetchAllSurahTask.execute();
     }
 

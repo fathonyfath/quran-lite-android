@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,10 +12,14 @@ import java.util.Stack;
 
 import id.fathonyfath.quranreader.MainActivity;
 import id.fathonyfath.quranreader.Res;
+import id.fathonyfath.quranreader.data.FontProvider;
 import id.fathonyfath.quranreader.data.QuranRepository;
 import id.fathonyfath.quranreader.models.Surah;
+import id.fathonyfath.quranreader.tasks.DownloadFontTask;
 import id.fathonyfath.quranreader.tasks.FetchAllSurahTask;
 import id.fathonyfath.quranreader.tasks.FetchSurahDetailTask;
+import id.fathonyfath.quranreader.tasks.HasFontInstalledTask;
+import id.fathonyfath.quranreader.utils.TypefaceLoader;
 import id.fathonyfath.quranreader.views.common.WrapperView;
 import id.fathonyfath.quranreader.views.fontDownloader.FontDownloaderView;
 import id.fathonyfath.quranreader.views.surahDetail.SurahDetailView;
@@ -32,11 +37,24 @@ public class MainView extends WrapperView {
     private final QuranRepository quranRepository = (QuranRepository) getContext()
             .getSystemService(MainActivity.QURAN_REPOSITORY_SERVICE);
 
+    @SuppressLint("WrongConstant")
+    private final FontProvider fontProvider = (FontProvider) getContext()
+            .getSystemService(MainActivity.FONT_PROVIDER_SERVICE);
+
     private final FontDownloaderView.OnViewEventListener fontDownloaderEventListener = new FontDownloaderView.OnViewEventListener() {
         @Override
         public void onDownloadCompleted() {
+            TypefaceLoader.invalidate();
             MainView.this.viewBackStack.pop();
             routeToSurahListView();
+        }
+
+        @Override
+        public void onDownloadFailed() {
+            TypefaceLoader.invalidate();
+            MainView.this.viewBackStack.pop();
+            routeToSurahListView();
+            Toast.makeText(getContext(), "Gagal mengunduh font. Silahkan mencoba kembali dengan menutup aplikasi dan membukanya kembali.", Toast.LENGTH_LONG).show();
         }
     };
 
@@ -103,7 +121,11 @@ public class MainView extends WrapperView {
     }
 
     private void initView() {
-        final FontDownloaderView fontDownloaderView = new FontDownloaderView(getContext());
+        final FontDownloaderView fontDownloaderView = new FontDownloaderView(
+                getContext(),
+                new HasFontInstalledTask.Factory(this.fontProvider),
+                new DownloadFontTask.Factory(this.fontProvider)
+        );
         fontDownloaderView.setOnViewEventListener(this.fontDownloaderEventListener);
 
         final SurahListView surahListView = new SurahListView(

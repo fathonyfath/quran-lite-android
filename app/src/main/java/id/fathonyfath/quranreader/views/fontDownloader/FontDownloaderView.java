@@ -8,6 +8,9 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import id.fathonyfath.quranreader.tasks.DownloadFontTask;
+import id.fathonyfath.quranreader.tasks.HasFontInstalledTask;
+import id.fathonyfath.quranreader.tasks.OnTaskListener;
 import id.fathonyfath.quranreader.utils.UnitConverter;
 import id.fathonyfath.quranreader.utils.ViewCallback;
 import id.fathonyfath.quranreader.views.common.ProgressView;
@@ -18,14 +21,54 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
     private final TextView informationTextView;
     private final ProgressView progressView;
 
+    private final HasFontInstalledTask.Factory hasFontInstalledTaskFactory;
+    private HasFontInstalledTask hasFontInstalledTask;
+    private final OnTaskListener<Boolean> hasFontInstalledCallback = new OnTaskListener<Boolean>() {
+        @Override
+        public void onProgress(float progress) {
+
+        }
+
+        @Override
+        public void onFinished(Boolean result) {
+            if (result) {
+                FontDownloaderView.this.notifyDownloadComplete();
+            } else {
+                FontDownloaderView.this.downloadFont();
+            }
+        }
+    };
+
+    private final DownloadFontTask.Factory downloadFontTaskFactory;
+    private DownloadFontTask downloadFontTask;
+    private final OnTaskListener<Boolean> downloadFontCallback = new OnTaskListener<Boolean>() {
+        @Override
+        public void onProgress(float progress) {
+
+        }
+
+        @Override
+        public void onFinished(Boolean result) {
+            if (result) {
+                FontDownloaderView.this.notifyDownloadComplete();
+            } else {
+                FontDownloaderView.this.notifyDownloadFailed();
+            }
+        }
+    };
+
     private OnViewEventListener onViewEventListener;
 
-    public FontDownloaderView(Context context) {
+    public FontDownloaderView(Context context,
+                              HasFontInstalledTask.Factory hasFontInstalledTaskFactory,
+                              DownloadFontTask.Factory downloadFontTaskFactory) {
         super(context);
 
         this.containerLayout = new LinearLayout(context);
         this.informationTextView = new TextView(context);
         this.progressView = new ProgressView(context);
+        this.hasFontInstalledTaskFactory = hasFontInstalledTaskFactory;
+        this.downloadFontTaskFactory = downloadFontTaskFactory;
 
         initConfiguration();
         initView();
@@ -33,12 +76,13 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
 
     @Override
     public void onResume() {
-
+        checkIfHasFontInstalled();
     }
 
     @Override
     public void onPause() {
-
+        clearHasFontInstalledTask();
+        clearDownloadFontTask();
     }
 
     public void setOnViewEventListener(OnViewEventListener onViewEventListener) {
@@ -97,7 +141,54 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
         this.containerLayout.setLayoutParams(containerParams);
     }
 
+    private void checkIfHasFontInstalled() {
+        clearHasFontInstalledTask();
+
+        this.hasFontInstalledTask = this.hasFontInstalledTaskFactory.create();
+
+        this.hasFontInstalledTask.setOnTaskListener(this.hasFontInstalledCallback);
+        this.hasFontInstalledTask.execute();
+    }
+
+    private void downloadFont() {
+        clearDownloadFontTask();
+
+        this.downloadFontTask = this.downloadFontTaskFactory.create();
+
+        this.downloadFontTask.setOnTaskListener(this.downloadFontCallback);
+        this.downloadFontTask.execute();
+    }
+
+    private void clearHasFontInstalledTask() {
+        if (this.hasFontInstalledTask != null) {
+            this.hasFontInstalledTask.cancel(true);
+            this.hasFontInstalledTask.setOnTaskListener(null);
+            this.hasFontInstalledTask = null;
+        }
+    }
+
+    private void clearDownloadFontTask() {
+        if (this.downloadFontTask != null) {
+            this.downloadFontTask.cancel(true);
+            this.downloadFontTask.setOnTaskListener(null);
+            this.downloadFontTask = null;
+        }
+    }
+
+    private void notifyDownloadComplete() {
+        if (this.onViewEventListener != null) {
+            this.onViewEventListener.onDownloadCompleted();
+        }
+    }
+
+    private void notifyDownloadFailed() {
+        if (this.onViewEventListener != null) {
+            this.onViewEventListener.onDownloadFailed();
+        }
+    }
+
     public interface OnViewEventListener {
         void onDownloadCompleted();
+        void onDownloadFailed();
     }
 }

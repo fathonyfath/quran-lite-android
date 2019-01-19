@@ -1,6 +1,5 @@
 package id.fathonyfath.quranreader.utils;
 
-import android.content.Context;
 import android.graphics.Typeface;
 
 import id.fathonyfath.quranreader.data.FontProvider;
@@ -14,6 +13,10 @@ public class TypefaceLoader {
             TypefaceLoader.instance = new TypefaceLoader(fontProvider);
         }
         return TypefaceLoader.instance;
+    }
+
+    public static void invalidate() {
+        TypefaceLoader.instance = null;
     }
 
     private Typeface defaultTypeface;
