@@ -50,13 +50,25 @@ public class QuranRepository {
     }
 
     public List<Surah> fetchAllSurah() {
-        final Map<Integer, SurahResponse> remoteResponse = quranJsonService.getSurahIndex();
-        return parseSurahResponseFromRemote(remoteResponse);
+        Map<Integer, SurahResponse> response;
+        if (this.quranDiskService.isSurahIndexExist()) {
+            response = this.quranDiskService.getSurahIndex();
+        } else {
+            response = this.quranJsonService.getSurahIndex();
+        }
+
+        return parseSurahResponseFromRemote(response);
     }
 
     public SurahDetail fetchSurahDetail(Surah surah) {
-        final Pair<String, SurahDetailResponse> remoteResponse = quranJsonService.getSurahDetailAtNumber(surah.getNumber());
-        return parseSurahDetailResponseFromRemote(remoteResponse.second);
+        Pair<String, SurahDetailResponse> response;
+        if (this.quranDiskService.isSurahDetailAtNumberExist(surah.getNumber())) {
+            response = this.quranDiskService.getSurahDetailAtNumber(surah.getNumber());
+        } else {
+            response = this.quranJsonService.getSurahDetailAtNumber(surah.getNumber());
+        }
+
+        return parseSurahDetailResponseFromRemote(response.second);
     }
 
     private List<Surah> parseSurahResponseFromRemote(Map<Integer, SurahResponse> remoteResponse) {

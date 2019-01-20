@@ -36,6 +36,9 @@ public class QuranJsonService {
         try {
             String httpResponse = doGetRequest(BASE_URL + "index.json");
             JSONObject responseJson = new JSONObject(httpResponse);
+
+            this.quranDiskService.saveSurahIndex(responseJson);
+
             return SurahResponseTransformer.parseJSONObjectToMapOfIntegerSurahResponse(responseJson);
         } catch (JSONException ignored) {
 
@@ -47,6 +50,9 @@ public class QuranJsonService {
         try {
             String httpResponse = doGetRequest(BASE_URL + surahNumber + ".json");
             JSONObject responseJson = new JSONObject(httpResponse);
+
+            this.quranDiskService.saveSurahDetailAtNumber(surahNumber, responseJson);
+
             SurahDetailResponse surahDetail = SurahDetailResponseTransformer
                     .parseJSONObjectToSurahDetailResponse(
                             responseJson.getJSONObject(String.valueOf(surahNumber))

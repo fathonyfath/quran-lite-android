@@ -54,7 +54,7 @@ public class MainActivity extends Activity {
     private void initService() {
         this.quranDiskService = new QuranDiskService(this.getApplicationContext());
         this.quranJsonService = new QuranJsonService(this.quranDiskService);
-        this.fontService  = new FontService();
+        this.fontService = new FontService();
 
         this.quranRepository = new QuranRepository(this.quranJsonService, this.quranDiskService);
         this.fontProvider = new FontProvider(this.getApplicationContext(), this.fontService);

@@ -139,7 +139,7 @@ public class QuranDiskService {
 
     private String fetchStringFromFile(File source) {
         try {
-            final FileInputStream indexStream = new FileInputStream(indexFileName);
+            final FileInputStream indexStream = new FileInputStream(source);
             byte[] contentsByteArray = readInputStreamToByteArray(indexStream);
 
             if (contentsByteArray == null) {
