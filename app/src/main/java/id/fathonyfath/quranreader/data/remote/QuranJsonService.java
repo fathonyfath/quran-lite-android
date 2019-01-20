@@ -14,6 +14,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
+import id.fathonyfath.quranreader.data.disk.QuranDiskService;
 import id.fathonyfath.quranreader.data.models.SurahDetailResponse;
 import id.fathonyfath.quranreader.data.models.SurahResponse;
 import id.fathonyfath.quranreader.data.transformer.SurahDetailResponseTransformer;
@@ -23,7 +24,13 @@ public class QuranJsonService {
 
     private final String BASE_URL = "https://fathonyfath.github.io/quran-json/surah/";
 
+    private final QuranDiskService quranDiskService;
+
     private OnDownloadProgressListener onDownloadProgressListener;
+
+    public QuranJsonService(QuranDiskService quranDiskService) {
+        this.quranDiskService = quranDiskService;
+    }
 
     public Map<Integer, SurahResponse> getSurahIndex() {
         try {

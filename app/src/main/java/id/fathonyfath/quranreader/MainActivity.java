@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import id.fathonyfath.quranreader.data.FontProvider;
 import id.fathonyfath.quranreader.data.QuranRepository;
+import id.fathonyfath.quranreader.data.disk.QuranDiskService;
 import id.fathonyfath.quranreader.data.remote.FontService;
 import id.fathonyfath.quranreader.data.remote.QuranJsonService;
 import id.fathonyfath.quranreader.views.MainView;
@@ -14,10 +15,11 @@ public class MainActivity extends Activity {
     public static final String QURAN_REPOSITORY_SERVICE = "MainActivity.QuranRepository";
     public static final String FONT_PROVIDER_SERVICE = "MainActivity.FontProvider";
 
-    private final QuranJsonService quranJsonService = new QuranJsonService();
-    private final FontService fontService = new FontService();
+    private QuranDiskService quranDiskService;
+    private QuranJsonService quranJsonService;
+    private FontService fontService;
 
-    private final QuranRepository quranRepository = new QuranRepository(this.quranJsonService);
+    private QuranRepository quranRepository;
     private FontProvider fontProvider;
 
     private MainView mainView = null;
@@ -26,7 +28,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        this.fontProvider = new FontProvider(this.getApplicationContext(), this.fontService);
+        initService();
 
         this.mainView = new MainView(this);
         setContentView(this.mainView);
@@ -47,5 +49,14 @@ public class MainActivity extends Activity {
             return fontProvider;
         }
         return super.getSystemService(name);
+    }
+
+    private void initService() {
+        this.quranDiskService = new QuranDiskService(this.getApplicationContext());
+        this.quranJsonService = new QuranJsonService(this.quranDiskService);
+        this.fontService  = new FontService();
+
+        this.quranRepository = new QuranRepository(this.quranJsonService, this.quranDiskService);
+        this.fontProvider = new FontProvider(this.getApplicationContext(), this.fontService);
     }
 }

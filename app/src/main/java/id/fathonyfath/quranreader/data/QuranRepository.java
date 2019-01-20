@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import id.fathonyfath.quranreader.data.disk.QuranDiskService;
 import id.fathonyfath.quranreader.data.models.SurahDetailResponse;
 import id.fathonyfath.quranreader.data.models.SurahResponse;
 import id.fathonyfath.quranreader.data.models.SurahTafsirResponse;
@@ -33,11 +34,15 @@ public class QuranRepository {
         }
     };
 
+    private final QuranDiskService quranDiskService;
+
     private OnProgressListener onProgressListener;
 
-    public QuranRepository(QuranJsonService quranJsonService) {
+    public QuranRepository(QuranJsonService quranJsonService, QuranDiskService quranDiskService) {
         this.quranJsonService = quranJsonService;
         this.quranJsonService.setOnDownloadProgressListener(onDownloadProgressListener);
+
+        this.quranDiskService = quranDiskService;
     }
 
     public void setOnProgressListener(OnProgressListener onProgressListener) {

@@ -1,5 +1,6 @@
 package id.fathonyfath.quranreader.data.disk;
 
+import android.content.Context;
 import android.util.Pair;
 
 import org.json.JSONException;
@@ -25,8 +26,9 @@ public class QuranDiskService {
 
     private final File destinationDirectory;
 
-    public QuranDiskService(File destDir) {
-        this.destinationDirectory = destDir;
+    public QuranDiskService(Context context) {
+        this.destinationDirectory = new File(context.getFilesDir(), "contents");
+        this.destinationDirectory.mkdirs();
     }
 
     public boolean saveSurahIndex(JSONObject jsonObject) {
