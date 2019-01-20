@@ -1,4 +1,27 @@
+import java.text.SimpleDateFormat
+
 apply plugin: 'com.android.application'
+
+static def gitSha() {
+    return 'git rev-parse --short HEAD'.execute().text.trim()
+}
+
+static def buildTime() {
+    def df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'")
+    df.setTimeZone(TimeZone.getTimeZone("UTC"))
+    return df.format(new Date())
+}
+
+buildscript {
+    project.ext.version = [
+            'major': 1,
+            'minor': 0,
+            'patch': 0,
+    ]
+
+    project.ext.version['name'] = "${project.ext.version.major}.${project.ext.version.minor}.${project.ext.version.patch}"
+    project.ext.version['code'] = project.ext.version.major * 10000000 + project.ext.version.minor * 10000 + project.ext.version.patch
+}
 
 android {
     compileSdkVersion 28
@@ -6,8 +29,8 @@ android {
         applicationId "id.fathonyfath.quranreader"
         minSdkVersion 15
         targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        versionCode project.ext.version.code
+        versionName "${project.ext.version.name}-${gitSha()} (${buildTime()})"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
