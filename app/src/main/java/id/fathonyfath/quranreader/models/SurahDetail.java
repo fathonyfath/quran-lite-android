@@ -93,7 +93,6 @@ public class SurahDetail implements Parcelable {
 
     /**
      * Parcelable implementation.
-     *
      */
 
     protected SurahDetail(Parcel in) {

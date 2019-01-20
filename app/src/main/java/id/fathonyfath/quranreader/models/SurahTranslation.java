@@ -47,7 +47,6 @@ public class SurahTranslation implements Parcelable {
 
     /**
      * Parcelable implementation.
-     *
      */
 
     protected SurahTranslation(Parcel in) {

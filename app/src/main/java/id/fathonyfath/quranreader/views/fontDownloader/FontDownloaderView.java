@@ -211,6 +211,7 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
 
     public interface OnViewEventListener {
         void onDownloadCompleted();
+
         void onDownloadFailed();
     }
 }

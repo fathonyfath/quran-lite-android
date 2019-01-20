@@ -1,4 +1,4 @@
-package id.fathonyfath.quranreader.data.remote.models;
+package id.fathonyfath.quranreader.data.models;
 
 import java.util.Map;
 
