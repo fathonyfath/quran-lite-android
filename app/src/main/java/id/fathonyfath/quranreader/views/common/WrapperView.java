@@ -135,8 +135,8 @@ public class WrapperView extends RelativeLayout {
     private void initView() {
         this.toolbarView.setId(Res.Id.toolbar);
 
-        HamburgerView hamburgerView = new HamburgerView(getContext());
-        this.toolbarView.setLeftView(hamburgerView);
+//        HamburgerView hamburgerView = new HamburgerView(getContext());
+//        this.toolbarView.setLeftView(hamburgerView);
 
         this.overlayView.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
