@@ -5,12 +5,10 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:label="Qur'an Reader"
-        android:theme="@android:style/Theme.Holo.Light.NoActionBar">
+        android:label="Qur'an Reader">
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

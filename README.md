@@ -6,15 +6,17 @@ Just your regular Qur'an apps on Android platform, except I'm trying to make it'
 
 ## TODOs
 
-* Feature to bookmark to your last reading page
-* Feature to switch between Light and Dark theme
-* Feature to prefetch all the contents
-* Feature to retry to load from cloud if there is a connection issue
+* [FEATURE] Bookmark to your last reading page
+* [FEATURE] Switch between Light and Dark theme
+* [FEATURE] Prefetch all the contents
+* [FEATURE] Retry to load from cloud if there is a connection issue
+* [BUG] Typeface not refreshing after finish downloading font on already loaded `TextView`
 
 ## Version History
 
 * v1.1.0
     * Add feature to save downloaded contents into storage
+    * Add feature to download the required font
     * Fix a lot of bugs
 * v1.0.0
     * Initial release
