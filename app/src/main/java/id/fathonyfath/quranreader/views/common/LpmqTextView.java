@@ -22,7 +22,7 @@ public class LpmqTextView extends TextView {
         applyTypeface();
     }
 
-    private void applyTypeface() {
+    public void applyTypeface() {
         setTypeface(TypefaceLoader.getInstance(this.fontProvider).getDefaultTypeface(), Typeface.NORMAL);
     }
 }

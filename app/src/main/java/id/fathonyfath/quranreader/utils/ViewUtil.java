@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.view.View;
+import android.view.ViewGroup;
+
+import id.fathonyfath.quranreader.views.common.LpmqTextView;
 
 public class ViewUtil {
 
@@ -19,6 +22,18 @@ public class ViewUtil {
 
         if (hostingActivity != null) {
             hostingActivity.onBackPressed();
+        }
+    }
+
+    public static void reloadChildsTypeface(View view) {
+        if (view instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) view;
+            for (int i = 0; i < viewGroup.getChildCount(); i++) {
+                reloadChildsTypeface(viewGroup.getChildAt(i));
+            }
+        } else if (view instanceof LpmqTextView) {
+            LpmqTextView textView = (LpmqTextView) view;
+            textView.applyTypeface();
         }
     }
 }

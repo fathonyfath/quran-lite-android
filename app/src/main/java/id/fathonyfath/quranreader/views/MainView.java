@@ -20,6 +20,7 @@ import id.fathonyfath.quranreader.tasks.FetchAllSurahTask;
 import id.fathonyfath.quranreader.tasks.FetchSurahDetailTask;
 import id.fathonyfath.quranreader.tasks.HasFontInstalledTask;
 import id.fathonyfath.quranreader.utils.TypefaceLoader;
+import id.fathonyfath.quranreader.utils.ViewUtil;
 import id.fathonyfath.quranreader.views.common.WrapperView;
 import id.fathonyfath.quranreader.views.fontDownloader.FontDownloaderView;
 import id.fathonyfath.quranreader.views.surahDetail.SurahDetailView;
@@ -43,6 +44,7 @@ public class MainView extends WrapperView {
         @Override
         public void onDownloadCompleted() {
             TypefaceLoader.invalidate();
+            ViewUtil.reloadChildsTypeface(MainView.this);
             MainView.this.viewBackStack.pop();
             routeToSurahListView();
         }
