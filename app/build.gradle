@@ -16,7 +16,7 @@ buildscript {
     project.ext.version = [
             'major': 1,
             'minor': 1,
-            'patch': 0,
+            'patch': 1,
     ]
 
     project.ext.version['name'] = "${project.ext.version.major}.${project.ext.version.minor}.${project.ext.version.patch}"

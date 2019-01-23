@@ -10,10 +10,12 @@ Just your regular Qur'an apps on Android platform, except I'm trying to make it'
 * [FEATURE] Switch between Light and Dark theme
 * [FEATURE] Prefetch all the contents
 * [FEATURE] Retry to load from cloud if there is a connection issue
-* [BUG] Typeface not refreshing after finish downloading font on already loaded `TextView`
 
 ## Version History
 
+* v1.1.1
+    * Fix bug Typeface not refreshing after finish downloading font on already loaded `TextView`
+    * Revert to set Application theme on Manifest instead of code because Cold start screen don't show full white screen
 * v1.1.0
     * Add feature to save downloaded contents into storage
     * Add feature to download the required font
