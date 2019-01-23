@@ -26,8 +26,6 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(android.R.style.Theme_Holo_Light_NoActionBar);
-
         super.onCreate(savedInstanceState);
 
         initService();
