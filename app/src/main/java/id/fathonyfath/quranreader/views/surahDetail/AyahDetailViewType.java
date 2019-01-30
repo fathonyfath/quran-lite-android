@@ -2,6 +2,9 @@ package id.fathonyfath.quranreader.views.surahDetail;
 
 public abstract class AyahDetailViewType {
 
+    public static class BasmalahViewModel extends AyahDetailViewType {
+    }
+
     public static class AyahViewModel extends AyahDetailViewType {
 
         public final Integer ayahNumber;

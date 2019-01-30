@@ -157,6 +157,11 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
 
         this.ayahViewTypeList.clear();
 
+
+        if (surahDetail.getNumber() != 1) {
+            this.ayahViewTypeList.add(new AyahDetailViewType.BasmalahViewModel());
+        }
+
         for (Map.Entry<Integer, String> entry : surahDetail.getContents().entrySet()) {
             String translation = surahDetail.getSurahTranslation().getContents().get(entry.getKey());
             if (translation == null) {
