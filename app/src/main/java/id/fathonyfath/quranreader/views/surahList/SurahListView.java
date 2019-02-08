@@ -92,6 +92,11 @@ public class SurahListView extends FrameLayout implements ViewCallback {
     }
 
     @Override
+    public void onStart() {
+
+    }
+
+    @Override
     public void onResume() {
         this.surahListView.setOnItemClickListener(onSurahItemClickListener);
 
@@ -106,6 +111,11 @@ public class SurahListView extends FrameLayout implements ViewCallback {
         this.surahListView.setOnItemClickListener(null);
 
         clearTaskCallbacks();
+    }
+
+    @Override
+    public void onStop() {
+        clearFetchAllSurahTask();
     }
 
     public void setOnViewEventListener(OnViewEventListener onViewEventListener) {

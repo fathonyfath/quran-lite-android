@@ -1,7 +1,5 @@
 package id.fathonyfath.quranreader.tasks;
 
-import android.os.AsyncTask;
-
 import id.fathonyfath.quranreader.data.FontProvider;
 
 public class HasFontInstalledTask extends BaseAsyncTask<Void, Boolean> {

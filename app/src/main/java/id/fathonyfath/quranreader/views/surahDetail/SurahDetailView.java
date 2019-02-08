@@ -89,6 +89,11 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
     }
 
     @Override
+    public void onStart() {
+
+    }
+
+    @Override
     public void onResume() {
         if (this.currentSurah != null) {
             registerTaskCallbacks();
@@ -102,6 +107,11 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
     public void onPause() {
         clearView();
         clearTaskCallbacks();
+    }
+
+    @Override
+    public void onStop() {
+        clearFetchSurahDetailTask();
     }
 
     public void setState(Surah selectedSurah) {

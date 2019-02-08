@@ -1,9 +1,7 @@
 package id.fathonyfath.quranreader;
 
 import android.app.Activity;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 
 import id.fathonyfath.quranreader.data.FontProvider;
 import id.fathonyfath.quranreader.data.QuranRepository;

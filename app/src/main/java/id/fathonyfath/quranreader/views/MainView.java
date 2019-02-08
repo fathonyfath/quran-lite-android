@@ -1,25 +1,19 @@
 package id.fathonyfath.quranreader.views;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.view.View;
 import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Stack;
 
-import id.fathonyfath.quranreader.MainActivity;
 import id.fathonyfath.quranreader.Res;
-import id.fathonyfath.quranreader.data.FontProvider;
-import id.fathonyfath.quranreader.data.QuranRepository;
 import id.fathonyfath.quranreader.models.Surah;
-import id.fathonyfath.quranreader.tasks.DownloadFontTask;
-import id.fathonyfath.quranreader.tasks.FetchAllSurahTask;
-import id.fathonyfath.quranreader.tasks.FetchSurahDetailTask;
-import id.fathonyfath.quranreader.tasks.HasFontInstalledTask;
 import id.fathonyfath.quranreader.utils.TypefaceLoader;
+import id.fathonyfath.quranreader.utils.ViewBackStack;
+import id.fathonyfath.quranreader.utils.ViewCallback;
 import id.fathonyfath.quranreader.utils.ViewUtil;
 import id.fathonyfath.quranreader.views.common.WrapperView;
 import id.fathonyfath.quranreader.views.fontDownloader.FontDownloaderView;
@@ -30,29 +24,40 @@ public class MainView extends WrapperView {
 
     private final Map<Class, Integer> mappedClassToIndex;
 
-    private Stack<Class> viewBackStack;
+    private ViewBackStack viewBackStack;
+    private final ViewBackStack.Callback viewBackStackCallback = new ViewBackStack.Callback() {
+        @Override
+        public void onViewPushed(Class<? extends View> pushedView) {
+            MainView.this.handleViewCallbackForPushedView(pushedView);
 
-    @SuppressLint("WrongConstant")
-    private final QuranRepository quranRepository = (QuranRepository) getContext()
-            .getSystemService(MainActivity.QURAN_REPOSITORY_SERVICE);
+            MainView.this.updateViewBasedOnViewClass(pushedView);
+        }
 
-    @SuppressLint("WrongConstant")
-    private final FontProvider fontProvider = (FontProvider) getContext()
-            .getSystemService(MainActivity.FONT_PROVIDER_SERVICE);
+        @Override
+        public void onViewPopped(Class<? extends View> poppedView) {
+            Class<? extends View> topStackView = MainView.this.viewBackStack.peekView();
+
+            if (topStackView != null) {
+                MainView.this.updateViewBasedOnViewClass(topStackView);
+            }
+
+            MainView.this.handleViewCallbackForPoppedView(poppedView);
+        }
+    };
 
     private final FontDownloaderView.OnViewEventListener fontDownloaderEventListener = new FontDownloaderView.OnViewEventListener() {
         @Override
         public void onDownloadCompleted() {
             TypefaceLoader.invalidate();
             ViewUtil.reloadChildsTypeface(MainView.this);
-            MainView.this.viewBackStack.pop();
+            MainView.this.viewBackStack.popView();
             routeToSurahListView();
         }
 
         @Override
         public void onDownloadFailed() {
             TypefaceLoader.invalidate();
-            MainView.this.viewBackStack.pop();
+            MainView.this.viewBackStack.popView();
             routeToSurahListView();
             Toast.makeText(getContext(), "Gagal mengunduh font. Silahkan mencoba kembali dengan menutup aplikasi dan membukanya kembali.", Toast.LENGTH_LONG).show();
         }
@@ -72,18 +77,14 @@ public class MainView extends WrapperView {
 
         this.mappedClassToIndex = new HashMap<>();
 
-        this.viewBackStack = new Stack<>();
+        this.viewBackStack = new ViewBackStack();
+        this.viewBackStack.setCallback(this.viewBackStackCallback);
 
         initView();
     }
 
     public boolean onBackPressed() {
-        if (this.viewBackStack.size() > 1) {
-            this.viewBackStack.pop();
-            updateViewBasedOnBackStack();
-            return true;
-        }
-        return false;
+        return this.viewBackStack.popView();
     }
 
     @Override
@@ -98,6 +99,7 @@ public class MainView extends WrapperView {
         final MainViewState viewState = (MainViewState) state;
         super.onRestoreInstanceState(viewState.getSuperState());
         this.viewBackStack = viewState.viewBackStack;
+        this.viewBackStack.setCallback(this.viewBackStackCallback);
     }
 
     @Override
@@ -107,7 +109,7 @@ public class MainView extends WrapperView {
         if (this.viewBackStack.isEmpty()) {
             routeToFontDownloaderView();
         } else {
-            updateViewBasedOnBackStack();
+            updateViewBasedOnViewClass(this.viewBackStack.peekView());
         }
     }
 
@@ -128,29 +130,26 @@ public class MainView extends WrapperView {
     }
 
     private void routeToFontDownloaderView() {
-        this.viewBackStack.push(FontDownloaderView.class);
-        updateViewBasedOnBackStack();
+        this.viewBackStack.pushView(FontDownloaderView.class);
     }
 
     private void routeToSurahListView() {
-        this.viewBackStack.push(SurahListView.class);
-        updateViewBasedOnBackStack();
+        this.viewBackStack.pushView(SurahListView.class);
     }
 
     private void routeToSurahDetailView(Surah selectedSurah) {
         SurahDetailView surahDetailView = findChildViewAtIndex(this.mappedClassToIndex.get(SurahDetailView.class));
         surahDetailView.setState(selectedSurah);
 
-        this.viewBackStack.push(SurahDetailView.class);
-        updateViewBasedOnBackStack();
+        this.viewBackStack.pushView(SurahDetailView.class);
     }
 
-    private void updateViewBasedOnBackStack() {
-        showViewAtIndex(this.mappedClassToIndex.get(this.viewBackStack.peek()));
-        showTitleForClass(this.viewBackStack.peek());
+    private void updateViewBasedOnViewClass(Class<? extends View> viewClass) {
+        showViewAtIndex(this.mappedClassToIndex.get(viewClass));
+        showTitleForClass(viewClass);
     }
 
-    private void showTitleForClass(Class classOfView) {
+    private void showTitleForClass(Class<? extends View> classOfView) {
         if (classOfView == FontDownloaderView.class) {
             setToolbarTitle("Mengunduh font");
         } else if (classOfView == SurahListView.class) {
@@ -161,19 +160,30 @@ public class MainView extends WrapperView {
         }
     }
 
+    private void handleViewCallbackForPushedView(Class<? extends View> viewClass) {
+        View view = findChildViewAtIndex(this.mappedClassToIndex.get(viewClass));
+        if (view instanceof ViewCallback) {
+            ViewCallback viewCallback = (ViewCallback) view;
+            viewCallback.onStart();
+        }
+    }
+
+    private void handleViewCallbackForPoppedView(Class<? extends View> viewClass) {
+        View view = findChildViewAtIndex(this.mappedClassToIndex.get(viewClass));
+        if (view instanceof ViewCallback) {
+            ViewCallback viewCallback = (ViewCallback) view;
+            viewCallback.onStop();
+        }
+    }
+
     private static class MainViewState extends BaseSavedState {
 
-        private Stack<Class> viewBackStack = new Stack<>();
+        private ViewBackStack viewBackStack;
 
         public MainViewState(Parcel source, ClassLoader loader) {
             super(source);
 
-            int size = source.readInt();
-            Class[] classArray = (Class[]) source.readSerializable();
-
-            for (int i = 0; i < size; i++) {
-                this.viewBackStack.add(i, classArray[i]);
-            }
+            this.viewBackStack = source.readParcelable(ViewBackStack.class.getClassLoader());
         }
 
         public MainViewState(Parcelable superState) {
@@ -184,10 +194,7 @@ public class MainView extends WrapperView {
         public void writeToParcel(Parcel out, int flags) {
             super.writeToParcel(out, flags);
 
-            out.writeInt(this.viewBackStack.size());
-
-            Class[] classArray = this.viewBackStack.toArray(new Class[0]);
-            out.writeSerializable(classArray);
+            out.writeParcelable(this.viewBackStack, flags);
         }
 
         public static final Parcelable.Creator<MainViewState> CREATOR

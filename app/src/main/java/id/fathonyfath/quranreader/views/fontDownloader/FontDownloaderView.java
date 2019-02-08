@@ -73,6 +73,11 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
     }
 
     @Override
+    public void onStart() {
+
+    }
+
+    @Override
     public void onResume() {
         registerTaskCallbacks();
         runHasFontInstalledTask();
@@ -81,6 +86,12 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
     @Override
     public void onPause() {
         clearTaskCallbacks();
+    }
+
+    @Override
+    public void onStop() {
+        clearHasFontInstalledTask();
+        clearDownloadFontTask();
     }
 
     public void setOnViewEventListener(OnViewEventListener onViewEventListener) {
