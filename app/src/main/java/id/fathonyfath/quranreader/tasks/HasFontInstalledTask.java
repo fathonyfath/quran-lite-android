@@ -4,18 +4,12 @@ import android.os.AsyncTask;
 
 import id.fathonyfath.quranreader.data.FontProvider;
 
-public class HasFontInstalledTask extends AsyncTask<Void, Float, Boolean> {
+public class HasFontInstalledTask extends BaseAsyncTask<Void, Boolean> {
 
     private final FontProvider fontProvider;
 
-    private OnTaskListener<Boolean> onTaskListener;
-
     public HasFontInstalledTask(FontProvider fontProvider) {
         this.fontProvider = fontProvider;
-    }
-
-    public void setOnTaskListener(OnTaskListener<Boolean> onTaskListener) {
-        this.onTaskListener = onTaskListener;
     }
 
     @Override
@@ -31,9 +25,7 @@ public class HasFontInstalledTask extends AsyncTask<Void, Float, Boolean> {
     protected void onPostExecute(Boolean aBoolean) {
         super.onPostExecute(aBoolean);
 
-        if (this.onTaskListener != null) {
-            this.onTaskListener.onFinished(aBoolean);
-        }
+        postResult(aBoolean);
     }
 
     public static class Factory implements AsyncTaskFactory<HasFontInstalledTask> {

@@ -2,13 +2,14 @@ package id.fathonyfath.quranreader.views.fontDownloader;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import id.fathonyfath.quranreader.tasks.AsyncTaskHolder;
+import id.fathonyfath.quranreader.tasks.AsyncTaskProvider;
 import id.fathonyfath.quranreader.tasks.DownloadFontTask;
 import id.fathonyfath.quranreader.tasks.HasFontInstalledTask;
 import id.fathonyfath.quranreader.tasks.OnTaskListener;
@@ -22,7 +23,6 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
     private final TextView informationTextView;
     private final ProgressView progressView;
 
-    private final HasFontInstalledTask.Factory hasFontInstalledTaskFactory;
     private final OnTaskListener<Boolean> hasFontInstalledCallback = new OnTaskListener<Boolean>() {
         @Override
         public void onProgress(float progress) {
@@ -34,14 +34,13 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
             if (result) {
                 FontDownloaderView.this.notifyDownloadComplete();
             } else {
-                FontDownloaderView.this.downloadFont();
+                FontDownloaderView.this.runDownloadFontTask();
             }
 
             clearHasFontInstalledTask();
         }
     };
 
-    private final DownloadFontTask.Factory downloadFontTaskFactory;
     private final OnTaskListener<Boolean> downloadFontCallback = new OnTaskListener<Boolean>() {
         @Override
         public void onProgress(float progress) {
@@ -62,16 +61,12 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
 
     private OnViewEventListener onViewEventListener;
 
-    public FontDownloaderView(Context context,
-                              HasFontInstalledTask.Factory hasFontInstalledTaskFactory,
-                              DownloadFontTask.Factory downloadFontTaskFactory) {
+    public FontDownloaderView(Context context) {
         super(context);
 
         this.containerLayout = new LinearLayout(context);
         this.informationTextView = new TextView(context);
         this.progressView = new ProgressView(context);
-        this.hasFontInstalledTaskFactory = hasFontInstalledTaskFactory;
-        this.downloadFontTaskFactory = downloadFontTaskFactory;
 
         initConfiguration();
         initView();
@@ -80,7 +75,7 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
     @Override
     public void onResume() {
         registerTaskCallbacks();
-        checkIfHasFontInstalled();
+        runHasFontInstalledTask();
     }
 
     @Override
@@ -142,55 +137,40 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
         this.containerLayout.setLayoutParams(containerParams);
     }
 
-    private void checkIfHasFontInstalled() {
-        if (AsyncTaskHolder.hasFontInstalledTaskInstance == null) {
-            AsyncTaskHolder.hasFontInstalledTaskInstance = this.hasFontInstalledTaskFactory.create();
-            AsyncTaskHolder.hasFontInstalledTaskInstance.setOnTaskListener(this.hasFontInstalledCallback);
-            AsyncTaskHolder.hasFontInstalledTaskInstance.execute();
+    private void runHasFontInstalledTask() {
+        final HasFontInstalledTask task = AsyncTaskProvider.getAsyncTask(HasFontInstalledTask.class);
+
+        if (task.getStatus() == AsyncTask.Status.PENDING) {
+            task.setOnTaskListener(this.hasFontInstalledCallback);
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
 
-    private void downloadFont() {
-        if (AsyncTaskHolder.downloadFontTaskInstance == null) {
-            AsyncTaskHolder.downloadFontTaskInstance = this.downloadFontTaskFactory.create();
-            AsyncTaskHolder.downloadFontTaskInstance.setOnTaskListener(this.downloadFontCallback);
-            AsyncTaskHolder.downloadFontTaskInstance.execute();
+    private void runDownloadFontTask() {
+        final DownloadFontTask task = AsyncTaskProvider.getAsyncTask(DownloadFontTask.class);
+
+        if (task.getStatus() == AsyncTask.Status.PENDING) {
+            task.setOnTaskListener(this.downloadFontCallback);
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
 
     private void clearHasFontInstalledTask() {
-        if (AsyncTaskHolder.hasFontInstalledTaskInstance != null) {
-            AsyncTaskHolder.hasFontInstalledTaskInstance.setOnTaskListener(null);
-            AsyncTaskHolder.hasFontInstalledTaskInstance = null;
-
-        }
+        AsyncTaskProvider.clearAsyncTask(HasFontInstalledTask.class);
     }
 
     private void clearDownloadFontTask() {
-        if (AsyncTaskHolder.downloadFontTaskInstance != null) {
-            AsyncTaskHolder.downloadFontTaskInstance.setOnTaskListener(null);
-            AsyncTaskHolder.downloadFontTaskInstance = null;
-        }
+        AsyncTaskProvider.clearAsyncTask(DownloadFontTask.class);
     }
 
     private void registerTaskCallbacks() {
-        if (AsyncTaskHolder.hasFontInstalledTaskInstance != null) {
-            AsyncTaskHolder.hasFontInstalledTaskInstance.setOnTaskListener(this.hasFontInstalledCallback);
-        }
-
-        if (AsyncTaskHolder.downloadFontTaskInstance != null) {
-            AsyncTaskHolder.downloadFontTaskInstance.setOnTaskListener(this.downloadFontCallback);
-        }
+        AsyncTaskProvider.getAsyncTask(HasFontInstalledTask.class).setOnTaskListener(this.hasFontInstalledCallback);
+        AsyncTaskProvider.getAsyncTask(DownloadFontTask.class).setOnTaskListener(this.downloadFontCallback);
     }
 
     private void clearTaskCallbacks() {
-        if (AsyncTaskHolder.hasFontInstalledTaskInstance != null) {
-            AsyncTaskHolder.hasFontInstalledTaskInstance.setOnTaskListener(null);
-        }
-
-        if (AsyncTaskHolder.downloadFontTaskInstance != null) {
-            AsyncTaskHolder.downloadFontTaskInstance.setOnTaskListener(null);
-        }
+        AsyncTaskProvider.getAsyncTask(HasFontInstalledTask.class).setOnTaskListener(null);
+        AsyncTaskProvider.getAsyncTask(DownloadFontTask.class).setOnTaskListener(null);
     }
 
     private void updateTextProgress(float progress) {

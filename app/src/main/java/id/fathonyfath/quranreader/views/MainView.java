@@ -114,23 +114,13 @@ public class MainView extends WrapperView {
     private void initView() {
         setOverlayAlpha(0.1f);
 
-        final FontDownloaderView fontDownloaderView = new FontDownloaderView(
-                getContext(),
-                new HasFontInstalledTask.Factory(this.fontProvider),
-                new DownloadFontTask.Factory(this.fontProvider)
-        );
+        final FontDownloaderView fontDownloaderView = new FontDownloaderView(getContext());
         fontDownloaderView.setOnViewEventListener(this.fontDownloaderEventListener);
 
-        final SurahListView surahListView = new SurahListView(
-                getContext(),
-                new FetchAllSurahTask.Factory(this.quranRepository)
-        );
+        final SurahListView surahListView = new SurahListView(getContext());
         surahListView.setOnViewEventListener(this.surahListEventListener);
 
-        final SurahDetailView surahDetailView = new SurahDetailView(
-                getContext(),
-                new FetchSurahDetailTask.Factory(this.quranRepository)
-        );
+        final SurahDetailView surahDetailView = new SurahDetailView(getContext());
 
         this.mappedClassToIndex.put(FontDownloaderView.class, addViewToContainer(fontDownloaderView));
         this.mappedClassToIndex.put(SurahListView.class, addViewToContainer(surahListView));

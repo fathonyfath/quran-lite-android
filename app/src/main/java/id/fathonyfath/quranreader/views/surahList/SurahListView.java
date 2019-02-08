@@ -2,6 +2,7 @@ package id.fathonyfath.quranreader.views.surahList;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.view.Gravity;
@@ -17,7 +18,7 @@ import java.util.List;
 
 import id.fathonyfath.quranreader.Res;
 import id.fathonyfath.quranreader.models.Surah;
-import id.fathonyfath.quranreader.tasks.AsyncTaskHolder;
+import id.fathonyfath.quranreader.tasks.AsyncTaskProvider;
 import id.fathonyfath.quranreader.tasks.FetchAllSurahTask;
 import id.fathonyfath.quranreader.tasks.OnTaskListener;
 import id.fathonyfath.quranreader.utils.ViewCallback;
@@ -60,14 +61,10 @@ public class SurahListView extends FrameLayout implements ViewCallback {
 
     private final ProgressView progressView;
 
-    private final FetchAllSurahTask.Factory fetchAllSurahTaskFactory;
-
     private OnViewEventListener onViewEventListener;
 
-    public SurahListView(Context context, FetchAllSurahTask.Factory fetchAllSurahTaskFactory) {
+    public SurahListView(Context context) {
         super(context);
-
-        this.fetchAllSurahTaskFactory = fetchAllSurahTaskFactory;
 
         setId(Res.Id.surahListView);
 
@@ -100,7 +97,7 @@ public class SurahListView extends FrameLayout implements ViewCallback {
 
         if (this.surahList.isEmpty()) {
             registerTaskCallbacks();
-            fetchAllSurahs();
+            runFetchAllSurahTask();
         }
     }
 
@@ -136,13 +133,13 @@ public class SurahListView extends FrameLayout implements ViewCallback {
         addView(this.progressView);
     }
 
-    private void fetchAllSurahs() {
+    private void runFetchAllSurahTask() {
         this.progressView.setVisibility(View.VISIBLE);
 
-        if (AsyncTaskHolder.fetchAllSurahTaskInstance == null) {
-            AsyncTaskHolder.fetchAllSurahTaskInstance = this.fetchAllSurahTaskFactory.create();
-            AsyncTaskHolder.fetchAllSurahTaskInstance.setOnTaskListener(this.fetchAllSurahCallback);
-            AsyncTaskHolder.fetchAllSurahTaskInstance.execute();
+        final FetchAllSurahTask task = AsyncTaskProvider.getAsyncTask(FetchAllSurahTask.class);
+        if (task.getStatus() == AsyncTask.Status.PENDING) {
+            task.setOnTaskListener(this.fetchAllSurahCallback);
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
 
@@ -164,22 +161,15 @@ public class SurahListView extends FrameLayout implements ViewCallback {
     }
 
     private void clearFetchAllSurahTask() {
-        if (AsyncTaskHolder.fetchAllSurahTaskInstance != null) {
-            AsyncTaskHolder.fetchAllSurahTaskInstance.setOnTaskListener(null);
-            AsyncTaskHolder.fetchAllSurahTaskInstance = null;
-        }
+        AsyncTaskProvider.clearAsyncTask(FetchAllSurahTask.class);
     }
 
     private void registerTaskCallbacks() {
-        if (AsyncTaskHolder.fetchAllSurahTaskInstance != null) {
-            AsyncTaskHolder.fetchAllSurahTaskInstance.setOnTaskListener(this.fetchAllSurahCallback);
-        }
+        AsyncTaskProvider.getAsyncTask(FetchAllSurahTask.class).setOnTaskListener(this.fetchAllSurahCallback);
     }
 
     private void clearTaskCallbacks() {
-        if (AsyncTaskHolder.fetchAllSurahTaskInstance != null) {
-            AsyncTaskHolder.fetchAllSurahTaskInstance.setOnTaskListener(null);
-        }
+        AsyncTaskProvider.getAsyncTask(FetchAllSurahTask.class).setOnTaskListener(null);
     }
 
     private static class SurahListViewState extends BaseSavedState {

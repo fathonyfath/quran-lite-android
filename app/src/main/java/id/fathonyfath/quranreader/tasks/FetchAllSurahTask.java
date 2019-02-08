@@ -1,14 +1,12 @@
 package id.fathonyfath.quranreader.tasks;
 
-import android.os.AsyncTask;
-
 import java.util.List;
 
 import id.fathonyfath.quranreader.data.OnProgressListener;
 import id.fathonyfath.quranreader.data.QuranRepository;
 import id.fathonyfath.quranreader.models.Surah;
 
-public class FetchAllSurahTask extends AsyncTask<Void, Float, List<Surah>> {
+public class FetchAllSurahTask extends BaseAsyncTask<Void, List<Surah>> {
 
     private final QuranRepository quranRepository;
     private final OnProgressListener onProgressListener = new OnProgressListener() {
@@ -18,15 +16,9 @@ public class FetchAllSurahTask extends AsyncTask<Void, Float, List<Surah>> {
         }
     };
 
-    private OnTaskListener<List<Surah>> onTaskListener;
-
     public FetchAllSurahTask(QuranRepository quranRepository) {
         this.quranRepository = quranRepository;
         this.quranRepository.setOnProgressListener(onProgressListener);
-    }
-
-    public void setOnTaskListener(OnTaskListener<List<Surah>> onTaskListener) {
-        this.onTaskListener = onTaskListener;
     }
 
     @Override
@@ -40,21 +32,9 @@ public class FetchAllSurahTask extends AsyncTask<Void, Float, List<Surah>> {
     }
 
     @Override
-    protected void onProgressUpdate(Float... values) {
-        super.onProgressUpdate(values);
-
-        if (this.onTaskListener != null) {
-            this.onTaskListener.onProgress(values[0]);
-        }
-    }
-
-    @Override
     protected void onPostExecute(List<Surah> s) {
         super.onPostExecute(s);
-
-        if (this.onTaskListener != null) {
-            this.onTaskListener.onFinished(s);
-        }
+        postResult(s);
     }
 
     public static class Factory implements AsyncTaskFactory<FetchAllSurahTask> {

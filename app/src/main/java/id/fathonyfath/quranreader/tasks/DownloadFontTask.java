@@ -1,11 +1,9 @@
 package id.fathonyfath.quranreader.tasks;
 
-import android.os.AsyncTask;
-
 import id.fathonyfath.quranreader.data.FontProvider;
 import id.fathonyfath.quranreader.data.OnProgressListener;
 
-public class DownloadFontTask extends AsyncTask<Void, Float, Boolean> {
+public class DownloadFontTask extends BaseAsyncTask<Void, Boolean> {
 
     private final FontProvider fontProvider;
     private final OnProgressListener onProgressListener = new OnProgressListener() {
@@ -15,15 +13,9 @@ public class DownloadFontTask extends AsyncTask<Void, Float, Boolean> {
         }
     };
 
-    private OnTaskListener<Boolean> onTaskListener;
-
     public DownloadFontTask(FontProvider fontProvider) {
         this.fontProvider = fontProvider;
         this.fontProvider.setOnProgressListener(this.onProgressListener);
-    }
-
-    public void setOnTaskListener(OnTaskListener<Boolean> onTaskListener) {
-        this.onTaskListener = onTaskListener;
     }
 
     @Override
@@ -37,21 +29,9 @@ public class DownloadFontTask extends AsyncTask<Void, Float, Boolean> {
     }
 
     @Override
-    protected void onProgressUpdate(Float... values) {
-        super.onProgressUpdate(values);
-
-        if (this.onTaskListener != null) {
-            this.onTaskListener.onProgress(values[0]);
-        }
-    }
-
-    @Override
     protected void onPostExecute(Boolean aBoolean) {
         super.onPostExecute(aBoolean);
-
-        if (this.onTaskListener != null) {
-            this.onTaskListener.onFinished(aBoolean);
-        }
+        postResult(aBoolean);
     }
 
     public static class Factory implements AsyncTaskFactory<DownloadFontTask> {

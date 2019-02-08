@@ -2,6 +2,7 @@ package id.fathonyfath.quranreader.views.surahDetail;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.view.Gravity;
@@ -17,7 +18,7 @@ import java.util.Map;
 import id.fathonyfath.quranreader.Res;
 import id.fathonyfath.quranreader.models.Surah;
 import id.fathonyfath.quranreader.models.SurahDetail;
-import id.fathonyfath.quranreader.tasks.AsyncTaskHolder;
+import id.fathonyfath.quranreader.tasks.AsyncTaskProvider;
 import id.fathonyfath.quranreader.tasks.FetchSurahDetailTask;
 import id.fathonyfath.quranreader.tasks.OnTaskListener;
 import id.fathonyfath.quranreader.utils.ViewCallback;
@@ -38,7 +39,6 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
 
     private final ProgressView progressView;
 
-    private final FetchSurahDetailTask.Factory fetchSurahDetailTaskFactory;
     private final OnTaskListener<SurahDetail> fetchSurahDetailCallback = new OnTaskListener<SurahDetail>() {
         @Override
         public void onProgress(float progress) {
@@ -57,12 +57,10 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
         }
     };
 
-    public SurahDetailView(Context context, FetchSurahDetailTask.Factory fetchSurahDetailTaskFactory) {
+    public SurahDetailView(Context context) {
         super(context);
 
         setId(Res.Id.surahDetailView);
-
-        this.fetchSurahDetailTaskFactory = fetchSurahDetailTaskFactory;
 
         this.ayahListView = new ListView(context);
         this.ayahListView.setId(Res.Id.surahDetailView_ayahListView);
@@ -94,7 +92,7 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
     public void onResume() {
         if (this.currentSurah != null) {
             registerTaskCallbacks();
-            fetchSurahDetail(this.currentSurah);
+            runFetchSurahDetailTask(this.currentSurah);
         } else {
             ViewUtil.onBackPressed(this);
         }
@@ -142,13 +140,13 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
         addView(this.progressView);
     }
 
-    private void fetchSurahDetail(Surah selectedSurah) {
+    private void runFetchSurahDetailTask(Surah selectedSurah) {
         this.progressView.setVisibility(View.VISIBLE);
 
-        if (AsyncTaskHolder.fetchSurahDetailTaskInstance == null) {
-            AsyncTaskHolder.fetchSurahDetailTaskInstance = this.fetchSurahDetailTaskFactory.create();
-            AsyncTaskHolder.fetchSurahDetailTaskInstance.setOnTaskListener(this.fetchSurahDetailCallback);
-            AsyncTaskHolder.fetchSurahDetailTaskInstance.execute(selectedSurah);
+        final FetchSurahDetailTask task = AsyncTaskProvider.getAsyncTask(FetchSurahDetailTask.class);
+        if (task.getStatus() == AsyncTask.Status.PENDING) {
+            task.setOnTaskListener(this.fetchSurahDetailCallback);
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, selectedSurah);
         }
     }
 
@@ -182,22 +180,15 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
     }
 
     private void clearFetchSurahDetailTask() {
-        if (AsyncTaskHolder.fetchSurahDetailTaskInstance != null) {
-            AsyncTaskHolder.fetchSurahDetailTaskInstance.setOnTaskListener(null);
-            AsyncTaskHolder.fetchSurahDetailTaskInstance = null;
-        }
+        AsyncTaskProvider.clearAsyncTask(FetchSurahDetailTask.class);
     }
 
     private void registerTaskCallbacks() {
-        if (AsyncTaskHolder.fetchSurahDetailTaskInstance != null) {
-            AsyncTaskHolder.fetchSurahDetailTaskInstance.setOnTaskListener(this.fetchSurahDetailCallback);
-        }
+        AsyncTaskProvider.getAsyncTask(FetchSurahDetailTask.class).setOnTaskListener(this.fetchSurahDetailCallback);
     }
 
     private void clearTaskCallbacks() {
-        if (AsyncTaskHolder.fetchSurahDetailTaskInstance != null) {
-            AsyncTaskHolder.fetchSurahDetailTaskInstance.setOnTaskListener(null);
-        }
+        AsyncTaskProvider.getAsyncTask(FetchSurahDetailTask.class).setOnTaskListener(null);
     }
 
     private void clearView() {
