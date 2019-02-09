@@ -34,6 +34,7 @@ public class AsyncTaskProvider {
     public static <T extends BaseAsyncTask> void clearAsyncTask(Class<T> asyncTaskClass) {
         BaseAsyncTask cached = AsyncTaskProvider.asyncTaskHolder.get(asyncTaskClass);
         if (cached != null) {
+            cached.cancel(true);
             cached.setOnTaskListener(null);
             AsyncTaskProvider.asyncTaskHolder.remove(asyncTaskClass);
         }
