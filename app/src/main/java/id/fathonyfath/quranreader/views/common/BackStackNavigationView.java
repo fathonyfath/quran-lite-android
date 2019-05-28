@@ -12,7 +12,7 @@ import id.fathonyfath.quranreader.Res;
 import id.fathonyfath.quranreader.utils.ViewBackStack;
 import id.fathonyfath.quranreader.utils.ViewCallback;
 
-public class BackstackNavigationView extends ContainerView {
+public class BackStackNavigationView extends ContainerView {
 
     private final Map<Class, Integer> mappedClassToIndex;
 
@@ -20,25 +20,25 @@ public class BackstackNavigationView extends ContainerView {
     private final ViewBackStack.Callback viewBackStackCallback = new ViewBackStack.Callback() {
         @Override
         public void onViewPushed(Class<? extends View> pushedView) {
-            BackstackNavigationView.this.handleViewCallbackForPushedView(pushedView);
+            BackStackNavigationView.this.handleViewCallbackForPushedView(pushedView);
 
-            BackstackNavigationView.this.updateViewBasedOnViewClass(pushedView);
+            BackStackNavigationView.this.updateViewBasedOnViewClass(pushedView);
         }
 
         @Override
         public void onViewPopped(Class<? extends View> poppedView) {
-            Class<? extends View> topStackView = BackstackNavigationView.this.viewBackStack.peekView();
+            Class<? extends View> topStackView = BackStackNavigationView.this.viewBackStack.peekView();
 
             if (topStackView != null) {
-                BackstackNavigationView.this.updateViewBasedOnViewClass(topStackView);
+                BackStackNavigationView.this.updateViewBasedOnViewClass(topStackView);
             }
 
-            BackstackNavigationView.this.handleViewCallbackForPoppedView(poppedView);
+            BackStackNavigationView.this.handleViewCallbackForPoppedView(poppedView);
         }
     };
 
 
-    public BackstackNavigationView(Context context) {
+    public BackStackNavigationView(Context context) {
         super(context);
 
         this.setId(Res.Id.navigationView);
@@ -54,14 +54,14 @@ public class BackstackNavigationView extends ContainerView {
 
     @Override
     protected Parcelable onSaveInstanceState() {
-        final BackstackNavigationViewState viewState = new BackstackNavigationViewState(super.onSaveInstanceState());
+        final BackStackNavigationViewState viewState = new BackStackNavigationViewState(super.onSaveInstanceState());
         viewState.viewBackStack = this.viewBackStack;
         return viewState;
     }
 
     @Override
     protected void onRestoreInstanceState(Parcelable state) {
-        final BackstackNavigationViewState viewState = (BackstackNavigationViewState) state;
+        final BackStackNavigationViewState viewState = (BackStackNavigationViewState) state;
         super.onRestoreInstanceState(viewState.getSuperState());
         this.viewBackStack = viewState.viewBackStack;
         this.viewBackStack.setCallback(this.viewBackStackCallback);
@@ -97,17 +97,17 @@ public class BackstackNavigationView extends ContainerView {
         }
     }
 
-    private static class BackstackNavigationViewState extends BaseSavedState {
+    private static class BackStackNavigationViewState extends BaseSavedState {
 
         private ViewBackStack viewBackStack;
 
-        public BackstackNavigationViewState(Parcel source, ClassLoader loader) {
+        public BackStackNavigationViewState(Parcel source, ClassLoader loader) {
             super(source);
 
             this.viewBackStack = source.readParcelable(ViewBackStack.class.getClassLoader());
         }
 
-        public BackstackNavigationViewState(Parcelable superState) {
+        public BackStackNavigationViewState(Parcelable superState) {
             super(superState);
         }
 
@@ -118,21 +118,21 @@ public class BackstackNavigationView extends ContainerView {
             out.writeParcelable(this.viewBackStack, flags);
         }
 
-        public static final Parcelable.Creator<BackstackNavigationViewState> CREATOR
-                = new Parcelable.ClassLoaderCreator<BackstackNavigationViewState>() {
+        public static final Parcelable.Creator<BackStackNavigationViewState> CREATOR
+                = new Parcelable.ClassLoaderCreator<BackStackNavigationViewState>() {
             @Override
-            public BackstackNavigationViewState createFromParcel(Parcel in) {
-                return new BackstackNavigationViewState(in, null);
+            public BackStackNavigationViewState createFromParcel(Parcel in) {
+                return new BackStackNavigationViewState(in, null);
             }
 
             @Override
-            public BackstackNavigationViewState createFromParcel(Parcel in, ClassLoader loader) {
-                return new BackstackNavigationViewState(in, loader);
+            public BackStackNavigationViewState createFromParcel(Parcel in, ClassLoader loader) {
+                return new BackStackNavigationViewState(in, loader);
             }
 
             @Override
-            public BackstackNavigationViewState[] newArray(int size) {
-                return new BackstackNavigationViewState[size];
+            public BackStackNavigationViewState[] newArray(int size) {
+                return new BackStackNavigationViewState[size];
             }
         };
     }
