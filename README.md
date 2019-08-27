@@ -1,4 +1,4 @@
-# Qur'an Reader
+# Qur'an Lite
 
 > Read Qur'an on your Android phone
 
