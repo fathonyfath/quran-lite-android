@@ -48,7 +48,7 @@ public class AyahView extends RelativeLayout {
 
     private void initView() {
         int ayahPadding = (int) UnitConverter.fromDpToPx(getContext(), 14f);
-        int topBottomAyahPadding = (int) UnitConverter.fromDpToPx(getContext(), 28f);
+        int topBottomAyahPadding = (int) UnitConverter.fromDpToPx(getContext(), 30f);
         this.ayahText.setPadding(ayahPadding, topBottomAyahPadding, ayahPadding, topBottomAyahPadding);
         this.ayahText.setBackgroundColor(Color.parseColor("#f4f4f4"));
         this.ayahText.setTextSize(30f);
