@@ -14,7 +14,7 @@ import id.fathonyfath.quranlite.tasks.DownloadFontTask;
 import id.fathonyfath.quranlite.tasks.HasFontInstalledTask;
 import id.fathonyfath.quranlite.tasks.OnTaskListener;
 import id.fathonyfath.quranlite.utils.UnitConverter;
-import id.fathonyfath.quranlite.utils.ViewCallback;
+import id.fathonyfath.quranlite.utils.viewLifecycle.ViewCallback;
 import id.fathonyfath.quranlite.views.common.ProgressView;
 
 public class FontDownloaderView extends FrameLayout implements ViewCallback {

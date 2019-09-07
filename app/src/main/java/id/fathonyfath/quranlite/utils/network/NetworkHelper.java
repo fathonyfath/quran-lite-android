@@ -1,4 +1,4 @@
-package id.fathonyfath.quranlite.utils;
+package id.fathonyfath.quranlite.utils.network;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -9,6 +9,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class NetworkHelper {
+
+    private NetworkHelper() {
+    }
 
     public static String doGetRequest(String url, CancelSignal signal, ProgressListener listener) {
         HttpURLConnection urlConnection = null;

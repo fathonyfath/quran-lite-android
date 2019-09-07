@@ -21,7 +21,7 @@ import id.fathonyfath.quranlite.models.SurahDetail;
 import id.fathonyfath.quranlite.tasks.AsyncTaskProvider;
 import id.fathonyfath.quranlite.tasks.FetchSurahDetailTask;
 import id.fathonyfath.quranlite.tasks.OnTaskListener;
-import id.fathonyfath.quranlite.utils.ViewCallback;
+import id.fathonyfath.quranlite.utils.viewLifecycle.ViewCallback;
 import id.fathonyfath.quranlite.utils.ViewUtil;
 import id.fathonyfath.quranlite.views.common.ProgressView;
 

@@ -1,4 +1,4 @@
-package id.fathonyfath.quranlite.utils;
+package id.fathonyfath.quranlite.utils.viewLifecycle;
 
 import android.os.Parcel;
 import android.os.Parcelable;

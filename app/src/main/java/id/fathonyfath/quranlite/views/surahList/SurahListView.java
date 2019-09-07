@@ -21,7 +21,7 @@ import id.fathonyfath.quranlite.models.Surah;
 import id.fathonyfath.quranlite.tasks.AsyncTaskProvider;
 import id.fathonyfath.quranlite.tasks.FetchAllSurahTask;
 import id.fathonyfath.quranlite.tasks.OnTaskListener;
-import id.fathonyfath.quranlite.utils.ViewCallback;
+import id.fathonyfath.quranlite.utils.viewLifecycle.ViewCallback;
 import id.fathonyfath.quranlite.views.common.ProgressView;
 
 public class SurahListView extends FrameLayout implements ViewCallback {

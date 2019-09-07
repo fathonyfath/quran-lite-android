@@ -9,8 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import id.fathonyfath.quranlite.Res;
-import id.fathonyfath.quranlite.utils.ViewBackStack;
-import id.fathonyfath.quranlite.utils.ViewCallback;
+import id.fathonyfath.quranlite.utils.viewLifecycle.ViewBackStack;
+import id.fathonyfath.quranlite.utils.viewLifecycle.ViewCallback;
 
 public abstract class BackStackNavigationView extends SwitchContainerView {
 

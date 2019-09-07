@@ -13,7 +13,7 @@ import android.widget.FrameLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-import id.fathonyfath.quranlite.utils.ViewCallback;
+import id.fathonyfath.quranlite.utils.viewLifecycle.ViewCallback;
 
 public class SwitchContainerView extends FrameLayout {
 
