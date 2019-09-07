@@ -11,8 +11,12 @@ Just your regular Qur'an apps on Android platform, except I'm trying to make it'
 * [FEATURE] Prefetch all the contents
 * [FEATURE] Retry to load from cloud if there is a connection issue
 
+Please report an Issue (<https://github.com/fathonyfath/quran-lite-android/issues>) if you encounter a problem while running the apps
+
 ## Version History
 
+* v1.2.0
+    * Improved stability
 * v1.1.1
     * Fix bug Typeface not refreshing after finish downloading font on already loaded `TextView`
     * Revert to set Application theme on Manifest instead of code because Cold start screen don't show full white screen

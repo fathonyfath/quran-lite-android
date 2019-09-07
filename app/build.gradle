@@ -15,8 +15,8 @@ static def buildTime() {
 buildscript {
     project.ext.version = [
             'major': 1,
-            'minor': 1,
-            'patch': 1,
+            'minor': 2,
+            'patch': 0,
     ]
 
     project.ext.version['name'] = "${project.ext.version.major}.${project.ext.version.minor}.${project.ext.version.patch}"
@@ -26,7 +26,7 @@ buildscript {
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "id.fathonyfath.quranreader"
+        applicationId "id.fathonyfath.quranlite"
         minSdkVersion 15
         targetSdkVersion 28
         versionCode project.ext.version.code
