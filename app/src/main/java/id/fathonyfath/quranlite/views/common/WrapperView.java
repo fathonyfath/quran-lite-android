@@ -21,7 +21,7 @@ import id.fathonyfath.quranlite.utils.ViewCallback;
 public class WrapperView extends RelativeLayout {
 
     private final ToolbarView toolbarView;
-    private final OverlayView overlayView;
+    private final ElevationView elevationView;
     private final FrameLayout containerView;
 
     private final List<Runnable> removeViewRunnables;
@@ -30,7 +30,7 @@ public class WrapperView extends RelativeLayout {
         super(context);
 
         this.toolbarView = new ToolbarView(getContext());
-        this.overlayView = new OverlayView(getContext());
+        this.elevationView = new ElevationView(getContext());
         this.containerView = new FrameLayout(getContext());
 
         this.removeViewRunnables = new ArrayList<>();
@@ -55,8 +55,8 @@ public class WrapperView extends RelativeLayout {
     }
 
     public void setOverlayAlpha(float alpha) {
-        if (this.overlayView != null) {
-            this.overlayView.setAlpha(alpha);
+        if (this.elevationView != null) {
+            this.elevationView.setAlpha(alpha);
         }
     }
 
@@ -135,10 +135,7 @@ public class WrapperView extends RelativeLayout {
     private void initView() {
         this.toolbarView.setId(Res.Id.toolbar);
 
-//        HamburgerView hamburgerView = new HamburgerView(getContext());
-//        this.toolbarView.setLeftView(hamburgerView);
-
-        this.overlayView.setLayoutParams(new ViewGroup.LayoutParams(
+        this.elevationView.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 (int) UnitConverter.fromDpToPx(getContext(), 8f)
         ));
@@ -146,11 +143,11 @@ public class WrapperView extends RelativeLayout {
         this.containerView.setId(Res.Id.containerView);
 
         addView(this.toolbarView);
-        addView(this.overlayView);
+        addView(this.elevationView);
         addView(this.containerView);
 
         final RelativeLayout.LayoutParams toolbarParams = (LayoutParams) this.toolbarView.getLayoutParams();
-        final RelativeLayout.LayoutParams overlayParams = (LayoutParams) this.overlayView.getLayoutParams();
+        final RelativeLayout.LayoutParams overlayParams = (LayoutParams) this.elevationView.getLayoutParams();
         final RelativeLayout.LayoutParams containerParams = new LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
@@ -160,8 +157,8 @@ public class WrapperView extends RelativeLayout {
         this.toolbarView.setLayoutParams(toolbarParams);
 
         overlayParams.addRule(RelativeLayout.BELOW, toolbarView.getId());
-        this.overlayView.setLayoutParams(overlayParams);
-        this.overlayView.bringToFront();
+        this.elevationView.setLayoutParams(overlayParams);
+        this.elevationView.bringToFront();
 
         containerParams.addRule(BELOW, this.toolbarView.getId());
         this.containerView.setLayoutParams(containerParams);

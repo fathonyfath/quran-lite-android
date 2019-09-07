@@ -6,9 +6,9 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.view.View;
 
-public class OverlayView extends View {
+public class ElevationView extends View {
 
-    public OverlayView(Context context) {
+    public ElevationView(Context context) {
         super(context);
 
         initOverlayColor();
