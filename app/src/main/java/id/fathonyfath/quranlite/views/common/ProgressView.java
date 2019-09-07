@@ -42,7 +42,7 @@ public class ProgressView extends LinearLayout {
     }
 
     public void updateProgress(float progress) {
-        this.progressText.setText(String.valueOf(Math.round(progress)) + "%");
+        this.progressText.setText(Math.round(progress) + "%");
     }
 
     private void initConfiguration() {

@@ -3,12 +3,12 @@ package id.fathonyfath.quranlite.tasks;
 import java.util.List;
 
 import id.fathonyfath.quranlite.data_old.OnProgressListener;
-import id.fathonyfath.quranlite.data_old.QuranRepository;
+import id.fathonyfath.quranlite.data_old.QuranRepositoryLegacy;
 import id.fathonyfath.quranlite.models.Surah;
 
 public class FetchAllSurahTask extends BaseAsyncTask<Void, List<Surah>> {
 
-    private final QuranRepository quranRepository;
+    private final QuranRepositoryLegacy quranRepositoryLegacy;
     private final OnProgressListener onProgressListener = new OnProgressListener() {
         @Override
         public void onProgress(float progress) {
@@ -16,16 +16,16 @@ public class FetchAllSurahTask extends BaseAsyncTask<Void, List<Surah>> {
         }
     };
 
-    public FetchAllSurahTask(QuranRepository quranRepository) {
-        this.quranRepository = quranRepository;
-        this.quranRepository.setOnProgressListener(onProgressListener);
+    public FetchAllSurahTask(QuranRepositoryLegacy quranRepositoryLegacy) {
+        this.quranRepositoryLegacy = quranRepositoryLegacy;
+        this.quranRepositoryLegacy.setOnProgressListener(onProgressListener);
     }
 
     @Override
     protected List<Surah> doInBackground(Void... voids) {
         publishProgress(0f);
         try {
-            return this.quranRepository.fetchAllSurah();
+            return this.quranRepositoryLegacy.fetchAllSurah();
         } catch (Exception ignored) {
             return null;
         }
@@ -39,16 +39,16 @@ public class FetchAllSurahTask extends BaseAsyncTask<Void, List<Surah>> {
 
     public static class Factory implements AsyncTaskFactory<FetchAllSurahTask> {
 
-        private final QuranRepository quranRepository;
+        private final QuranRepositoryLegacy quranRepositoryLegacy;
 
 
-        public Factory(QuranRepository quranRepository) {
-            this.quranRepository = quranRepository;
+        public Factory(QuranRepositoryLegacy quranRepositoryLegacy) {
+            this.quranRepositoryLegacy = quranRepositoryLegacy;
         }
 
         @Override
         public FetchAllSurahTask create() {
-            return new FetchAllSurahTask(this.quranRepository);
+            return new FetchAllSurahTask(this.quranRepositoryLegacy);
         }
     }
 }

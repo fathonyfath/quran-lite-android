@@ -21,15 +21,15 @@ import id.fathonyfath.quranlite.models.SurahDetail;
 import id.fathonyfath.quranlite.models.SurahTafsir;
 import id.fathonyfath.quranlite.models.SurahTranslation;
 
-public class QuranRepository {
+public class QuranRepositoryLegacy {
 
     private final QuranJsonService quranJsonService;
     private final OnDownloadProgressListener onDownloadProgressListener = new OnDownloadProgressListener() {
         @Override
         public void onDownloadProgress(int currentProgress, int maxProgress) {
-            if (QuranRepository.this.onProgressListener != null) {
+            if (QuranRepositoryLegacy.this.onProgressListener != null) {
                 float progress = ((float) currentProgress) / ((float) maxProgress) * 100.0f;
-                QuranRepository.this.onProgressListener.onProgress(progress);
+                QuranRepositoryLegacy.this.onProgressListener.onProgress(progress);
             }
         }
     };
@@ -38,7 +38,7 @@ public class QuranRepository {
 
     private OnProgressListener onProgressListener;
 
-    public QuranRepository(QuranJsonService quranJsonService, QuranDiskService quranDiskService) {
+    public QuranRepositoryLegacy(QuranJsonService quranJsonService, QuranDiskService quranDiskService) {
         this.quranJsonService = quranJsonService;
         this.quranJsonService.setOnDownloadProgressListener(onDownloadProgressListener);
 

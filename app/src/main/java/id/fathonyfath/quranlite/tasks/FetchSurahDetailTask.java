@@ -1,13 +1,13 @@
 package id.fathonyfath.quranlite.tasks;
 
 import id.fathonyfath.quranlite.data_old.OnProgressListener;
-import id.fathonyfath.quranlite.data_old.QuranRepository;
+import id.fathonyfath.quranlite.data_old.QuranRepositoryLegacy;
 import id.fathonyfath.quranlite.models.Surah;
 import id.fathonyfath.quranlite.models.SurahDetail;
 
 public class FetchSurahDetailTask extends BaseAsyncTask<Surah, SurahDetail> {
 
-    private final QuranRepository quranRepository;
+    private final QuranRepositoryLegacy quranRepositoryLegacy;
     private final OnProgressListener onProgressListener = new OnProgressListener() {
         @Override
         public void onProgress(float progress) {
@@ -15,9 +15,9 @@ public class FetchSurahDetailTask extends BaseAsyncTask<Surah, SurahDetail> {
         }
     };
 
-    public FetchSurahDetailTask(QuranRepository quranRepository) {
-        this.quranRepository = quranRepository;
-        this.quranRepository.setOnProgressListener(onProgressListener);
+    public FetchSurahDetailTask(QuranRepositoryLegacy quranRepositoryLegacy) {
+        this.quranRepositoryLegacy = quranRepositoryLegacy;
+        this.quranRepositoryLegacy.setOnProgressListener(onProgressListener);
     }
 
     @Override
@@ -25,7 +25,7 @@ public class FetchSurahDetailTask extends BaseAsyncTask<Surah, SurahDetail> {
         publishProgress(0f);
         if (surahs != null) {
             try {
-                return this.quranRepository.fetchSurahDetail(surahs[0]);
+                return this.quranRepositoryLegacy.fetchSurahDetail(surahs[0]);
             } catch (Exception ignored) {
                 return null;
             }
@@ -41,15 +41,15 @@ public class FetchSurahDetailTask extends BaseAsyncTask<Surah, SurahDetail> {
 
     public static class Factory implements AsyncTaskFactory<FetchSurahDetailTask> {
 
-        private final QuranRepository quranRepository;
+        private final QuranRepositoryLegacy quranRepositoryLegacy;
 
-        public Factory(QuranRepository quranRepository) {
-            this.quranRepository = quranRepository;
+        public Factory(QuranRepositoryLegacy quranRepositoryLegacy) {
+            this.quranRepositoryLegacy = quranRepositoryLegacy;
         }
 
         @Override
         public FetchSurahDetailTask create() {
-            return new FetchSurahDetailTask(this.quranRepository);
+            return new FetchSurahDetailTask(this.quranRepositoryLegacy);
         }
     }
 }
