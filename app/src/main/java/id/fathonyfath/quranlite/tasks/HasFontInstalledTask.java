@@ -1,6 +1,6 @@
 package id.fathonyfath.quranlite.tasks;
 
-import id.fathonyfath.quranlite.data.FontProvider;
+import id.fathonyfath.quranlite.data_old.FontProvider;
 
 public class HasFontInstalledTask extends BaseAsyncTask<Void, Boolean> {
 

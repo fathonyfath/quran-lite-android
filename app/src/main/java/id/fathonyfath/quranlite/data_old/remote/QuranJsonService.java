@@ -1,4 +1,4 @@
-package id.fathonyfath.quranlite.data.remote;
+package id.fathonyfath.quranlite.data_old.remote;
 
 import android.util.Pair;
 
@@ -14,11 +14,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
-import id.fathonyfath.quranlite.data.disk.QuranDiskService;
-import id.fathonyfath.quranlite.data.models.SurahDetailResponse;
-import id.fathonyfath.quranlite.data.models.SurahResponse;
-import id.fathonyfath.quranlite.data.transformer.SurahDetailResponseTransformer;
-import id.fathonyfath.quranlite.data.transformer.SurahResponseTransformer;
+import id.fathonyfath.quranlite.data_old.disk.QuranDiskService;
+import id.fathonyfath.quranlite.data_old.models.SurahDetailResponse;
+import id.fathonyfath.quranlite.data_old.models.SurahResponse;
+import id.fathonyfath.quranlite.data_old.transformer.SurahDetailResponseTransformer;
+import id.fathonyfath.quranlite.data_old.transformer.SurahResponseTransformer;
 
 public class QuranJsonService {
 

@@ -1,4 +1,4 @@
-package id.fathonyfath.quranlite.data.transformer;
+package id.fathonyfath.quranlite.data_old.transformer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -7,7 +7,7 @@ import org.json.JSONObject;
 import java.util.Map;
 import java.util.TreeMap;
 
-import id.fathonyfath.quranlite.data.models.SurahResponse;
+import id.fathonyfath.quranlite.data_old.models.SurahResponse;
 
 public class SurahResponseTransformer {
 

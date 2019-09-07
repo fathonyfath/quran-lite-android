@@ -1,4 +1,4 @@
-package id.fathonyfath.quranlite.data.models;
+package id.fathonyfath.quranlite.data_old.models;
 
 import java.util.Map;
 

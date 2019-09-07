@@ -3,11 +3,11 @@ package id.fathonyfath.quranlite;
 import android.app.Activity;
 import android.os.Bundle;
 
-import id.fathonyfath.quranlite.data.FontProvider;
-import id.fathonyfath.quranlite.data.QuranRepository;
-import id.fathonyfath.quranlite.data.disk.QuranDiskService;
-import id.fathonyfath.quranlite.data.remote.FontService;
-import id.fathonyfath.quranlite.data.remote.QuranJsonService;
+import id.fathonyfath.quranlite.data_old.FontProvider;
+import id.fathonyfath.quranlite.data_old.QuranRepository;
+import id.fathonyfath.quranlite.data_old.disk.QuranDiskService;
+import id.fathonyfath.quranlite.data_old.remote.FontService;
+import id.fathonyfath.quranlite.data_old.remote.QuranJsonService;
 import id.fathonyfath.quranlite.tasks.AsyncTaskProvider;
 import id.fathonyfath.quranlite.tasks.DownloadFontTask;
 import id.fathonyfath.quranlite.tasks.FetchAllSurahTask;

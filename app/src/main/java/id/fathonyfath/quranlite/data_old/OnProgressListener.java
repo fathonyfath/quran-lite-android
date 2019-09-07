@@ -1,4 +1,4 @@
-package id.fathonyfath.quranlite.data;
+package id.fathonyfath.quranlite.data_old;
 
 public interface OnProgressListener {
 

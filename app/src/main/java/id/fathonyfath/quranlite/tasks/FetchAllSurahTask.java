@@ -2,8 +2,8 @@ package id.fathonyfath.quranlite.tasks;
 
 import java.util.List;
 
-import id.fathonyfath.quranlite.data.OnProgressListener;
-import id.fathonyfath.quranlite.data.QuranRepository;
+import id.fathonyfath.quranlite.data_old.OnProgressListener;
+import id.fathonyfath.quranlite.data_old.QuranRepository;
 import id.fathonyfath.quranlite.models.Surah;
 
 public class FetchAllSurahTask extends BaseAsyncTask<Void, List<Surah>> {

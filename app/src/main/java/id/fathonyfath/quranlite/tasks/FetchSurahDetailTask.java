@@ -1,7 +1,7 @@
 package id.fathonyfath.quranlite.tasks;
 
-import id.fathonyfath.quranlite.data.OnProgressListener;
-import id.fathonyfath.quranlite.data.QuranRepository;
+import id.fathonyfath.quranlite.data_old.OnProgressListener;
+import id.fathonyfath.quranlite.data_old.QuranRepository;
 import id.fathonyfath.quranlite.models.Surah;
 import id.fathonyfath.quranlite.models.SurahDetail;
 

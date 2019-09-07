@@ -1,4 +1,4 @@
-package id.fathonyfath.quranlite.data;
+package id.fathonyfath.quranlite.data_old;
 
 import android.util.Pair;
 
@@ -6,16 +6,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import id.fathonyfath.quranlite.data.disk.QuranDiskService;
-import id.fathonyfath.quranlite.data.models.SurahDetailResponse;
-import id.fathonyfath.quranlite.data.models.SurahResponse;
-import id.fathonyfath.quranlite.data.models.SurahTafsirResponse;
-import id.fathonyfath.quranlite.data.models.SurahTafsirSourceResponse;
-import id.fathonyfath.quranlite.data.models.SurahTafsirsResponse;
-import id.fathonyfath.quranlite.data.models.SurahTranslationResponse;
-import id.fathonyfath.quranlite.data.models.SurahTranslationsResponse;
-import id.fathonyfath.quranlite.data.remote.OnDownloadProgressListener;
-import id.fathonyfath.quranlite.data.remote.QuranJsonService;
+import id.fathonyfath.quranlite.data_old.disk.QuranDiskService;
+import id.fathonyfath.quranlite.data_old.models.SurahDetailResponse;
+import id.fathonyfath.quranlite.data_old.models.SurahResponse;
+import id.fathonyfath.quranlite.data_old.models.SurahTafsirResponse;
+import id.fathonyfath.quranlite.data_old.models.SurahTafsirSourceResponse;
+import id.fathonyfath.quranlite.data_old.models.SurahTafsirsResponse;
+import id.fathonyfath.quranlite.data_old.models.SurahTranslationResponse;
+import id.fathonyfath.quranlite.data_old.models.SurahTranslationsResponse;
+import id.fathonyfath.quranlite.data_old.remote.OnDownloadProgressListener;
+import id.fathonyfath.quranlite.data_old.remote.QuranJsonService;
 import id.fathonyfath.quranlite.models.Surah;
 import id.fathonyfath.quranlite.models.SurahDetail;
 import id.fathonyfath.quranlite.models.SurahTafsir;

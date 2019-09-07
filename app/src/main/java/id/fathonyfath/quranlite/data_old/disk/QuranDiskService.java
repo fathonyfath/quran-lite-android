@@ -1,4 +1,4 @@
-package id.fathonyfath.quranlite.data.disk;
+package id.fathonyfath.quranlite.data_old.disk;
 
 import android.content.Context;
 import android.util.Pair;
@@ -15,10 +15,10 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.util.Map;
 
-import id.fathonyfath.quranlite.data.models.SurahDetailResponse;
-import id.fathonyfath.quranlite.data.models.SurahResponse;
-import id.fathonyfath.quranlite.data.transformer.SurahDetailResponseTransformer;
-import id.fathonyfath.quranlite.data.transformer.SurahResponseTransformer;
+import id.fathonyfath.quranlite.data_old.models.SurahDetailResponse;
+import id.fathonyfath.quranlite.data_old.models.SurahResponse;
+import id.fathonyfath.quranlite.data_old.transformer.SurahDetailResponseTransformer;
+import id.fathonyfath.quranlite.data_old.transformer.SurahResponseTransformer;
 
 public class QuranDiskService {
 

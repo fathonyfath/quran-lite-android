@@ -1,4 +1,4 @@
-package id.fathonyfath.quranlite.data.remote;
+package id.fathonyfath.quranlite.data_old.remote;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;

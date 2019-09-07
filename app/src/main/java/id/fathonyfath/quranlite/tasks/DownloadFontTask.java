@@ -1,7 +1,7 @@
 package id.fathonyfath.quranlite.tasks;
 
-import id.fathonyfath.quranlite.data.FontProvider;
-import id.fathonyfath.quranlite.data.OnProgressListener;
+import id.fathonyfath.quranlite.data_old.FontProvider;
+import id.fathonyfath.quranlite.data_old.OnProgressListener;
 
 public class DownloadFontTask extends BaseAsyncTask<Void, Boolean> {
 

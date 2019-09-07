@@ -2,7 +2,7 @@ package id.fathonyfath.quranlite.utils;
 
 import android.graphics.Typeface;
 
-import id.fathonyfath.quranlite.data.FontProvider;
+import id.fathonyfath.quranlite.data_old.FontProvider;
 
 public class TypefaceLoader {
 

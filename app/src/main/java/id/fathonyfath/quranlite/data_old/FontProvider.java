@@ -1,11 +1,11 @@
-package id.fathonyfath.quranlite.data;
+package id.fathonyfath.quranlite.data_old;
 
 import android.content.Context;
 
 import java.io.File;
 
-import id.fathonyfath.quranlite.data.remote.FontService;
-import id.fathonyfath.quranlite.data.remote.OnDownloadProgressListener;
+import id.fathonyfath.quranlite.data_old.remote.FontService;
+import id.fathonyfath.quranlite.data_old.remote.OnDownloadProgressListener;
 
 public class FontProvider {
 
