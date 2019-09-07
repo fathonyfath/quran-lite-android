@@ -47,10 +47,8 @@ public class FetchAllSurahUseCase extends BaseUseCase {
     }
 
     private void fetchFromRepository() {
-        List<Surah> surahList = this.quranRepository.fetchAllSurah(cancellationSignal, progressListener);
-        if (surahList != null) {
-            postResultToMainThread(surahList);
-        }
+        final List<Surah> surahList = this.quranRepository.fetchAllSurah(cancellationSignal, progressListener);
+        postResultToMainThread(surahList);
     }
 
     private void postResultToMainThread(final List<Surah> surahList) {
