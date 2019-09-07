@@ -12,7 +12,7 @@ import id.fathonyfath.quranlite.Res;
 import id.fathonyfath.quranlite.utils.ViewBackStack;
 import id.fathonyfath.quranlite.utils.ViewCallback;
 
-public class BackStackNavigationView extends ContainerView {
+public abstract class BackStackNavigationView extends SwitchContainerView {
 
     private final Map<Class, Integer> mappedClassToIndex;
 
@@ -22,7 +22,7 @@ public class BackStackNavigationView extends ContainerView {
         public void onViewPushed(Class<? extends View> pushedView) {
             BackStackNavigationView.this.handleViewCallbackForPushedView(pushedView);
 
-            BackStackNavigationView.this.updateViewBasedOnViewClass(pushedView);
+            BackStackNavigationView.this.showViewBasedOnViewClass(pushedView);
         }
 
         @Override
@@ -30,7 +30,7 @@ public class BackStackNavigationView extends ContainerView {
             Class<? extends View> topStackView = BackStackNavigationView.this.viewBackStack.peekView();
 
             if (topStackView != null) {
-                BackStackNavigationView.this.updateViewBasedOnViewClass(topStackView);
+                BackStackNavigationView.this.showViewBasedOnViewClass(topStackView);
             }
 
             BackStackNavigationView.this.handleViewCallbackForPoppedView(poppedView);
@@ -45,10 +45,32 @@ public class BackStackNavigationView extends ContainerView {
 
         this.mappedClassToIndex = new HashMap<>();
         this.viewBackStack = new ViewBackStack();
+        this.viewBackStack.setCallback(this.viewBackStackCallback);
+    }
 
+    protected abstract void initStack();
+
+    protected void pushView(Class<? extends View> viewClass) {
+        this.viewBackStack.pushView(viewClass);
+    }
+
+    protected boolean popView() {
+        return this.viewBackStack.popView();
+    }
+
+    protected void registerView(Class viewClass, View view) {
+        this.mappedClassToIndex.put(viewClass, addViewToContainer(view));
+    }
+
+    protected <T extends View> T findChildWithClass(Class viewClass) {
+        return this.findChildViewAtIndex(this.mappedClassToIndex.get(viewClass));
     }
 
     public boolean onBackPressed() {
+        if (this.viewBackStack.size() == 1) {
+            this.viewBackStack.popView();
+            return false;
+        }
         return this.viewBackStack.popView();
     }
 
@@ -56,6 +78,7 @@ public class BackStackNavigationView extends ContainerView {
     protected Parcelable onSaveInstanceState() {
         final BackStackNavigationViewState viewState = new BackStackNavigationViewState(super.onSaveInstanceState());
         viewState.viewBackStack = this.viewBackStack;
+
         return viewState;
     }
 
@@ -67,7 +90,25 @@ public class BackStackNavigationView extends ContainerView {
         this.viewBackStack.setCallback(this.viewBackStackCallback);
     }
 
-    private void updateViewBasedOnViewClass(Class<? extends View> viewClass) {
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+
+        if (this.viewBackStack.isEmpty()) {
+            initStack();
+        } else {
+            showViewBasedOnViewClass(this.viewBackStack.peekView());
+        }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        this.viewBackStack.setCallback(null);
+
+        super.onDetachedFromWindow();
+    }
+
+    private void showViewBasedOnViewClass(Class<? extends View> viewClass) {
         Integer indexOfView = this.mappedClassToIndex.get(viewClass);
 
         if (indexOfView != null) {

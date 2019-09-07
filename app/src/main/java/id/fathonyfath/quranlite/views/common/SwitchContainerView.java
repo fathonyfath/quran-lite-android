@@ -15,11 +15,11 @@ import java.util.List;
 
 import id.fathonyfath.quranlite.utils.ViewCallback;
 
-public class ContainerView extends FrameLayout {
+public class SwitchContainerView extends FrameLayout {
 
     private final List<Runnable> removeViewRunnables;
 
-    public ContainerView(Context context) {
+    public SwitchContainerView(Context context) {
         super(context);
 
         this.removeViewRunnables = new ArrayList<>();
@@ -30,11 +30,11 @@ public class ContainerView extends FrameLayout {
 
     @Override
     protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-
         for (Runnable runnable : this.removeViewRunnables) {
             removeCallbacks(runnable);
         }
+
+        super.onDetachedFromWindow();
     }
 
     public int addViewToContainer(View view) {
@@ -85,7 +85,7 @@ public class ContainerView extends FrameLayout {
                     @Override
                     public void run() {
                         this.viewToHide.setVisibility(View.GONE);
-                        ContainerView.this.removeViewRunnables.remove(this);
+                        SwitchContainerView.this.removeViewRunnables.remove(this);
                         removeCallbacks(this);
                     }
                 };

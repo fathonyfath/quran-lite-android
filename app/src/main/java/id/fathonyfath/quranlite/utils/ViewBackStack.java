@@ -49,6 +49,10 @@ public class ViewBackStack implements Parcelable {
         return this.viewBackStack.isEmpty();
     }
 
+    public int size() {
+        return this.viewBackStack.size();
+    }
+
     public void setCallback(Callback callback) {
         this.callback = callback;
     }
