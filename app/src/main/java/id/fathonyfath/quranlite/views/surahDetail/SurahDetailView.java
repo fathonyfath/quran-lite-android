@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +22,11 @@ import id.fathonyfath.quranlite.models.SurahDetail;
 import id.fathonyfath.quranlite.tasks.AsyncTaskProvider;
 import id.fathonyfath.quranlite.tasks.FetchSurahDetailTask;
 import id.fathonyfath.quranlite.tasks.OnTaskListener;
-import id.fathonyfath.quranlite.utils.viewLifecycle.ViewCallback;
+import id.fathonyfath.quranlite.useCase.FetchSurahDetailUseCase;
+import id.fathonyfath.quranlite.useCase.UseCaseCallback;
+import id.fathonyfath.quranlite.useCase.UseCaseProvider;
 import id.fathonyfath.quranlite.utils.ViewUtil;
+import id.fathonyfath.quranlite.utils.viewLifecycle.ViewCallback;
 import id.fathonyfath.quranlite.views.common.ProgressView;
 
 public class SurahDetailView extends FrameLayout implements ViewCallback {
@@ -39,21 +43,26 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
 
     private final ProgressView progressView;
 
-    private final OnTaskListener<SurahDetail> fetchSurahDetailCallback = new OnTaskListener<SurahDetail>() {
+    private final UseCaseCallback<SurahDetail> fetchSurahDetailCallback = new UseCaseCallback<SurahDetail>() {
         @Override
         public void onProgress(float progress) {
             updateTextProgress(progress);
         }
 
         @Override
-        public void onFinished(SurahDetail result) {
-            if (result != null) {
-                processSurahDetail(result);
-            } else {
-                // TODO: 19/01/19 Handle null value
-            }
+        public void onResult(SurahDetail data) {
+            // Don't forget to do some cleanups
+            unregisterUseCaseCallback();
+            clearUseCase();
 
-            clearFetchSurahDetailTask();
+            processSurahDetail(data);
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            // Don't forget to do some cleanups
+            unregisterUseCaseCallback();
+            clearUseCase();
         }
     };
 
@@ -90,14 +99,18 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
 
     @Override
     public void onStart() {
-
+        this.progressView.setVisibility(View.GONE);
+        updateTextProgress(0f);
     }
 
     @Override
     public void onResume() {
         if (this.currentSurah != null) {
-            registerTaskCallbacks();
-            runFetchSurahDetailTask(this.currentSurah);
+            this.progressView.setVisibility(View.VISIBLE);
+
+            if (!tryToRestoreUseCase()) {
+                createAndRunUseCase();
+            }
         } else {
             ViewUtil.onBackPressed(this);
         }
@@ -106,12 +119,12 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
     @Override
     public void onPause() {
         clearView();
-        clearTaskCallbacks();
+        unregisterUseCaseCallback();
     }
 
     @Override
     public void onStop() {
-        clearFetchSurahDetailTask();
+        clearUseCase();
     }
 
     public void setState(Surah selectedSurah) {
@@ -145,23 +158,13 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
         );
         progressParams.gravity = Gravity.CENTER;
         this.progressView.setLayoutParams(progressParams);
-        this.progressView.setVisibility(View.GONE);
 
         addView(this.progressView);
     }
 
-    private void runFetchSurahDetailTask(Surah selectedSurah) {
-        this.progressView.setVisibility(View.VISIBLE);
-
-        final FetchSurahDetailTask task = AsyncTaskProvider.getAsyncTask(FetchSurahDetailTask.class);
-        if (task.getStatus() == AsyncTask.Status.PENDING) {
-            task.setOnTaskListener(this.fetchSurahDetailCallback);
-            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, selectedSurah);
-        }
-    }
-
     private void processSurahDetail(SurahDetail surahDetail) {
         this.progressView.setVisibility(View.GONE);
+        updateTextProgress(0f);
 
         this.ayahViewTypeList.clear();
 
@@ -189,16 +192,31 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
         this.progressView.updateProgress(progress);
     }
 
-    private void clearFetchSurahDetailTask() {
-        AsyncTaskProvider.clearAsyncTask(FetchSurahDetailTask.class);
+    private boolean tryToRestoreUseCase() {
+        FetchSurahDetailUseCase useCase = UseCaseProvider.getUseCase(FetchSurahDetailUseCase.class);
+        if (useCase != null) {
+            useCase.setCallback(this.fetchSurahDetailCallback);
+            return true;
+        }
+        return false;
     }
 
-    private void registerTaskCallbacks() {
-        AsyncTaskProvider.getAsyncTask(FetchSurahDetailTask.class).setOnTaskListener(this.fetchSurahDetailCallback);
+    private void createAndRunUseCase() {
+        FetchSurahDetailUseCase useCase = UseCaseProvider.createUseCase(FetchSurahDetailUseCase.class);
+        useCase.setCallback(this.fetchSurahDetailCallback);
+        useCase.setArguments(this.currentSurah);
+        useCase.run();
     }
 
-    private void clearTaskCallbacks() {
-        AsyncTaskProvider.getAsyncTask(FetchSurahDetailTask.class).setOnTaskListener(null);
+    private void unregisterUseCaseCallback() {
+        FetchSurahDetailUseCase useCase = UseCaseProvider.getUseCase(FetchSurahDetailUseCase.class);
+        if (useCase != null) {
+            useCase.setCallback(null);
+        }
+    }
+
+    private void clearUseCase() {
+        UseCaseProvider.clearUseCase(FetchSurahDetailUseCase.class);
     }
 
     private void clearView() {

@@ -17,6 +17,7 @@ import id.fathonyfath.quranlite.tasks.FetchAllSurahTask;
 import id.fathonyfath.quranlite.tasks.FetchSurahDetailTask;
 import id.fathonyfath.quranlite.tasks.HasFontInstalledTask;
 import id.fathonyfath.quranlite.useCase.FetchAllSurahUseCase;
+import id.fathonyfath.quranlite.useCase.FetchSurahDetailUseCase;
 import id.fathonyfath.quranlite.useCase.UseCaseProvider;
 import id.fathonyfath.quranlite.views.MainView;
 
@@ -103,5 +104,6 @@ public class MainActivity extends Activity {
 
     private void registerUseCaseFactory() {
         UseCaseProvider.registerFactory(FetchAllSurahUseCase.class, new FetchAllSurahUseCase.Factory(this.quranRepository));
+        UseCaseProvider.registerFactory(FetchSurahDetailUseCase.class, new FetchSurahDetailUseCase.Factory(this.quranRepository));
     }
 }

@@ -34,6 +34,8 @@ public class SwitchContainerView extends FrameLayout {
             removeCallbacks(runnable);
         }
 
+        this.animateHideAllVisibleChild();
+
         super.onDetachedFromWindow();
     }
 

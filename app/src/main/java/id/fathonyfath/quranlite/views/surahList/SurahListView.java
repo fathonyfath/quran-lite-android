@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -98,11 +97,14 @@ public class SurahListView extends FrameLayout implements ViewCallback {
 
     @Override
     public void onStart() {
-
+        this.progressView.setVisibility(View.GONE);
+        updateTextProgress(0f);
     }
 
     @Override
     public void onResume() {
+        this.progressView.setVisibility(View.GONE);
+
         this.surahListView.setOnItemClickListener(onSurahItemClickListener);
 
         if (this.surahList.isEmpty()) {
@@ -112,9 +114,6 @@ public class SurahListView extends FrameLayout implements ViewCallback {
                 createAndRunUseCase();
             }
         }
-
-        FetchAllSurahUseCase useCase = UseCaseProvider.getUseCase(FetchAllSurahUseCase.class);
-        Log.d("SurahListView", "UseCase: " + useCase);
     }
 
     @Override
@@ -149,8 +148,6 @@ public class SurahListView extends FrameLayout implements ViewCallback {
         );
         progressParams.gravity = Gravity.CENTER;
         this.progressView.setLayoutParams(progressParams);
-        this.progressView.setVisibility(View.GONE);
-        updateTextProgress(0f);
 
         addView(this.progressView);
     }

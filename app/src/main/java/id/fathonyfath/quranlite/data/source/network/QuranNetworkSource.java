@@ -25,7 +25,8 @@ public class QuranNetworkSource {
         String result = NetworkHelper.doGetRequest(BASE_URL + surahNumber + ".json", cancelSignal, progressListener);
         try {
             if (result != null) {
-                return new JSONObject(result);
+                final JSONObject parentJSON = new JSONObject(result);
+                return parentJSON.getJSONObject(String.valueOf(surahNumber));
             }
         } catch (JSONException e) {
             e.printStackTrace();

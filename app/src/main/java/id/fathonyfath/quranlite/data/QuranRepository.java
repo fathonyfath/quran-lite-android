@@ -37,6 +37,14 @@ public class QuranRepository {
             surahIndexJSON = this.quranNetworkSource.getSurahIndex(
                     cancellationSignal,
                     networkProgressListener);
+
+            if (surahIndexJSON != null) {
+                this.quranDiskSource.saveSurahIndex(surahIndexJSON);
+            }
+        }
+
+        if (surahIndexJSON == null) {
+            return null;
         }
 
         try {
@@ -49,15 +57,25 @@ public class QuranRepository {
         return null;
     }
 
-    public SurahDetail fetchSurahDetail(Surah surah) {
+    public SurahDetail fetchSurahDetail(Surah surah,
+                                        NetworkHelper.CancelSignal cancellationSignal,
+                                        NetworkHelper.ProgressListener networkProgressListener) {
         final JSONObject surahDetailJSON;
         if (this.quranDiskSource.isSurahDetailAtNumberExist(surah.getNumber())) {
             surahDetailJSON = this.quranDiskSource.getSurahDetailAtNumber(surah.getNumber());
         } else {
             surahDetailJSON = this.quranNetworkSource.getSurahDetailAtNumber(
                     surah.getNumber(),
-                    null,
-                    null);
+                    cancellationSignal,
+                    networkProgressListener);
+
+            if (surahDetailJSON != null) {
+                this.quranDiskSource.saveSurahDetailAtNumber(surah.getNumber(), surahDetailJSON);
+            }
+        }
+
+        if (surahDetailJSON == null) {
+            return null;
         }
 
         try {

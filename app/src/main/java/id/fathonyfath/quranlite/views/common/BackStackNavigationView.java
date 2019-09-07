@@ -87,13 +87,13 @@ public abstract class BackStackNavigationView extends SwitchContainerView {
         final BackStackNavigationViewState viewState = (BackStackNavigationViewState) state;
         super.onRestoreInstanceState(viewState.getSuperState());
         this.viewBackStack = viewState.viewBackStack;
-        this.viewBackStack.setCallback(this.viewBackStackCallback);
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
 
+        this.viewBackStack.setCallback(this.viewBackStackCallback);
         if (this.viewBackStack.isEmpty()) {
             initStack();
         } else {
