@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="id.fathonyfath.quranreader">
+    package="id.fathonyfath.quranlite">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:label="Qur'an Reader"
+        android:label="Qur'an Lite"
         android:theme="@android:style/Theme.Holo.Light.NoActionBar">
-        <activity android:name=".MainActivity">
+        <activity android:name="id.fathonyfath.quranlite.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
