@@ -54,7 +54,7 @@ public class WrapperView extends RelativeLayout {
         }
     }
 
-    public void setOverlayAlpha(float alpha) {
+    public void setElevationAlpha(float alpha) {
         if (this.elevationView != null) {
             this.elevationView.setAlpha(alpha);
         }
