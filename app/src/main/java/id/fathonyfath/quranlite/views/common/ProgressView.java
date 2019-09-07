@@ -71,6 +71,23 @@ public class ProgressView extends LinearLayout {
 
     public static class ProgressViewState extends BaseSavedState {
 
+        public static final Parcelable.Creator<ProgressViewState> CREATOR
+                = new Parcelable.ClassLoaderCreator<ProgressViewState>() {
+            @Override
+            public ProgressViewState createFromParcel(Parcel in) {
+                return new ProgressViewState(in, null);
+            }
+
+            @Override
+            public ProgressViewState createFromParcel(Parcel in, ClassLoader loader) {
+                return new ProgressViewState(in, loader);
+            }
+
+            @Override
+            public ProgressViewState[] newArray(int size) {
+                return new ProgressViewState[size];
+            }
+        };
         private String currentText;
 
         public ProgressViewState(Parcel source, ClassLoader loader) {
@@ -89,23 +106,5 @@ public class ProgressView extends LinearLayout {
 
             out.writeString(this.currentText);
         }
-
-        public static final Parcelable.Creator<ProgressViewState> CREATOR
-                = new Parcelable.ClassLoaderCreator<ProgressViewState>() {
-            @Override
-            public ProgressViewState createFromParcel(Parcel in) {
-                return new ProgressViewState(in, null);
-            }
-
-            @Override
-            public ProgressViewState createFromParcel(Parcel in, ClassLoader loader) {
-                return new ProgressViewState(in, loader);
-            }
-
-            @Override
-            public ProgressViewState[] newArray(int size) {
-                return new ProgressViewState[size];
-            }
-        };
     }
 }

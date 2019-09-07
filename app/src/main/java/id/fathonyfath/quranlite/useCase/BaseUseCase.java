@@ -25,12 +25,11 @@ public abstract class BaseUseCase {
         setCancelled(true);
     }
 
+    protected boolean isCancelled() {
+        return this.cancelled;
+    }
 
     protected void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
-    }
-
-    protected boolean isCancelled() {
-        return this.cancelled;
     }
 }

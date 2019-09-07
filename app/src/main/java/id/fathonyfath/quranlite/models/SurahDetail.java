@@ -8,6 +8,17 @@ import java.util.TreeMap;
 
 public class SurahDetail implements Parcelable {
 
+    public static final Creator<SurahDetail> CREATOR = new Creator<SurahDetail>() {
+        @Override
+        public SurahDetail createFromParcel(Parcel in) {
+            return new SurahDetail(in);
+        }
+
+        @Override
+        public SurahDetail[] newArray(int size) {
+            return new SurahDetail[size];
+        }
+    };
     private final int number;
     private final String name;
     private final String nameInLatin;
@@ -32,6 +43,30 @@ public class SurahDetail implements Parcelable {
 
         for (Map.Entry<Integer, String> entry : contents.entrySet()) {
             this.contents.put(entry.getKey(), entry.getValue());
+        }
+    }
+
+    /**
+     * Parcelable implementation.
+     */
+
+    protected SurahDetail(Parcel in) {
+        this.number = in.readInt();
+        this.name = in.readString();
+        this.nameInLatin = in.readString();
+        this.numberOfAyah = in.readInt();
+        this.surahTranslation = in.readParcelable(SurahTranslation.class.getClassLoader());
+        this.surahTafsir = in.readParcelable(SurahTafsir.class.getClassLoader());
+
+        int length = in.readInt();
+        int[] keySet = new int[length];
+        in.readIntArray(keySet);
+
+        String[] valueSet = new String[length];
+        in.readStringArray(valueSet);
+
+        for (int i = 0; i < length; i++) {
+            this.contents.put(keySet[i], valueSet[i]);
         }
     }
 
@@ -91,30 +126,6 @@ public class SurahDetail implements Parcelable {
         return result;
     }
 
-    /**
-     * Parcelable implementation.
-     */
-
-    protected SurahDetail(Parcel in) {
-        this.number = in.readInt();
-        this.name = in.readString();
-        this.nameInLatin = in.readString();
-        this.numberOfAyah = in.readInt();
-        this.surahTranslation = in.readParcelable(SurahTranslation.class.getClassLoader());
-        this.surahTafsir = in.readParcelable(SurahTafsir.class.getClassLoader());
-
-        int length = in.readInt();
-        int[] keySet = new int[length];
-        in.readIntArray(keySet);
-
-        String[] valueSet = new String[length];
-        in.readStringArray(valueSet);
-
-        for (int i = 0; i < length; i++) {
-            this.contents.put(keySet[i], valueSet[i]);
-        }
-    }
-
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.number);
@@ -140,16 +151,4 @@ public class SurahDetail implements Parcelable {
     public int describeContents() {
         return 0;
     }
-
-    public static final Creator<SurahDetail> CREATOR = new Creator<SurahDetail>() {
-        @Override
-        public SurahDetail createFromParcel(Parcel in) {
-            return new SurahDetail(in);
-        }
-
-        @Override
-        public SurahDetail[] newArray(int size) {
-            return new SurahDetail[size];
-        }
-    };
 }

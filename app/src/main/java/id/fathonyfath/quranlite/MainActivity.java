@@ -8,39 +8,16 @@ import id.fathonyfath.quranlite.data.QuranRepository;
 import id.fathonyfath.quranlite.data.font.FontRemoteSource;
 import id.fathonyfath.quranlite.data.source.disk.QuranDiskSource;
 import id.fathonyfath.quranlite.data.source.network.QuranNetworkSource;
-import id.fathonyfath.quranlite.data_old.FontProviderLegacy;
-import id.fathonyfath.quranlite.data_old.QuranRepositoryLegacy;
-import id.fathonyfath.quranlite.data_old.disk.QuranDiskService;
-import id.fathonyfath.quranlite.data_old.remote.FontService;
-import id.fathonyfath.quranlite.data_old.remote.QuranJsonService;
-import id.fathonyfath.quranlite.tasks.AsyncTaskProvider;
-import id.fathonyfath.quranlite.tasks.DownloadFontTask;
-import id.fathonyfath.quranlite.tasks.FetchAllSurahTask;
-import id.fathonyfath.quranlite.tasks.FetchSurahDetailTask;
-import id.fathonyfath.quranlite.tasks.HasFontInstalledTask;
-import id.fathonyfath.quranlite.useCase.InstallFontIfNecessaryUseCase;
 import id.fathonyfath.quranlite.useCase.FetchAllSurahUseCase;
 import id.fathonyfath.quranlite.useCase.FetchSurahDetailUseCase;
+import id.fathonyfath.quranlite.useCase.InstallFontIfNecessaryUseCase;
 import id.fathonyfath.quranlite.useCase.UseCaseProvider;
 import id.fathonyfath.quranlite.views.MainView;
 
 public class MainActivity extends Activity {
 
-    public static final String QURAN_REPOSITORY_LEGACY_SERVICE = "MainActivity.QuranRepositoryLegacy";
     public static final String QURAN_REPOSITORY_SERVICE = "MainActivity.QuranRepository";
-    public static final String FONT_PROVIDER_LEGACY_SERVICE = "MainActivity.FontProviderLegacy";
     public static final String FONT_PROVIDER_SERVICE = "MainActivity.FontProvider";
-
-    private QuranDiskService quranDiskService;
-    private QuranJsonService quranJsonService;
-    private FontService fontService;
-
-    private QuranRepositoryLegacy quranRepositoryLegacy;
-    private FontProviderLegacy fontProviderLegacy;
-
-    private QuranDiskSource quranDiskSource;
-    private QuranNetworkSource quranNetworkSource;
-    private FontRemoteSource fontRemoteSource;
 
     private QuranRepository quranRepository;
     private FontProvider fontProvider;
@@ -52,7 +29,6 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         initService();
-        registerAsyncTaskFactory();
         registerUseCaseFactory();
 
         this.mainView = new MainView(this);
@@ -62,7 +38,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         if (isFinishing()) {
-            AsyncTaskProvider.clearAllAsyncTask();
+            UseCaseProvider.clearAllUseCase();
         }
 
         super.onDestroy();
@@ -77,12 +53,8 @@ public class MainActivity extends Activity {
 
     @Override
     public Object getSystemService(String name) {
-        if (name.equals(QURAN_REPOSITORY_LEGACY_SERVICE)) {
-            return quranRepositoryLegacy;
-        } else if (name.equals(QURAN_REPOSITORY_SERVICE)) {
+        if (name.equals(QURAN_REPOSITORY_SERVICE)) {
             return quranRepository;
-        } else if (name.equals(FONT_PROVIDER_LEGACY_SERVICE)) {
-            return fontProviderLegacy;
         } else if (name.equals(FONT_PROVIDER_SERVICE)) {
             return fontProvider;
         }
@@ -90,26 +62,12 @@ public class MainActivity extends Activity {
     }
 
     private void initService() {
-        this.quranDiskService = new QuranDiskService(this.getApplicationContext());
-        this.quranJsonService = new QuranJsonService(this.quranDiskService);
-        this.fontService = new FontService();
+        QuranDiskSource quranDiskSource = new QuranDiskSource(this.getApplicationContext());
+        QuranNetworkSource quranNetworkSource = new QuranNetworkSource();
+        FontRemoteSource fontRemoteSource = new FontRemoteSource();
 
-        this.quranRepositoryLegacy = new QuranRepositoryLegacy(this.quranJsonService, this.quranDiskService);
-        this.fontProviderLegacy = new FontProviderLegacy(this.getApplicationContext(), this.fontService);
-
-        this.quranDiskSource = new QuranDiskSource(this.getApplicationContext());
-        this.quranNetworkSource = new QuranNetworkSource();
-        this.fontRemoteSource = new FontRemoteSource();
-
-        this.quranRepository = new QuranRepository(this.quranDiskSource, this.quranNetworkSource);
-        this.fontProvider = new FontProvider(this.getApplicationContext(), this.fontRemoteSource);
-    }
-
-    private void registerAsyncTaskFactory() {
-        AsyncTaskProvider.registerFactory(DownloadFontTask.class, new DownloadFontTask.Factory(this.fontProviderLegacy));
-        AsyncTaskProvider.registerFactory(HasFontInstalledTask.class, new HasFontInstalledTask.Factory(this.fontProviderLegacy));
-        AsyncTaskProvider.registerFactory(FetchAllSurahTask.class, new FetchAllSurahTask.Factory(this.quranRepositoryLegacy));
-        AsyncTaskProvider.registerFactory(FetchSurahDetailTask.class, new FetchSurahDetailTask.Factory(this.quranRepositoryLegacy));
+        this.quranRepository = new QuranRepository(quranDiskSource, quranNetworkSource);
+        this.fontProvider = new FontProvider(this.getApplicationContext(), fontRemoteSource);
     }
 
     private void registerUseCaseFactory() {

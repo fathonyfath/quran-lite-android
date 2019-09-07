@@ -8,6 +8,17 @@ import java.util.TreeMap;
 
 public class SurahTafsir implements Parcelable {
 
+    public static final Creator<SurahTafsir> CREATOR = new Creator<SurahTafsir>() {
+        @Override
+        public SurahTafsir createFromParcel(Parcel in) {
+            return new SurahTafsir(in);
+        }
+
+        @Override
+        public SurahTafsir[] newArray(int size) {
+            return new SurahTafsir[size];
+        }
+    };
     private final String name;
     private final String source;
     private final Map<Integer, String> contents = new TreeMap<>();
@@ -18,6 +29,26 @@ public class SurahTafsir implements Parcelable {
 
         for (Map.Entry<Integer, String> entry : contents.entrySet()) {
             this.contents.put(entry.getKey(), entry.getValue());
+        }
+    }
+
+    /**
+     * Parcelable implementation.
+     */
+
+    protected SurahTafsir(Parcel in) {
+        this.name = in.readString();
+        this.source = in.readString();
+
+        int length = in.readInt();
+        int[] keySet = new int[length];
+        in.readIntArray(keySet);
+
+        String[] valueSet = new String[length];
+        in.readStringArray(valueSet);
+
+        for (int i = 0; i < length; i++) {
+            this.contents.put(keySet[i], valueSet[i]);
         }
     }
 
@@ -53,26 +84,6 @@ public class SurahTafsir implements Parcelable {
         return result;
     }
 
-    /**
-     * Parcelable implementation.
-     */
-
-    protected SurahTafsir(Parcel in) {
-        this.name = in.readString();
-        this.source = in.readString();
-
-        int length = in.readInt();
-        int[] keySet = new int[length];
-        in.readIntArray(keySet);
-
-        String[] valueSet = new String[length];
-        in.readStringArray(valueSet);
-
-        for (int i = 0; i < length; i++) {
-            this.contents.put(keySet[i], valueSet[i]);
-        }
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -96,16 +107,4 @@ public class SurahTafsir implements Parcelable {
         dest.writeIntArray(keySet);
         dest.writeStringArray(valueSet);
     }
-
-    public static final Creator<SurahTafsir> CREATOR = new Creator<SurahTafsir>() {
-        @Override
-        public SurahTafsir createFromParcel(Parcel in) {
-            return new SurahTafsir(in);
-        }
-
-        @Override
-        public SurahTafsir[] newArray(int size) {
-            return new SurahTafsir[size];
-        }
-    };
 }

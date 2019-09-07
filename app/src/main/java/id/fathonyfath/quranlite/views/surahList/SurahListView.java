@@ -26,17 +26,9 @@ import id.fathonyfath.quranlite.views.common.ProgressView;
 public class SurahListView extends FrameLayout implements ViewCallback {
 
     private final List<Surah> surahList = new ArrayList<>();
-
-    private final AdapterView.OnItemClickListener onSurahItemClickListener = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            if (SurahListView.this.onViewEventListener != null) {
-                Surah selectedSurah = SurahListView.this.surahAdapter.getItem(position);
-                SurahListView.this.onViewEventListener.onSurahSelected(selectedSurah);
-            }
-        }
-    };
-
+    private final ListView surahListView;
+    private final SurahAdapter surahAdapter;
+    private final ProgressView progressView;
     private final UseCaseCallback<List<Surah>> fetchAllSurahCallback = new UseCaseCallback<List<Surah>>() {
         @Override
         public void onProgress(float progress) {
@@ -59,13 +51,16 @@ public class SurahListView extends FrameLayout implements ViewCallback {
             clearUseCase();
         }
     };
-
-    private final ListView surahListView;
-    private final SurahAdapter surahAdapter;
-
-    private final ProgressView progressView;
-
     private OnViewEventListener onViewEventListener;
+    private final AdapterView.OnItemClickListener onSurahItemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            if (SurahListView.this.onViewEventListener != null) {
+                Surah selectedSurah = SurahListView.this.surahAdapter.getItem(position);
+                SurahListView.this.onViewEventListener.onSurahSelected(selectedSurah);
+            }
+        }
+    };
 
     public SurahListView(Context context) {
         super(context);
@@ -196,8 +191,29 @@ public class SurahListView extends FrameLayout implements ViewCallback {
         this.surahList.addAll(surahList);
     }
 
+    public interface OnViewEventListener {
+        void onSurahSelected(Surah selectedSurah);
+    }
+
     private static class SurahListViewState extends BaseSavedState {
 
+        public static final Parcelable.Creator<SurahListViewState> CREATOR
+                = new Parcelable.ClassLoaderCreator<SurahListViewState>() {
+            @Override
+            public SurahListViewState createFromParcel(Parcel in) {
+                return new SurahListViewState(in, null);
+            }
+
+            @Override
+            public SurahListViewState createFromParcel(Parcel in, ClassLoader loader) {
+                return new SurahListViewState(in, loader);
+            }
+
+            @Override
+            public SurahListViewState[] newArray(int size) {
+                return new SurahListViewState[size];
+            }
+        };
         private List<Surah> surahList = new ArrayList<>();
 
         public SurahListViewState(Parcel source, ClassLoader loader) {
@@ -223,27 +239,5 @@ public class SurahListView extends FrameLayout implements ViewCallback {
             Surah[] surahArray = this.surahList.toArray(new Surah[0]);
             out.writeTypedArray(surahArray, flags);
         }
-
-        public static final Parcelable.Creator<SurahListViewState> CREATOR
-                = new Parcelable.ClassLoaderCreator<SurahListViewState>() {
-            @Override
-            public SurahListViewState createFromParcel(Parcel in) {
-                return new SurahListViewState(in, null);
-            }
-
-            @Override
-            public SurahListViewState createFromParcel(Parcel in, ClassLoader loader) {
-                return new SurahListViewState(in, loader);
-            }
-
-            @Override
-            public SurahListViewState[] newArray(int size) {
-                return new SurahListViewState[size];
-            }
-        };
-    }
-
-    public interface OnViewEventListener {
-        void onSurahSelected(Surah selectedSurah);
     }
 }

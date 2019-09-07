@@ -2,10 +2,8 @@ package id.fathonyfath.quranlite.views.surahDetail;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,9 +17,6 @@ import java.util.Map;
 import id.fathonyfath.quranlite.Res;
 import id.fathonyfath.quranlite.models.Surah;
 import id.fathonyfath.quranlite.models.SurahDetail;
-import id.fathonyfath.quranlite.tasks.AsyncTaskProvider;
-import id.fathonyfath.quranlite.tasks.FetchSurahDetailTask;
-import id.fathonyfath.quranlite.tasks.OnTaskListener;
 import id.fathonyfath.quranlite.useCase.FetchSurahDetailUseCase;
 import id.fathonyfath.quranlite.useCase.UseCaseCallback;
 import id.fathonyfath.quranlite.useCase.UseCaseProvider;
@@ -31,18 +26,13 @@ import id.fathonyfath.quranlite.views.common.ProgressView;
 
 public class SurahDetailView extends FrameLayout implements ViewCallback {
 
-    private Surah currentSurah;
-    private Parcelable listViewState;
-
-    private boolean newPage = false;
-
     private final List<AyahDetailViewType> ayahViewTypeList = new ArrayList<>();
-
     private final ListView ayahListView;
     private final AyahDetailAdapter ayahDetailAdapter;
-
     private final ProgressView progressView;
-
+    private Surah currentSurah;
+    private Parcelable listViewState;
+    private boolean newPage = false;
     private final UseCaseCallback<SurahDetail> fetchSurahDetailCallback = new UseCaseCallback<SurahDetail>() {
         @Override
         public void onProgress(float progress) {
@@ -226,6 +216,23 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
 
     private static class SurahDetailViewState extends BaseSavedState {
 
+        public static final Parcelable.Creator<SurahDetailViewState> CREATOR
+                = new Parcelable.ClassLoaderCreator<SurahDetailViewState>() {
+            @Override
+            public SurahDetailViewState createFromParcel(Parcel in) {
+                return new SurahDetailViewState(in, null);
+            }
+
+            @Override
+            public SurahDetailViewState createFromParcel(Parcel in, ClassLoader loader) {
+                return new SurahDetailViewState(in, loader);
+            }
+
+            @Override
+            public SurahDetailViewState[] newArray(int size) {
+                return new SurahDetailViewState[size];
+            }
+        };
         private Surah currentSurah;
         private Parcelable listViewState;
 
@@ -247,23 +254,5 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
             out.writeParcelable(this.currentSurah, flags);
             out.writeParcelable(this.listViewState, flags);
         }
-
-        public static final Parcelable.Creator<SurahDetailViewState> CREATOR
-                = new Parcelable.ClassLoaderCreator<SurahDetailViewState>() {
-            @Override
-            public SurahDetailViewState createFromParcel(Parcel in) {
-                return new SurahDetailViewState(in, null);
-            }
-
-            @Override
-            public SurahDetailViewState createFromParcel(Parcel in, ClassLoader loader) {
-                return new SurahDetailViewState(in, loader);
-            }
-
-            @Override
-            public SurahDetailViewState[] newArray(int size) {
-                return new SurahDetailViewState[size];
-            }
-        };
     }
 }

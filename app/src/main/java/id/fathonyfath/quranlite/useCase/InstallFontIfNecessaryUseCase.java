@@ -14,7 +14,7 @@ public class InstallFontIfNecessaryUseCase extends BaseUseCase {
             return InstallFontIfNecessaryUseCase.this.isCancelled();
         }
     };
-
+    private UseCaseCallback<Boolean> callback;
     private NetworkHelper.ProgressListener progressListener = new NetworkHelper.ProgressListener() {
         @Override
         public void onProgress(int currentReadByte, int maxReadByte) {
@@ -22,8 +22,6 @@ public class InstallFontIfNecessaryUseCase extends BaseUseCase {
             postProgressToMainThread(progress);
         }
     };
-
-    private UseCaseCallback<Boolean> callback;
 
     public InstallFontIfNecessaryUseCase(FontProvider fontProvider) {
         this.fontProvider = fontProvider;

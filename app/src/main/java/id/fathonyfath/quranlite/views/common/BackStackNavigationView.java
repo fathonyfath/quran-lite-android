@@ -140,6 +140,23 @@ public abstract class BackStackNavigationView extends SwitchContainerView {
 
     private static class BackStackNavigationViewState extends BaseSavedState {
 
+        public static final Parcelable.Creator<BackStackNavigationViewState> CREATOR
+                = new Parcelable.ClassLoaderCreator<BackStackNavigationViewState>() {
+            @Override
+            public BackStackNavigationViewState createFromParcel(Parcel in) {
+                return new BackStackNavigationViewState(in, null);
+            }
+
+            @Override
+            public BackStackNavigationViewState createFromParcel(Parcel in, ClassLoader loader) {
+                return new BackStackNavigationViewState(in, loader);
+            }
+
+            @Override
+            public BackStackNavigationViewState[] newArray(int size) {
+                return new BackStackNavigationViewState[size];
+            }
+        };
         private ViewBackStack viewBackStack;
 
         public BackStackNavigationViewState(Parcel source, ClassLoader loader) {
@@ -158,23 +175,5 @@ public abstract class BackStackNavigationView extends SwitchContainerView {
 
             out.writeParcelable(this.viewBackStack, flags);
         }
-
-        public static final Parcelable.Creator<BackStackNavigationViewState> CREATOR
-                = new Parcelable.ClassLoaderCreator<BackStackNavigationViewState>() {
-            @Override
-            public BackStackNavigationViewState createFromParcel(Parcel in) {
-                return new BackStackNavigationViewState(in, null);
-            }
-
-            @Override
-            public BackStackNavigationViewState createFromParcel(Parcel in, ClassLoader loader) {
-                return new BackStackNavigationViewState(in, loader);
-            }
-
-            @Override
-            public BackStackNavigationViewState[] newArray(int size) {
-                return new BackStackNavigationViewState[size];
-            }
-        };
     }
 }

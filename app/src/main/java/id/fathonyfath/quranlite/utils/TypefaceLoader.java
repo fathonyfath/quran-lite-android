@@ -3,11 +3,19 @@ package id.fathonyfath.quranlite.utils;
 import android.graphics.Typeface;
 
 import id.fathonyfath.quranlite.data.FontProvider;
-import id.fathonyfath.quranlite.data_old.FontProviderLegacy;
 
 public class TypefaceLoader {
 
     private static TypefaceLoader instance;
+    private Typeface defaultTypeface;
+
+    private TypefaceLoader(FontProvider fontProvider) {
+        try {
+            this.defaultTypeface = Typeface.createFromFile(fontProvider.getFontFile());
+        } catch (RuntimeException ignored) {
+            this.defaultTypeface = Typeface.DEFAULT;
+        }
+    }
 
     public static TypefaceLoader getInstance(FontProvider fontProvider) {
         if (TypefaceLoader.instance == null) {
@@ -18,16 +26,6 @@ public class TypefaceLoader {
 
     public static void invalidate() {
         TypefaceLoader.instance = null;
-    }
-
-    private Typeface defaultTypeface;
-
-    private TypefaceLoader(FontProvider fontProvider) {
-        try {
-            this.defaultTypeface = Typeface.createFromFile(fontProvider.getFontFile());
-        } catch (RuntimeException ignored) {
-            this.defaultTypeface = Typeface.DEFAULT;
-        }
     }
 
     public Typeface getDefaultTypeface() {

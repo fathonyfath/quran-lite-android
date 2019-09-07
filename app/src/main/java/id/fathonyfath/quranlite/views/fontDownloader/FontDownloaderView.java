@@ -21,7 +21,7 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
     private final LinearLayout containerLayout;
     private final TextView informationTextView;
     private final ProgressView progressView;
-
+    private OnViewEventListener onViewEventListener;
     private final UseCaseCallback<Boolean> installFontIfNecessaryCallback = new UseCaseCallback<Boolean>() {
         @Override
         public void onProgress(float progress) {
@@ -50,8 +50,6 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
             FontDownloaderView.this.notifyDownloadFailed();
         }
     };
-
-    private OnViewEventListener onViewEventListener;
 
     public FontDownloaderView(Context context) {
         super(context);

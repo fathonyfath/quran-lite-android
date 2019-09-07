@@ -8,11 +8,35 @@ import java.util.Stack;
 
 public class ViewBackStack implements Parcelable {
 
+    public static final Creator<ViewBackStack> CREATOR = new Creator<ViewBackStack>() {
+        @Override
+        public ViewBackStack createFromParcel(Parcel in) {
+            return new ViewBackStack(in);
+        }
+
+        @Override
+        public ViewBackStack[] newArray(int size) {
+            return new ViewBackStack[size];
+        }
+    };
     private Stack<Class<? extends View>> viewBackStack;
     private ViewBackStack.Callback callback;
 
     public ViewBackStack() {
         this.viewBackStack = new Stack<>();
+    }
+
+    /**
+     * Parcelable implementation.
+     */
+
+    protected ViewBackStack(Parcel in) {
+        int size = in.readInt();
+        Class[] classArray = (Class[]) in.readSerializable();
+
+        for (int i = 0; i < size; i++) {
+            this.viewBackStack.add(i, classArray[i]);
+        }
     }
 
     public void pushView(Class<? extends View> viewClass) {
@@ -57,19 +81,6 @@ public class ViewBackStack implements Parcelable {
         this.callback = callback;
     }
 
-    /**
-     * Parcelable implementation.
-     */
-
-    protected ViewBackStack(Parcel in) {
-        int size = in.readInt();
-        Class[] classArray = (Class[]) in.readSerializable();
-
-        for (int i = 0; i < size; i++) {
-            this.viewBackStack.add(i, classArray[i]);
-        }
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -82,18 +93,6 @@ public class ViewBackStack implements Parcelable {
         Class[] classArray = this.viewBackStack.toArray(new Class[0]);
         dest.writeSerializable(classArray);
     }
-
-    public static final Creator<ViewBackStack> CREATOR = new Creator<ViewBackStack>() {
-        @Override
-        public ViewBackStack createFromParcel(Parcel in) {
-            return new ViewBackStack(in);
-        }
-
-        @Override
-        public ViewBackStack[] newArray(int size) {
-            return new ViewBackStack[size];
-        }
-    };
 
     public interface Callback {
 
