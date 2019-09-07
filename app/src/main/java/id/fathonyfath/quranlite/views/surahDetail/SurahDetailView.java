@@ -23,8 +23,9 @@ import id.fathonyfath.quranlite.useCase.UseCaseProvider;
 import id.fathonyfath.quranlite.utils.ViewUtil;
 import id.fathonyfath.quranlite.utils.viewLifecycle.ViewCallback;
 import id.fathonyfath.quranlite.views.common.ProgressView;
+import id.fathonyfath.quranlite.views.common.WrapperView;
 
-public class SurahDetailView extends FrameLayout implements ViewCallback {
+public class SurahDetailView extends WrapperView implements ViewCallback {
 
     private final List<AyahDetailViewType> ayahViewTypeList = new ArrayList<>();
     private final ListView ayahListView;
@@ -67,6 +68,8 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
 
         this.progressView = new ProgressView(getContext());
 
+        this.setElevationAlpha(0.1f);
+
         initConfiguration();
         initView();
     }
@@ -91,6 +94,11 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
     public void onStart() {
         this.progressView.setVisibility(View.GONE);
         updateTextProgress(0f);
+
+        if (this.currentSurah != null) {
+            this.setToolbarTitle("QS. " + this.currentSurah.getNameInLatin() + " [" + this.currentSurah.getNumber() + "]");
+        }
+
     }
 
     @Override
@@ -137,10 +145,7 @@ public class SurahDetailView extends FrameLayout implements ViewCallback {
         this.ayahListView.setAdapter(this.ayahDetailAdapter);
         this.ayahListView.setDivider(null);
 
-        addView(this.ayahListView, new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-        ));
+        addView(this.ayahListView);
 
         final FrameLayout.LayoutParams progressParams = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,

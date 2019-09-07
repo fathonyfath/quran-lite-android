@@ -22,8 +22,9 @@ import id.fathonyfath.quranlite.useCase.UseCaseCallback;
 import id.fathonyfath.quranlite.useCase.UseCaseProvider;
 import id.fathonyfath.quranlite.utils.viewLifecycle.ViewCallback;
 import id.fathonyfath.quranlite.views.common.ProgressView;
+import id.fathonyfath.quranlite.views.common.WrapperView;
 
-public class SurahListView extends FrameLayout implements ViewCallback {
+public class SurahListView extends WrapperView implements ViewCallback {
 
     private final List<Surah> surahList = new ArrayList<>();
     private final ListView surahListView;
@@ -71,6 +72,9 @@ public class SurahListView extends FrameLayout implements ViewCallback {
         this.surahAdapter = new SurahAdapter(getContext(), this.surahList);
 
         this.progressView = new ProgressView(getContext());
+
+        this.setToolbarTitle("Al-Qur'an Lite");
+        this.setElevationAlpha(0.1f);
 
         initConfiguration();
         initView();
