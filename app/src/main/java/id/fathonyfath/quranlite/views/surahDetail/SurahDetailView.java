@@ -95,16 +95,15 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         this.progressView.setVisibility(View.GONE);
         updateTextProgress(0f);
 
-        if (this.currentSurah != null) {
-            this.setToolbarTitle("QS. " + this.currentSurah.getNameInLatin() + " [" + this.currentSurah.getNumber() + "]");
-        }
-
     }
 
     @Override
     public void onResume() {
         if (this.currentSurah != null) {
             this.progressView.setVisibility(View.VISIBLE);
+
+            this.setToolbarTitle("QS. " + this.currentSurah.getNameInLatin() +
+                    " [" + this.currentSurah.getNumber() + "]");
 
             if (!tryToRestoreUseCase()) {
                 createAndRunUseCase();
@@ -128,13 +127,6 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
     public void setState(Surah selectedSurah) {
         this.currentSurah = selectedSurah;
         this.newPage = true;
-    }
-
-    public String getSurahName() {
-        if (this.currentSurah != null) {
-            return this.currentSurah.getNameInLatin();
-        }
-        return "";
     }
 
     private void initConfiguration() {
