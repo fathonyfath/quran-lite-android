@@ -7,7 +7,7 @@ import java.io.File;
 import id.fathonyfath.quranlite.data_old.remote.FontService;
 import id.fathonyfath.quranlite.data_old.remote.OnDownloadProgressListener;
 
-public class FontProvider {
+public class FontProviderLegacy {
 
     private static final String FONT_FILENAME = "font.otf";
 
@@ -15,9 +15,9 @@ public class FontProvider {
     private final OnDownloadProgressListener onDownloadProgressListener = new OnDownloadProgressListener() {
         @Override
         public void onDownloadProgress(int currentProgress, int maxProgress) {
-            if (FontProvider.this.onProgressListener != null) {
+            if (FontProviderLegacy.this.onProgressListener != null) {
                 float progress = ((float) currentProgress) / ((float) maxProgress) * 100.0f;
-                FontProvider.this.onProgressListener.onProgress(progress);
+                FontProviderLegacy.this.onProgressListener.onProgress(progress);
             }
         }
     };
@@ -26,7 +26,7 @@ public class FontProvider {
 
     private OnProgressListener onProgressListener;
 
-    public FontProvider(Context context, FontService fontService) {
+    public FontProviderLegacy(Context context, FontService fontService) {
         this.fontService = fontService;
         this.fontService.setOnDownloadProgressListener(this.onDownloadProgressListener);
 

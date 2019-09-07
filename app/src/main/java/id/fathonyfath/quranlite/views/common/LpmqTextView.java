@@ -6,7 +6,8 @@ import android.graphics.Typeface;
 import android.widget.TextView;
 
 import id.fathonyfath.quranlite.MainActivity;
-import id.fathonyfath.quranlite.data_old.FontProvider;
+import id.fathonyfath.quranlite.data.FontProvider;
+import id.fathonyfath.quranlite.data_old.FontProviderLegacy;
 import id.fathonyfath.quranlite.utils.TypefaceLoader;
 
 public class LpmqTextView extends TextView {

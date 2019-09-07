@@ -2,11 +2,15 @@ package id.fathonyfath.quranlite.utils.network;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
 
 public class NetworkHelper {
 
@@ -14,7 +18,57 @@ public class NetworkHelper {
     }
 
     public static String doGetRequest(String url, CancelSignal signal, ProgressListener listener) {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+            if (!doGetRequest(url, outputStream, signal, listener)) {
+                throw new IOException();
+            }
+
+            final StringBuilder sb = new StringBuilder();
+
+            byte[] contentByteArray = outputStream.toByteArray();
+            sb.append(new String(contentByteArray, 0, contentByteArray.length, Charset.forName("UTF-8")));
+
+            outputStream.close();
+
+            cancelSignalCheck(signal);
+
+            return sb.toString();
+        } catch (IOException ignored) {
+
+        }
+
+        return null;
+    }
+
+    public static boolean doGetRequestAndSaveToFile(String url, File destination, CancelSignal signal, ProgressListener listener) {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+            if (!doGetRequest(url, outputStream, signal, listener)) {
+                throw new IOException();
+            }
+
+            cancelSignalCheck(signal);
+
+            FileOutputStream fileOutputStream = new FileOutputStream(destination);
+            fileOutputStream.write(outputStream.toByteArray());
+
+            outputStream.close();
+            fileOutputStream.close();
+
+            return true;
+        } catch (IOException ignored) {
+
+        }
+
+        return false;
+    }
+
+    private static boolean doGetRequest(String url, OutputStream into, CancelSignal signal, ProgressListener listener) {
         HttpURLConnection urlConnection = null;
+
         try {
             URL indexUrl = new URL(url);
             urlConnection = (HttpURLConnection) indexUrl.openConnection();
@@ -28,22 +82,7 @@ public class NetworkHelper {
             int contentLength = urlConnection.getContentLength();
             int totalRead = 0;
 
-            String[] responseHeader = urlConnection.getContentType().split(";");
-            String charset = "";
-
-            for (String value : responseHeader) {
-                value = value.trim();
-                if (value.toLowerCase().startsWith("charset=")) {
-                    charset = value.substring("charset=".length());
-                    break;
-                }
-            }
-            if (charset.equals("")) charset = "utf-8";
-
             InputStream stream = new BufferedInputStream(urlConnection.getInputStream());
-            final StringBuilder sb = new StringBuilder();
-
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
             byte[] buffer = new byte[1024];
             int bytesRead;
@@ -51,7 +90,7 @@ public class NetworkHelper {
             while ((bytesRead = stream.read(buffer)) != -1) {
                 cancelSignalCheck(signal);
 
-                outputStream.write(buffer, 0, bytesRead);
+                into.write(buffer, 0, bytesRead);
                 totalRead += bytesRead;
 
                 if (listener != null) {
@@ -61,12 +100,7 @@ public class NetworkHelper {
 
             stream.close();
 
-            byte[] contentByteArray = outputStream.toByteArray();
-            sb.append(new String(contentByteArray, 0, contentByteArray.length, charset.toUpperCase()));
-
-            cancelSignalCheck(signal);
-
-            return sb.toString();
+            return true;
         } catch (MalformedURLException ignored) {
 
         } catch (IOException ignored) {
@@ -76,8 +110,7 @@ public class NetworkHelper {
                 urlConnection.disconnect();
             }
         }
-
-        return null;
+        return false;
     }
 
     private static void cancelSignalCheck(CancelSignal signal) throws IOException {

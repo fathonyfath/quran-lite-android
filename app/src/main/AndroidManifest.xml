@@ -7,7 +7,7 @@
     <application
         android:label="Qur'an Lite"
         android:theme="@android:style/Theme.Holo.Light.NoActionBar">
-        <activity android:name="id.fathonyfath.quranlite.MainActivity">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

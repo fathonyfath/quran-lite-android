@@ -1,11 +1,11 @@
 package id.fathonyfath.quranlite.tasks;
 
-import id.fathonyfath.quranlite.data_old.FontProvider;
+import id.fathonyfath.quranlite.data_old.FontProviderLegacy;
 import id.fathonyfath.quranlite.data_old.OnProgressListener;
 
 public class DownloadFontTask extends BaseAsyncTask<Void, Boolean> {
 
-    private final FontProvider fontProvider;
+    private final FontProviderLegacy fontProviderLegacy;
     private final OnProgressListener onProgressListener = new OnProgressListener() {
         @Override
         public void onProgress(float progress) {
@@ -13,16 +13,16 @@ public class DownloadFontTask extends BaseAsyncTask<Void, Boolean> {
         }
     };
 
-    public DownloadFontTask(FontProvider fontProvider) {
-        this.fontProvider = fontProvider;
-        this.fontProvider.setOnProgressListener(this.onProgressListener);
+    public DownloadFontTask(FontProviderLegacy fontProviderLegacy) {
+        this.fontProviderLegacy = fontProviderLegacy;
+        this.fontProviderLegacy.setOnProgressListener(this.onProgressListener);
     }
 
     @Override
     protected Boolean doInBackground(Void... voids) {
         publishProgress(0f);
         try {
-            return this.fontProvider.downloadFont();
+            return this.fontProviderLegacy.downloadFont();
         } catch (Exception ignored) {
             return false;
         }
@@ -36,15 +36,15 @@ public class DownloadFontTask extends BaseAsyncTask<Void, Boolean> {
 
     public static class Factory implements AsyncTaskFactory<DownloadFontTask> {
 
-        private final FontProvider fontProvider;
+        private final FontProviderLegacy fontProviderLegacy;
 
-        public Factory(FontProvider fontProvider) {
-            this.fontProvider = fontProvider;
+        public Factory(FontProviderLegacy fontProviderLegacy) {
+            this.fontProviderLegacy = fontProviderLegacy;
         }
 
         @Override
         public DownloadFontTask create() {
-            return new DownloadFontTask(this.fontProvider);
+            return new DownloadFontTask(this.fontProviderLegacy);
         }
     }
 }

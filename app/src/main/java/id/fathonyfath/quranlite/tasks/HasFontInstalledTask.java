@@ -1,19 +1,19 @@
 package id.fathonyfath.quranlite.tasks;
 
-import id.fathonyfath.quranlite.data_old.FontProvider;
+import id.fathonyfath.quranlite.data_old.FontProviderLegacy;
 
 public class HasFontInstalledTask extends BaseAsyncTask<Void, Boolean> {
 
-    private final FontProvider fontProvider;
+    private final FontProviderLegacy fontProviderLegacy;
 
-    public HasFontInstalledTask(FontProvider fontProvider) {
-        this.fontProvider = fontProvider;
+    public HasFontInstalledTask(FontProviderLegacy fontProviderLegacy) {
+        this.fontProviderLegacy = fontProviderLegacy;
     }
 
     @Override
     protected Boolean doInBackground(Void... voids) {
         try {
-            return this.fontProvider.hasFontInstalled();
+            return this.fontProviderLegacy.hasFontInstalled();
         } catch (Exception e) {
             return null;
         }
@@ -28,15 +28,15 @@ public class HasFontInstalledTask extends BaseAsyncTask<Void, Boolean> {
 
     public static class Factory implements AsyncTaskFactory<HasFontInstalledTask> {
 
-        private final FontProvider fontProvider;
+        private final FontProviderLegacy fontProviderLegacy;
 
-        public Factory(FontProvider fontService) {
-            this.fontProvider = fontService;
+        public Factory(FontProviderLegacy fontService) {
+            this.fontProviderLegacy = fontService;
         }
 
         @Override
         public HasFontInstalledTask create() {
-            return new HasFontInstalledTask(this.fontProvider);
+            return new HasFontInstalledTask(this.fontProviderLegacy);
         }
     }
 }

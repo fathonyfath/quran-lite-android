@@ -9,7 +9,8 @@ public class QuranNetworkSource {
 
     private final String BASE_URL = "https://fathonyfath.github.io/quran-json/surah/";
 
-    public JSONObject getSurahIndex(NetworkHelper.CancelSignal cancelSignal, NetworkHelper.ProgressListener progressListener) {
+    public JSONObject getSurahIndex(NetworkHelper.CancelSignal cancelSignal,
+                                    NetworkHelper.ProgressListener progressListener) {
         String result = NetworkHelper.doGetRequest(BASE_URL + "index.json", cancelSignal, progressListener);
         try {
             if (result != null) {
@@ -21,8 +22,14 @@ public class QuranNetworkSource {
         return null;
     }
 
-    public JSONObject getSurahDetailAtNumber(int surahNumber, NetworkHelper.CancelSignal cancelSignal, NetworkHelper.ProgressListener progressListener) {
-        String result = NetworkHelper.doGetRequest(BASE_URL + surahNumber + ".json", cancelSignal, progressListener);
+    public JSONObject getSurahDetailAtNumber(int surahNumber,
+                                             NetworkHelper.CancelSignal cancelSignal,
+                                             NetworkHelper.ProgressListener progressListener) {
+        String result = NetworkHelper.doGetRequest(
+                BASE_URL + surahNumber + ".json",
+                cancelSignal,
+                progressListener);
+
         try {
             if (result != null) {
                 final JSONObject parentJSON = new JSONObject(result);
