@@ -5,6 +5,9 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import id.fathonyfath.quranlite.themes.BaseTheme;
+import id.fathonyfath.quranlite.utils.ThemeContext;
+
 public class TwoLineTextView extends LinearLayout {
 
     private final TextView firstLineTextView;
@@ -17,6 +20,7 @@ public class TwoLineTextView extends LinearLayout {
 
         initConfiguration();
         initView();
+        applyStyleBasedOnTheme();
     }
 
     public void setTexts(String first, String second) {
@@ -47,5 +51,13 @@ public class TwoLineTextView extends LinearLayout {
 
         this.firstLineTextView.setLayoutParams(firstParams);
         this.secondLineTextView.setLayoutParams(secondParams);
+    }
+
+    private void applyStyleBasedOnTheme() {
+        BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
+        if (theme != null) {
+            this.firstLineTextView.setTextColor(theme.objectOnPrimary());
+            this.secondLineTextView.setTextColor(theme.objectOnPrimary());
+        }
     }
 }

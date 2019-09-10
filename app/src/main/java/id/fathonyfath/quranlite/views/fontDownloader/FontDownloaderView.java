@@ -9,9 +9,11 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import id.fathonyfath.quranlite.themes.BaseTheme;
 import id.fathonyfath.quranlite.useCase.InstallFontIfNecessaryUseCase;
 import id.fathonyfath.quranlite.useCase.UseCaseCallback;
 import id.fathonyfath.quranlite.useCase.UseCaseProvider;
+import id.fathonyfath.quranlite.utils.ThemeContext;
 import id.fathonyfath.quranlite.utils.UnitConverter;
 import id.fathonyfath.quranlite.utils.viewLifecycle.ViewCallback;
 import id.fathonyfath.quranlite.views.common.ProgressView;
@@ -60,6 +62,7 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
 
         initConfiguration();
         initView();
+        applyStyleBasedOnTheme();
     }
 
     @Override
@@ -137,6 +140,14 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
         final LayoutParams containerParams = (LayoutParams) this.containerLayout.getLayoutParams();
         containerParams.gravity = Gravity.CENTER;
         this.containerLayout.setLayoutParams(containerParams);
+    }
+
+    private void applyStyleBasedOnTheme() {
+        BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
+        if (theme != null) {
+            this.setBackgroundColor(theme.primary());
+            this.informationTextView.setTextColor(theme.objectOnPrimary());
+        }
     }
 
     private boolean tryToRestoreUseCase() {

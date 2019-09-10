@@ -17,9 +17,11 @@ import java.util.List;
 
 import id.fathonyfath.quranlite.Res;
 import id.fathonyfath.quranlite.models.Surah;
+import id.fathonyfath.quranlite.themes.BaseTheme;
 import id.fathonyfath.quranlite.useCase.FetchAllSurahUseCase;
 import id.fathonyfath.quranlite.useCase.UseCaseCallback;
 import id.fathonyfath.quranlite.useCase.UseCaseProvider;
+import id.fathonyfath.quranlite.utils.ThemeContext;
 import id.fathonyfath.quranlite.utils.viewLifecycle.ViewCallback;
 import id.fathonyfath.quranlite.views.common.ProgressView;
 import id.fathonyfath.quranlite.views.common.WrapperView;
@@ -78,6 +80,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
 
         initConfiguration();
         initView();
+        applyStyleBasedOnTheme();
     }
 
     @Override
@@ -242,6 +245,13 @@ public class SurahListView extends WrapperView implements ViewCallback {
             out.writeInt(this.surahList.size());
             Surah[] surahArray = this.surahList.toArray(new Surah[0]);
             out.writeTypedArray(surahArray, flags);
+        }
+    }
+
+    private void applyStyleBasedOnTheme() {
+        BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
+        if (theme != null) {
+            this.setBackgroundColor(theme.primary());
         }
     }
 }

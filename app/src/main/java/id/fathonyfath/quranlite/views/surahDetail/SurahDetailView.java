@@ -17,9 +17,11 @@ import java.util.Map;
 import id.fathonyfath.quranlite.Res;
 import id.fathonyfath.quranlite.models.Surah;
 import id.fathonyfath.quranlite.models.SurahDetail;
+import id.fathonyfath.quranlite.themes.BaseTheme;
 import id.fathonyfath.quranlite.useCase.FetchSurahDetailUseCase;
 import id.fathonyfath.quranlite.useCase.UseCaseCallback;
 import id.fathonyfath.quranlite.useCase.UseCaseProvider;
+import id.fathonyfath.quranlite.utils.ThemeContext;
 import id.fathonyfath.quranlite.utils.ViewUtil;
 import id.fathonyfath.quranlite.utils.viewLifecycle.ViewCallback;
 import id.fathonyfath.quranlite.views.common.ProgressView;
@@ -72,6 +74,7 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
 
         initConfiguration();
         initView();
+        applyStyleBasedOnTheme();
     }
 
     @Override
@@ -147,6 +150,13 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         this.progressView.setLayoutParams(progressParams);
 
         addView(this.progressView);
+    }
+
+    private void applyStyleBasedOnTheme() {
+        BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
+        if (theme != null) {
+            this.setBackgroundColor(theme.primary());
+        }
     }
 
     private void processSurahDetail(SurahDetail surahDetail) {

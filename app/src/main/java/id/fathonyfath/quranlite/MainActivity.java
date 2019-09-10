@@ -8,10 +8,13 @@ import id.fathonyfath.quranlite.data.QuranRepository;
 import id.fathonyfath.quranlite.data.font.FontRemoteSource;
 import id.fathonyfath.quranlite.data.source.disk.QuranDiskSource;
 import id.fathonyfath.quranlite.data.source.network.QuranNetworkSource;
+import id.fathonyfath.quranlite.themes.DarkTheme;
+import id.fathonyfath.quranlite.themes.LightTheme;
 import id.fathonyfath.quranlite.useCase.FetchAllSurahUseCase;
 import id.fathonyfath.quranlite.useCase.FetchSurahDetailUseCase;
 import id.fathonyfath.quranlite.useCase.InstallFontIfNecessaryUseCase;
 import id.fathonyfath.quranlite.useCase.UseCaseProvider;
+import id.fathonyfath.quranlite.utils.ThemeContext;
 import id.fathonyfath.quranlite.views.MainView;
 
 public class MainActivity extends Activity {
@@ -31,7 +34,7 @@ public class MainActivity extends Activity {
         initService();
         registerUseCaseFactory();
 
-        this.mainView = new MainView(this);
+        this.mainView = new MainView(new ThemeContext(this, new DarkTheme()));
         setContentView(this.mainView);
     }
 

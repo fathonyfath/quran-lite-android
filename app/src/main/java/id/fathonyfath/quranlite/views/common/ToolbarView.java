@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import id.fathonyfath.quranlite.themes.BaseTheme;
+import id.fathonyfath.quranlite.utils.ThemeContext;
 import id.fathonyfath.quranlite.utils.UnitConverter;
 
 public class ToolbarView extends LinearLayout {
@@ -31,6 +33,7 @@ public class ToolbarView extends LinearLayout {
         this.titleView.setTextSize(18f);
 
         initConfiguration();
+        applyStyleBasedOnTheme();
         invalidate();
     }
 
@@ -68,6 +71,14 @@ public class ToolbarView extends LinearLayout {
         setBackgroundColor(Color.WHITE);
 
         updateToolbarTitle();
+    }
+
+    private void applyStyleBasedOnTheme() {
+        BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
+        if (theme != null) {
+            this.setBackgroundColor(theme.primary());
+            this.titleView.setTextColor(theme.objectOnPrimary());
+        }
     }
 
     private void updateToolbarTitle() {

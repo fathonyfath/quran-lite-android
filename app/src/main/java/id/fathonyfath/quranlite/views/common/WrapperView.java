@@ -8,6 +8,8 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import id.fathonyfath.quranlite.Res;
+import id.fathonyfath.quranlite.themes.BaseTheme;
+import id.fathonyfath.quranlite.utils.ThemeContext;
 import id.fathonyfath.quranlite.utils.UnitConverter;
 
 public abstract class WrapperView extends RelativeLayout {
@@ -25,6 +27,7 @@ public abstract class WrapperView extends RelativeLayout {
 
         initConfiguration();
         initView();
+        applyStyleBasedOnTheme();
     }
 
     protected void setToolbarTitle(String title) {
@@ -83,4 +86,10 @@ public abstract class WrapperView extends RelativeLayout {
         this.contentView.setLayoutParams(containerParams);
     }
 
+    private void applyStyleBasedOnTheme() {
+        BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
+        if (theme != null) {
+            this.setBackgroundColor(theme.primary());
+        }
+    }
 }

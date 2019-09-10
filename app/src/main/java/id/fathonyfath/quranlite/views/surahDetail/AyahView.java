@@ -9,6 +9,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import id.fathonyfath.quranlite.Res;
+import id.fathonyfath.quranlite.themes.BaseTheme;
+import id.fathonyfath.quranlite.utils.ThemeContext;
 import id.fathonyfath.quranlite.utils.UnitConverter;
 import id.fathonyfath.quranlite.views.common.LpmqTextView;
 
@@ -29,6 +31,7 @@ public class AyahView extends RelativeLayout {
 
         initConfiguration();
         initView();
+        applyStyleBasedOnTheme();
     }
 
     public void updateAyah(AyahDetailViewType.AyahViewModel viewModel) {
@@ -87,5 +90,14 @@ public class AyahView extends RelativeLayout {
                 (int) UnitConverter.fromDpToPx(getContext(), 4f));
 
         this.ayahTranslationText.setLayoutParams(ayahTranslationParams);
+    }
+
+    private void applyStyleBasedOnTheme() {
+        BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
+        if (theme != null) {
+            this.setBackgroundColor(theme.primary());
+            this.ayahText.setBackgroundColor(theme.secondary());
+            this.ayahNumberText.setBackgroundColor(theme.secondaryDark());
+        }
     }
 }

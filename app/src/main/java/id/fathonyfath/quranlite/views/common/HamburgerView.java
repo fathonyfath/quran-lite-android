@@ -8,11 +8,13 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 
+import id.fathonyfath.quranlite.themes.BaseTheme;
+import id.fathonyfath.quranlite.utils.ThemeContext;
 import id.fathonyfath.quranlite.utils.UnitConverter;
 
 public class HamburgerView extends View {
 
-    private final Paint blackPaint;
+    private final Paint paint;
 
     private int workingHeight = 0;
 
@@ -21,8 +23,21 @@ public class HamburgerView extends View {
 
         initConfiguration();
 
-        this.blackPaint = new Paint();
-        this.blackPaint.setColor(Color.parseColor("#000000"));
+        this.paint = new Paint();
+
+        setPaintColor();
+    }
+
+    private void setPaintColor() {
+        int colorToApply = Color.parseColor("#FF000000");
+
+        BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
+
+        if (theme != null) {
+            colorToApply = theme.objectOnPrimary();
+        }
+
+        this.paint.setColor(colorToApply);
     }
 
     @Override
@@ -38,9 +53,9 @@ public class HamburgerView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        canvas.drawRect(getPaddingLeft(), getTopAt(1), getWidth() - getPaddingRight(), getTopAt(2), blackPaint);
-        canvas.drawRect(getPaddingLeft(), getTopAt(3), getWidth() - getPaddingRight(), getTopAt(4), blackPaint);
-        canvas.drawRect(getPaddingLeft(), getTopAt(5), getWidth() - getPaddingRight(), getTopAt(6), blackPaint);
+        canvas.drawRect(getPaddingLeft(), getTopAt(1), getWidth() - getPaddingRight(), getTopAt(2), paint);
+        canvas.drawRect(getPaddingLeft(), getTopAt(3), getWidth() - getPaddingRight(), getTopAt(4), paint);
+        canvas.drawRect(getPaddingLeft(), getTopAt(5), getWidth() - getPaddingRight(), getTopAt(6), paint);
     }
 
     private void initConfiguration() {

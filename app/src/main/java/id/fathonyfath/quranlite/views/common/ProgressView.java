@@ -1,6 +1,7 @@
 package id.fathonyfath.quranlite.views.common;
 
 import android.content.Context;
+import android.graphics.PorterDuff;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.view.Gravity;
@@ -10,6 +11,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import id.fathonyfath.quranlite.Res;
+import id.fathonyfath.quranlite.themes.BaseTheme;
+import id.fathonyfath.quranlite.utils.ThemeContext;
 
 public class ProgressView extends LinearLayout {
 
@@ -25,6 +28,7 @@ public class ProgressView extends LinearLayout {
 
         initConfiguration();
         initView();
+        applyStyleBasedOnTheme();
     }
 
     @Override
@@ -67,6 +71,13 @@ public class ProgressView extends LinearLayout {
         addView(this.progressText, secondParams);
 
         this.progressBar.setIndeterminate(true);
+    }
+
+    private void applyStyleBasedOnTheme() {
+        BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
+        if (theme != null) {
+            this.progressText.setTextColor(theme.objectOnPrimary());
+        }
     }
 
     public static class ProgressViewState extends BaseSavedState {

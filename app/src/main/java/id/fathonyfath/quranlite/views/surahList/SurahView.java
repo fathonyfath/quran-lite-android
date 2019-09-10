@@ -6,6 +6,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import id.fathonyfath.quranlite.models.Surah;
+import id.fathonyfath.quranlite.themes.BaseTheme;
+import id.fathonyfath.quranlite.utils.ThemeContext;
 import id.fathonyfath.quranlite.utils.UnitConverter;
 import id.fathonyfath.quranlite.views.common.LpmqTextView;
 import id.fathonyfath.quranlite.views.common.TwoLineTextView;
@@ -23,6 +25,7 @@ public class SurahView extends RelativeLayout {
 
         initConfiguration();
         initView();
+        applyStyleBasedOnTheme();
     }
 
     public void bindData(Surah surah) {
@@ -64,5 +67,11 @@ public class SurahView extends RelativeLayout {
         this.surahNumberTextView.setTextSize(20f);
     }
 
-
+    private void applyStyleBasedOnTheme() {
+        BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
+        if (theme != null) {
+            this.setBackgroundColor(theme.primary());
+            this.surahNumberTextView.setTextColor(theme.objectOnPrimary());
+        }
+    }
 }

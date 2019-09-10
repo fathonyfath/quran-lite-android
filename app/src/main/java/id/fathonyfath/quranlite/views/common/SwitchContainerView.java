@@ -13,6 +13,8 @@ import android.widget.FrameLayout;
 import java.util.ArrayList;
 import java.util.List;
 
+import id.fathonyfath.quranlite.themes.BaseTheme;
+import id.fathonyfath.quranlite.utils.ThemeContext;
 import id.fathonyfath.quranlite.utils.viewLifecycle.ViewCallback;
 
 public class SwitchContainerView extends FrameLayout {
@@ -25,7 +27,7 @@ public class SwitchContainerView extends FrameLayout {
         this.removeViewRunnables = new ArrayList<>();
 
         this.initConfiguration();
-        this.initView();
+        this.applyStyleBasedOnTheme();
     }
 
     @Override
@@ -111,8 +113,11 @@ public class SwitchContainerView extends FrameLayout {
         setBackgroundColor(Color.WHITE);
     }
 
-    private void initView() {
-
+    private void applyStyleBasedOnTheme() {
+        BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
+        if (theme != null) {
+            this.setBackgroundColor(theme.primary());
+        }
     }
 
     private abstract static class HideViewRunnable implements Runnable {
