@@ -198,4 +198,7 @@ fabric.properties
 
 !/gradle/wrapper/gradle-wrapper.jar
 
+### Tbh just remove all idea folder ###
+.idea
+
 # End of https://www.gitignore.io/api/android,androidstudio
