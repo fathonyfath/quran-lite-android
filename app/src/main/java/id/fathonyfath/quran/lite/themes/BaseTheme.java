@@ -2,20 +2,13 @@ package id.fathonyfath.quran.lite.themes;
 
 public abstract class BaseTheme {
 
-    public abstract int primary();
+    public abstract int toolbarColor();
 
-    public abstract int primaryLight();
+    public abstract int baseColor();
 
-    public abstract int primaryDark();
+    public abstract int ayahBackColor();
 
-    public abstract int secondary();
+    public abstract int ayahNumberBackColor();
 
-    public abstract int secondaryLight();
-
-    public abstract int secondaryDark();
-
-    public abstract int objectOnPrimary();
-
-    public abstract int objectOnSecondary();
-
+    public abstract int contrastColor();
 }

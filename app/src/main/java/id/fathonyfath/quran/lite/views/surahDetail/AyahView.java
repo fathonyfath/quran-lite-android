@@ -95,9 +95,9 @@ public class AyahView extends RelativeLayout {
     private void applyStyleBasedOnTheme() {
         BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
         if (theme != null) {
-            this.setBackgroundColor(theme.primary());
-            this.ayahText.setBackgroundColor(theme.secondary());
-            this.ayahNumberText.setBackgroundColor(theme.secondaryDark());
+            this.setBackgroundColor(theme.baseColor());
+            this.ayahText.setBackgroundColor(theme.ayahBackColor());
+            this.ayahNumberText.setBackgroundColor(theme.ayahNumberBackColor());
         }
     }
 }

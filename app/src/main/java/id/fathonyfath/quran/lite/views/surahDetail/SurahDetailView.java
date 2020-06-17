@@ -155,7 +155,7 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
     private void applyStyleBasedOnTheme() {
         BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
         if (theme != null) {
-            this.setBackgroundColor(theme.primary());
+            this.setBackgroundColor(theme.baseColor());
         }
     }
 

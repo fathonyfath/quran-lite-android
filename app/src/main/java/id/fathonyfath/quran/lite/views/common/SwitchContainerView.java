@@ -116,7 +116,7 @@ public class SwitchContainerView extends FrameLayout {
     private void applyStyleBasedOnTheme() {
         BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
         if (theme != null) {
-            this.setBackgroundColor(theme.primary());
+            this.setBackgroundColor(theme.baseColor());
         }
     }
 

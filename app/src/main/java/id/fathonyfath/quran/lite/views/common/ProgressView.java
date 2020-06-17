@@ -75,7 +75,7 @@ public class ProgressView extends LinearLayout {
     private void applyStyleBasedOnTheme() {
         BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
         if (theme != null) {
-            this.progressText.setTextColor(theme.objectOnPrimary());
+            this.progressText.setTextColor(theme.contrastColor());
         }
     }
 

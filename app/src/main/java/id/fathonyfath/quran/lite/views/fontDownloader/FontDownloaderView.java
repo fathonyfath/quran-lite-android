@@ -145,8 +145,8 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
     private void applyStyleBasedOnTheme() {
         BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
         if (theme != null) {
-            this.setBackgroundColor(theme.primary());
-            this.informationTextView.setTextColor(theme.objectOnPrimary());
+            this.setBackgroundColor(theme.baseColor());
+            this.informationTextView.setTextColor(theme.contrastColor());
         }
     }
 

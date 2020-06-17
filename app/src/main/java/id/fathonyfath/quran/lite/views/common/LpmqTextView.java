@@ -32,7 +32,7 @@ public class LpmqTextView extends TextView {
     private void applyStyleBasedOnTheme() {
         BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
         if (theme != null) {
-            this.setTextColor(theme.objectOnPrimary());
+            this.setTextColor(theme.contrastColor());
         }
     }
 }

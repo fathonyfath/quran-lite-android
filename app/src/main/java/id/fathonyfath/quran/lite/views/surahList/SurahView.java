@@ -70,8 +70,8 @@ public class SurahView extends RelativeLayout {
     private void applyStyleBasedOnTheme() {
         BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
         if (theme != null) {
-            this.setBackgroundColor(theme.primary());
-            this.surahNumberTextView.setTextColor(theme.objectOnPrimary());
+            this.setBackgroundColor(theme.baseColor());
+            this.surahNumberTextView.setTextColor(theme.contrastColor());
         }
     }
 }

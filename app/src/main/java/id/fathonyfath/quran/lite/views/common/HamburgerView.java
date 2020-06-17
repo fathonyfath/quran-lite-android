@@ -34,7 +34,7 @@ public class HamburgerView extends View {
         BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
 
         if (theme != null) {
-            colorToApply = theme.objectOnPrimary();
+            colorToApply = theme.contrastColor();
         }
 
         this.paint.setColor(colorToApply);

@@ -3,42 +3,27 @@ package id.fathonyfath.quran.lite.themes;
 public class LightTheme extends BaseTheme {
 
     @Override
-    public int primary() {
-        return 0xFFFAFAFA;
-    }
-
-    @Override
-    public int primaryLight() {
+    public int toolbarColor() {
         return 0xFFFFFFFF;
     }
 
     @Override
-    public int primaryDark() {
-        return 0xFFC7C7C7;
+    public int baseColor() {
+        return 0xFFFFFFFF;
     }
 
     @Override
-    public int secondary() {
+    public int ayahBackColor() {
         return 0xFFEEEEEE;
     }
 
     @Override
-    public int secondaryLight() {
-        return 0xFFFFFFFF;
-    }
-
-    @Override
-    public int secondaryDark() {
+    public int ayahNumberBackColor() {
         return 0xFFBCBCBC;
     }
 
     @Override
-    public int objectOnPrimary() {
-        return 0xFF000000;
-    }
-
-    @Override
-    public int objectOnSecondary() {
+    public int contrastColor() {
         return 0xFF000000;
     }
 }

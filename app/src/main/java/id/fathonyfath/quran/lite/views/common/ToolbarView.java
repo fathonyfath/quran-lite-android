@@ -76,8 +76,8 @@ public class ToolbarView extends LinearLayout {
     private void applyStyleBasedOnTheme() {
         BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
         if (theme != null) {
-            this.setBackgroundColor(theme.primary());
-            this.titleView.setTextColor(theme.objectOnPrimary());
+            this.setBackgroundColor(theme.toolbarColor());
+            this.titleView.setTextColor(theme.contrastColor());
         }
     }
 

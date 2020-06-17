@@ -56,8 +56,8 @@ public class TwoLineTextView extends LinearLayout {
     private void applyStyleBasedOnTheme() {
         BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
         if (theme != null) {
-            this.firstLineTextView.setTextColor(theme.objectOnPrimary());
-            this.secondLineTextView.setTextColor(theme.objectOnPrimary());
+            this.firstLineTextView.setTextColor(theme.contrastColor());
+            this.secondLineTextView.setTextColor(theme.contrastColor());
         }
     }
 }

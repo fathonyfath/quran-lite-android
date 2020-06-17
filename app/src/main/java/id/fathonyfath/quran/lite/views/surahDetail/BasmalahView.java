@@ -51,8 +51,8 @@ public class BasmalahView extends FrameLayout {
     private void applyStyleBasedOnTheme() {
         BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
         if (theme != null) {
-            this.setBackgroundColor(theme.primary());
-            this.basmalahText.setBackgroundColor(theme.primaryDark());
+            this.setBackgroundColor(theme.baseColor());
+            this.basmalahText.setBackgroundColor(theme.ayahBackColor());
         }
     }
 }
