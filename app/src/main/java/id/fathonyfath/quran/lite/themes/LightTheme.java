@@ -4,22 +4,22 @@ public class LightTheme extends BaseTheme {
 
     @Override
     public int toolbarColor() {
-        return 0xFFFFFFFF;
+        return 0xFFF7F7F7;
     }
 
     @Override
     public int baseColor() {
-        return 0xFFFFFFFF;
+        return 0xFFF7F7F7;
     }
 
     @Override
     public int ayahBackColor() {
-        return 0xFFEEEEEE;
+        return 0xFFF0F0F0;
     }
 
     @Override
     public int ayahNumberBackColor() {
-        return 0xFFBCBCBC;
+        return 0xFFE8E8E8;
     }
 
     @Override
