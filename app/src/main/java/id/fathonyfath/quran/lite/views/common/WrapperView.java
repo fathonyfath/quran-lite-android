@@ -7,6 +7,9 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import id.fathonyfath.quran.lite.Res;
 import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
@@ -24,6 +27,10 @@ public abstract class WrapperView extends RelativeLayout {
         this.toolbarView = new ToolbarView(context);
         this.elevationView = new ElevationView(context);
         this.contentView = new FrameLayout(context);
+
+        final Set<View> setOfView = new HashSet<>();
+        setOfView.add(new DarkLightSwitchView(context));
+        this.toolbarView.setRightView(setOfView);
 
         initConfiguration();
         initView();

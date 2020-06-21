@@ -34,7 +34,7 @@ public class MainActivity extends Activity {
         initService();
         registerUseCaseFactory();
 
-        this.mainView = new MainView(new ThemeContext(this, new LightTheme()));
+        this.mainView = new MainView(new ThemeContext(this, new DarkTheme()));
         setContentView(this.mainView);
     }
 
