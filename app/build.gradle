@@ -26,7 +26,7 @@ buildscript {
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "id.fathonyfath.quranlite"
+        applicationId "id.fathonyfath.quran.lite"
         minSdkVersion 15
         targetSdkVersion 28
         versionCode project.ext.version.code
