@@ -6,7 +6,6 @@ import android.content.res.Configuration;
 import id.fathonyfath.quran.lite.data.ConfigRepository;
 import id.fathonyfath.quran.lite.models.DayNight;
 import id.fathonyfath.quran.lite.models.config.DayNightPreference;
-import id.fathonyfath.quran.lite.utils.scheduler.Schedulers;
 
 public class GetDayNightUseCase extends BaseUseCase {
 
@@ -22,12 +21,7 @@ public class GetDayNightUseCase extends BaseUseCase {
 
     @Override
     protected void task() {
-        Schedulers.IO().execute(new Runnable() {
-            @Override
-            public void run() {
-                fetchDayNightPreference();
-            }
-        });
+        fetchDayNightPreference();
     }
 
     public void setCallback(UseCaseCallback<DayNight> callback) {
@@ -36,12 +30,7 @@ public class GetDayNightUseCase extends BaseUseCase {
 
     private void fetchDayNightPreference() {
         final DayNightPreference preference = this.configRepository.getDayNightPreference();
-        Schedulers.Computation().execute(new Runnable() {
-            @Override
-            public void run() {
-                processDayNightPreference(preference);
-            }
-        });
+        processDayNightPreference(preference);
     }
 
     private void processDayNightPreference(DayNightPreference dayNightPreference) {
@@ -61,12 +50,7 @@ public class GetDayNightUseCase extends BaseUseCase {
 
         final DayNight finalDayNight = dayNight;
 
-        Schedulers.Main().execute(new Runnable() {
-            @Override
-            public void run() {
-                postResultToMainThread(finalDayNight);
-            }
-        });
+        postResult(finalDayNight);
     }
 
     private SystemDayNight getSystemUiDayNightStatus() {
@@ -94,8 +78,10 @@ public class GetDayNightUseCase extends BaseUseCase {
         throw new IllegalStateException("This flow is impossible to get.");
     }
 
-    private void postResultToMainThread(DayNight dayNight) {
-        callback.onResult(dayNight);
+    private void postResult(DayNight dayNight) {
+        if (callback != null) {
+            callback.onResult(dayNight);
+        }
     }
 
     private enum SystemDayNight {
