@@ -17,6 +17,7 @@ import id.fathonyfath.quran.lite.themes.DarkTheme;
 import id.fathonyfath.quran.lite.themes.LightTheme;
 import id.fathonyfath.quran.lite.useCase.FetchAllSurahUseCase;
 import id.fathonyfath.quran.lite.useCase.FetchSurahDetailUseCase;
+import id.fathonyfath.quran.lite.useCase.GetDayNightPreferenceUseCase;
 import id.fathonyfath.quran.lite.useCase.GetDayNightUseCase;
 import id.fathonyfath.quran.lite.useCase.InstallFontIfNecessaryUseCase;
 import id.fathonyfath.quran.lite.useCase.UseCaseCallback;
@@ -129,6 +130,7 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight> 
         UseCaseProvider.registerFactory(FetchAllSurahUseCase.class, new FetchAllSurahUseCase.Factory(this.quranRepository));
         UseCaseProvider.registerFactory(FetchSurahDetailUseCase.class, new FetchSurahDetailUseCase.Factory(this.quranRepository));
         UseCaseProvider.registerFactory(GetDayNightUseCase.class, new GetDayNightUseCase.Factory(this, this.configRepository));
+        UseCaseProvider.registerFactory(GetDayNightPreferenceUseCase.class, new GetDayNightPreferenceUseCase.Factory(this.configRepository));
     }
 
     private void showViewWithLightTheme() {
