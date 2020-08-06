@@ -8,7 +8,7 @@ public class ConfigRepository {
 
     private final DayNightPreferencesSource dayNightPreferencesSource;
 
-    ConfigRepository(DayNightPreferencesSource dayNightPreferencesSource) {
+    public ConfigRepository(DayNightPreferencesSource dayNightPreferencesSource) {
         this.dayNightPreferencesSource = dayNightPreferencesSource;
     }
 

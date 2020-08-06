@@ -8,7 +8,7 @@ public class DayNightPreferencesSource {
     private static final String DAY_NIGHT_PREFERENCE_KEY = "DAY_NIGHT_PREFERENCE_KEY";
     private final SharedPreferences sharedPreferences;
 
-    DayNightPreferencesSource(SharedPreferences sharedPreferences) {
+    public DayNightPreferencesSource(SharedPreferences sharedPreferences) {
         this.sharedPreferences = sharedPreferences;
     }
 
