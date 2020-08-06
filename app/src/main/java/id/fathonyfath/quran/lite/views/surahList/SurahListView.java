@@ -26,6 +26,7 @@ import id.fathonyfath.quran.lite.useCase.GetDayNightPreferenceUseCase;
 import id.fathonyfath.quran.lite.useCase.UseCaseCallback;
 import id.fathonyfath.quran.lite.useCase.UseCaseProvider;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
+import id.fathonyfath.quran.lite.utils.ViewUtil;
 import id.fathonyfath.quran.lite.utils.viewLifecycle.ViewCallback;
 import id.fathonyfath.quran.lite.views.common.DarkLightSwitchView;
 import id.fathonyfath.quran.lite.views.common.ProgressView;
@@ -92,7 +93,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
     private final View.OnClickListener onDayNightPreferenceClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-
+            ViewUtil.recreateActivity(SurahListView.this);
         }
     };
 

@@ -1,6 +1,7 @@
 package id.fathonyfath.quran.lite;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -36,7 +37,6 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight> 
     private ConfigRepository configRepository;
 
     private MainView mainView = null;
-    private long startExecution = 0L;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +53,11 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight> 
             // Fallback to Light Theme
             showViewWithLightTheme();
         }
+    }
+
+    public void relaunchActivity() {
+        getWindow().setWindowAnimations(R.style.WindowAnimation);
+        recreate();
     }
 
     @Override
