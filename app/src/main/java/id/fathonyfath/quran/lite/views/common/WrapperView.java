@@ -28,10 +28,6 @@ public abstract class WrapperView extends RelativeLayout {
         this.elevationView = new ElevationView(context);
         this.contentView = new FrameLayout(context);
 
-        final Set<View> setOfView = new HashSet<>();
-        setOfView.add(new DarkLightSwitchView(context));
-        this.toolbarView.setRightView(setOfView);
-
         initConfiguration();
         initView();
         applyStyleBasedOnTheme();
@@ -47,6 +43,10 @@ public abstract class WrapperView extends RelativeLayout {
         if (this.elevationView != null) {
             this.elevationView.setAlpha(alpha);
         }
+    }
+
+    protected void setToolbarRightViews(Set<View> viewSet) {
+        this.toolbarView.setRightView(viewSet);
     }
 
     @Override

@@ -11,15 +11,18 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 
+import id.fathonyfath.quran.lite.models.config.DayNightPreference;
 import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
 import id.fathonyfath.quran.lite.utils.UnitConverter;
 
-class DarkLightSwitchView extends View {
+public class DarkLightSwitchView extends View {
 
     private final Paint basePaint;
     private final Paint clearPaint;
     private final RectF reusableRect;
+
+    private DayNightPreference currentPreference = DayNightPreference.SYSTEM;
 
     public DarkLightSwitchView(Context context) {
         super(context);
@@ -31,6 +34,43 @@ class DarkLightSwitchView extends View {
         this.clearPaint = new Paint();
 
         setPaintColor();
+    }
+
+    public void setDayNightPreference(DayNightPreference preference) {
+        if (preference == null) {
+            preference = DayNightPreference.SYSTEM;
+        }
+        this.currentPreference = preference;
+    }
+
+    public DayNightPreference cycleNextPreference() {
+        switch (this.currentPreference) {
+            case SYSTEM:
+                return DayNightPreference.DAY;
+            case DAY:
+                return DayNightPreference.NIGHT;
+            case NIGHT:
+                return DayNightPreference.SYSTEM;
+        }
+
+        throw new IllegalStateException("This is impossible. Throw exceptions!");
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+
+        switch (this.currentPreference) {
+            case SYSTEM:
+                drawBrightness(canvas);
+                break;
+            case DAY:
+                drawSun(canvas);
+                break;
+            case NIGHT:
+                drawMoon(canvas);
+                break;
+        }
     }
 
     private void setPaintColor() {
@@ -46,15 +86,6 @@ class DarkLightSwitchView extends View {
 
         final PorterDuff.Mode mode = PorterDuff.Mode.CLEAR;
         this.clearPaint.setXfermode(new PorterDuffXfermode(mode));
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-
-//        drawSun(canvas);
-//        drawBrightness(canvas);
-        drawMoon(canvas);
     }
 
     private void initConfiguration() {

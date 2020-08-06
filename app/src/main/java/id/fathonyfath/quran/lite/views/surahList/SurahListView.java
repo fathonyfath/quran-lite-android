@@ -10,19 +10,24 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import id.fathonyfath.quran.lite.Res;
 import id.fathonyfath.quran.lite.models.Surah;
+import id.fathonyfath.quran.lite.models.config.DayNightPreference;
 import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.useCase.FetchAllSurahUseCase;
+import id.fathonyfath.quran.lite.useCase.GetDayNightPreferenceUseCase;
 import id.fathonyfath.quran.lite.useCase.UseCaseCallback;
 import id.fathonyfath.quran.lite.useCase.UseCaseProvider;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
 import id.fathonyfath.quran.lite.utils.viewLifecycle.ViewCallback;
+import id.fathonyfath.quran.lite.views.common.DarkLightSwitchView;
 import id.fathonyfath.quran.lite.views.common.ProgressView;
 import id.fathonyfath.quran.lite.views.common.WrapperView;
 
@@ -32,6 +37,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
     private final ListView surahListView;
     private final SurahAdapter surahAdapter;
     private final ProgressView progressView;
+    private final DarkLightSwitchView darkLightSwitchView;
     private final UseCaseCallback<List<Surah>> fetchAllSurahCallback = new UseCaseCallback<List<Surah>>() {
         @Override
         public void onProgress(float progress) {
@@ -41,8 +47,8 @@ public class SurahListView extends WrapperView implements ViewCallback {
         @Override
         public void onResult(List<Surah> data) {
             // Don't forget to do some cleanups
-            unregisterUseCaseCallback();
-            clearUseCase();
+            unregisterFetchAllSurahUseCaseCallback();
+            clearFetchAllSurahUseCase();
 
             updateSurahList(data);
         }
@@ -50,8 +56,27 @@ public class SurahListView extends WrapperView implements ViewCallback {
         @Override
         public void onError(Throwable throwable) {
             // Don't forget to do some cleanups
-            unregisterUseCaseCallback();
-            clearUseCase();
+            unregisterFetchAllSurahUseCaseCallback();
+            clearFetchAllSurahUseCase();
+        }
+    };
+    private final UseCaseCallback<DayNightPreference> dayNightPreferenceCallback = new UseCaseCallback<DayNightPreference>() {
+        @Override
+        public void onProgress(float progress) {
+
+        }
+
+        @Override
+        public void onResult(DayNightPreference data) {
+            // Do some cleanups
+            unregisterAndClearGetDayNightPreferenceUseCaseCallback();
+
+            setDayNightPreferenceView(data);
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+
         }
     };
     private OnViewEventListener onViewEventListener;
@@ -64,6 +89,12 @@ public class SurahListView extends WrapperView implements ViewCallback {
             }
         }
     };
+    private final View.OnClickListener onDayNightPreferenceClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+        }
+    };
 
     public SurahListView(Context context) {
         super(context);
@@ -74,6 +105,9 @@ public class SurahListView extends WrapperView implements ViewCallback {
         this.surahAdapter = new SurahAdapter(getContext(), this.surahList);
 
         this.progressView = new ProgressView(getContext());
+
+        this.darkLightSwitchView = new DarkLightSwitchView(getContext());
+        this.darkLightSwitchView.setOnClickListener(onDayNightPreferenceClickListener);
 
         this.setToolbarTitle("Al-Qur'an Lite");
         this.setElevationAlpha(0.1f);
@@ -112,22 +146,25 @@ public class SurahListView extends WrapperView implements ViewCallback {
         if (this.surahList.isEmpty()) {
             this.progressView.setVisibility(View.VISIBLE);
 
-            if (!tryToRestoreUseCase()) {
-                createAndRunUseCase();
+            if (!tryToRestoreFetchAllSurahUseCase()) {
+                createAndRunFetchAllSurahUseCase();
             }
         }
+
+        createAndRunGetDayNightPreferenceUseCase();
     }
 
     @Override
     public void onPause() {
         this.surahListView.setOnItemClickListener(null);
 
-        unregisterUseCaseCallback();
+        unregisterFetchAllSurahUseCaseCallback();
+        unregisterAndClearGetDayNightPreferenceUseCaseCallback();
     }
 
     @Override
     public void onStop() {
-        clearUseCase();
+        clearFetchAllSurahUseCase();
     }
 
     public void setOnViewEventListener(OnViewEventListener onViewEventListener) {
@@ -154,7 +191,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
         addView(this.progressView);
     }
 
-    private boolean tryToRestoreUseCase() {
+    private boolean tryToRestoreFetchAllSurahUseCase() {
         FetchAllSurahUseCase useCase = UseCaseProvider.getUseCase(FetchAllSurahUseCase.class);
         if (useCase != null) {
             useCase.setCallback(this.fetchAllSurahCallback);
@@ -163,21 +200,43 @@ public class SurahListView extends WrapperView implements ViewCallback {
         return false;
     }
 
-    private void createAndRunUseCase() {
+    private void createAndRunFetchAllSurahUseCase() {
         FetchAllSurahUseCase useCase = UseCaseProvider.createUseCase(FetchAllSurahUseCase.class);
         useCase.setCallback(this.fetchAllSurahCallback);
         useCase.run();
     }
 
-    private void unregisterUseCaseCallback() {
+    private void createAndRunGetDayNightPreferenceUseCase() {
+        GetDayNightPreferenceUseCase useCase = UseCaseProvider.createUseCase(GetDayNightPreferenceUseCase.class);
+        useCase.setCallback(this.dayNightPreferenceCallback);
+        useCase.run();
+    }
+
+    private void unregisterFetchAllSurahUseCaseCallback() {
         FetchAllSurahUseCase useCase = UseCaseProvider.getUseCase(FetchAllSurahUseCase.class);
         if (useCase != null) {
             useCase.setCallback(null);
         }
     }
 
-    private void clearUseCase() {
+    private void unregisterAndClearGetDayNightPreferenceUseCaseCallback() {
+        GetDayNightPreferenceUseCase useCase = UseCaseProvider.getUseCase(GetDayNightPreferenceUseCase.class);
+        if (useCase != null) {
+            useCase.setCallback(null);
+        }
+
+        UseCaseProvider.clearUseCase(GetDayNightPreferenceUseCase.class);
+    }
+
+    private void clearFetchAllSurahUseCase() {
         UseCaseProvider.clearUseCase(FetchAllSurahUseCase.class);
+    }
+
+    private void setDayNightPreferenceView(DayNightPreference preference) {
+        final HashSet<View> views = new HashSet<>();
+        this.darkLightSwitchView.setDayNightPreference(preference);
+        views.add(this.darkLightSwitchView);
+        setToolbarRightViews(views);
     }
 
     private void updateSurahList(List<Surah> surahList) {
