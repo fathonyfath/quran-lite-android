@@ -9,15 +9,15 @@ import id.fathonyfath.quran.lite.utils.scheduler.Schedulers;
 
 public class PutDayNightPreferenceUseCase extends BaseUseCase {
 
-    private final ConfigRepository configRepository;
     private final Context context;
+    private final ConfigRepository configRepository;
 
     private DayNightPreference updateWith;
     private UseCaseCallback<Boolean> callback;
 
-    public PutDayNightPreferenceUseCase(ConfigRepository configRepository, Context context) {
-        this.configRepository = configRepository;
+    public PutDayNightPreferenceUseCase(Context context, ConfigRepository configRepository) {
         this.context = context;
+        this.configRepository = configRepository;
     }
 
     public void setUpdateWith(DayNightPreference updateWith) {
@@ -72,6 +72,8 @@ public class PutDayNightPreferenceUseCase extends BaseUseCase {
                     } else {
                         postResultToMainThread(true);
                     }
+                } else if (previous != updateWith) {
+                    postResultToMainThread(true);
                 }
             }
         });
@@ -119,17 +121,17 @@ public class PutDayNightPreferenceUseCase extends BaseUseCase {
 
     public static class Factory implements UseCaseFactory<PutDayNightPreferenceUseCase> {
 
-        private final ConfigRepository configRepository;
         private final Context context;
+        private final ConfigRepository configRepository;
 
-        public Factory(ConfigRepository configRepository, Context context) {
-            this.configRepository = configRepository;
+        public Factory(Context context, ConfigRepository configRepository) {
             this.context = context;
+            this.configRepository = configRepository;
         }
 
         @Override
         public PutDayNightPreferenceUseCase create() {
-            return new PutDayNightPreferenceUseCase(this.configRepository, this.context);
+            return new PutDayNightPreferenceUseCase(this.context, this.configRepository);
         }
     }
 }
