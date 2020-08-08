@@ -23,6 +23,7 @@ import id.fathonyfath.quran.lite.models.config.DayNightPreference;
 import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.useCase.FetchAllSurahUseCase;
 import id.fathonyfath.quran.lite.useCase.GetDayNightPreferenceUseCase;
+import id.fathonyfath.quran.lite.useCase.PutDayNightPreferenceUseCase;
 import id.fathonyfath.quran.lite.useCase.UseCaseCallback;
 import id.fathonyfath.quran.lite.useCase.UseCaseProvider;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
@@ -77,7 +78,29 @@ public class SurahListView extends WrapperView implements ViewCallback {
 
         @Override
         public void onError(Throwable throwable) {
+            unregisterAndClearGetDayNightPreferenceUseCaseCallback();
+        }
+    };
+    private final UseCaseCallback<Boolean> putDayNightPreferenceCallback = new UseCaseCallback<Boolean>() {
+        @Override
+        public void onProgress(float progress) {
 
+        }
+
+        @Override
+        public void onResult(Boolean isUpdateDifferentFromPrevious) {
+            unregisterAndClearPutDayNightPreferenceUseCaseCallback();
+
+            if (isUpdateDifferentFromPrevious) {
+                ViewUtil.recreateActivity(SurahListView.this);
+            } else {
+                createAndRunGetDayNightPreferenceUseCase();
+            }
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            unregisterAndClearPutDayNightPreferenceUseCaseCallback();
         }
     };
     private OnViewEventListener onViewEventListener;
@@ -93,7 +116,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
     private final View.OnClickListener onDayNightPreferenceClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            ViewUtil.recreateActivity(SurahListView.this);
+            createAndRunPutDayNightPreferenceUseCase(darkLightSwitchView.cycleNextPreference());
         }
     };
 
@@ -166,6 +189,8 @@ public class SurahListView extends WrapperView implements ViewCallback {
     @Override
     public void onStop() {
         clearFetchAllSurahUseCase();
+        unregisterAndClearGetDayNightPreferenceUseCaseCallback();
+        unregisterAndClearPutDayNightPreferenceUseCaseCallback();
     }
 
     public void setOnViewEventListener(OnViewEventListener onViewEventListener) {
@@ -213,6 +238,13 @@ public class SurahListView extends WrapperView implements ViewCallback {
         useCase.run();
     }
 
+    private void createAndRunPutDayNightPreferenceUseCase(DayNightPreference updateWith) {
+        PutDayNightPreferenceUseCase useCase = UseCaseProvider.createUseCase(PutDayNightPreferenceUseCase.class);
+        useCase.setUpdateWith(updateWith);
+        useCase.setCallback(this.putDayNightPreferenceCallback);
+        useCase.run();
+    }
+
     private void unregisterFetchAllSurahUseCaseCallback() {
         FetchAllSurahUseCase useCase = UseCaseProvider.getUseCase(FetchAllSurahUseCase.class);
         if (useCase != null) {
@@ -227,6 +259,15 @@ public class SurahListView extends WrapperView implements ViewCallback {
         }
 
         UseCaseProvider.clearUseCase(GetDayNightPreferenceUseCase.class);
+    }
+
+    private void unregisterAndClearPutDayNightPreferenceUseCaseCallback() {
+        PutDayNightPreferenceUseCase useCase = UseCaseProvider.getUseCase(PutDayNightPreferenceUseCase.class);
+        if (useCase != null) {
+            useCase.setCallback(null);
+        }
+
+        UseCaseProvider.clearUseCase(PutDayNightPreferenceUseCase.class);
     }
 
     private void clearFetchAllSurahUseCase() {
