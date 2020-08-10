@@ -1,6 +1,6 @@
 package id.fathonyfath.quran.lite.themes;
 
-public class LightTheme extends BaseTheme {
+public class DayTheme extends BaseTheme {
 
     @Override
     public int toolbarColor() {

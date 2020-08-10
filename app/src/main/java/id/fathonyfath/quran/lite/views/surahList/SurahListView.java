@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,7 +28,7 @@ import id.fathonyfath.quran.lite.useCase.UseCaseProvider;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
 import id.fathonyfath.quran.lite.utils.ViewUtil;
 import id.fathonyfath.quran.lite.utils.viewLifecycle.ViewCallback;
-import id.fathonyfath.quran.lite.views.common.DarkLightSwitchView;
+import id.fathonyfath.quran.lite.views.common.DayNightSwitchButton;
 import id.fathonyfath.quran.lite.views.common.ProgressView;
 import id.fathonyfath.quran.lite.views.common.WrapperView;
 
@@ -39,7 +38,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
     private final ListView surahListView;
     private final SurahAdapter surahAdapter;
     private final ProgressView progressView;
-    private final DarkLightSwitchView darkLightSwitchView;
+    private final DayNightSwitchButton dayNightSwitchButton;
     private final UseCaseCallback<List<Surah>> fetchAllSurahCallback = new UseCaseCallback<List<Surah>>() {
         @Override
         public void onProgress(float progress) {
@@ -116,7 +115,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
     private final View.OnClickListener onDayNightPreferenceClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            createAndRunPutDayNightPreferenceUseCase(darkLightSwitchView.cycleNextPreference());
+            createAndRunPutDayNightPreferenceUseCase(dayNightSwitchButton.cycleNextPreference());
         }
     };
 
@@ -130,8 +129,8 @@ public class SurahListView extends WrapperView implements ViewCallback {
 
         this.progressView = new ProgressView(getContext());
 
-        this.darkLightSwitchView = new DarkLightSwitchView(getContext());
-        this.darkLightSwitchView.setOnClickListener(onDayNightPreferenceClickListener);
+        this.dayNightSwitchButton = new DayNightSwitchButton(getContext());
+        this.dayNightSwitchButton.setOnClickListener(onDayNightPreferenceClickListener);
 
         this.setToolbarTitle("Al-Qur'an Lite");
         this.setElevationAlpha(0.1f);
@@ -276,8 +275,8 @@ public class SurahListView extends WrapperView implements ViewCallback {
 
     private void setDayNightPreferenceView(DayNightPreference preference) {
         final HashSet<View> views = new HashSet<>();
-        this.darkLightSwitchView.setDayNightPreference(preference);
-        views.add(this.darkLightSwitchView);
+        this.dayNightSwitchButton.setDayNightPreference(preference);
+        views.add(this.dayNightSwitchButton);
         setToolbarRightViews(views);
     }
 

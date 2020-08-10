@@ -1,7 +1,6 @@
 package id.fathonyfath.quran.lite;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -14,8 +13,8 @@ import id.fathonyfath.quran.lite.data.source.disk.QuranDiskSource;
 import id.fathonyfath.quran.lite.data.source.network.QuranNetworkSource;
 import id.fathonyfath.quran.lite.data.source.preferences.DayNightPreferencesSource;
 import id.fathonyfath.quran.lite.models.DayNight;
-import id.fathonyfath.quran.lite.themes.DarkTheme;
-import id.fathonyfath.quran.lite.themes.LightTheme;
+import id.fathonyfath.quran.lite.themes.NightTheme;
+import id.fathonyfath.quran.lite.themes.DayTheme;
 import id.fathonyfath.quran.lite.useCase.FetchAllSurahUseCase;
 import id.fathonyfath.quran.lite.useCase.FetchSurahDetailUseCase;
 import id.fathonyfath.quran.lite.useCase.GetDayNightPreferenceUseCase;
@@ -141,12 +140,12 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight> 
     }
 
     private void showViewWithLightTheme() {
-        this.mainView = new MainView(new ThemeContext(this, new LightTheme()));
+        this.mainView = new MainView(new ThemeContext(this, new DayTheme()));
         setContentView(MainActivity.this.mainView);
     }
 
     private void showViewWithDarkTheme() {
-        this.mainView = new MainView(new ThemeContext(this, new DarkTheme()));
+        this.mainView = new MainView(new ThemeContext(this, new NightTheme()));
         setContentView(MainActivity.this.mainView);
     }
 }

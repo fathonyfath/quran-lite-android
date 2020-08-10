@@ -16,7 +16,7 @@ import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
 import id.fathonyfath.quran.lite.utils.UnitConverter;
 
-public class DarkLightSwitchView extends View {
+public class DayNightSwitchButton extends View {
 
     private final Paint basePaint;
     private final Paint clearPaint;
@@ -24,7 +24,7 @@ public class DarkLightSwitchView extends View {
 
     private DayNightPreference currentPreference = DayNightPreference.SYSTEM;
 
-    public DarkLightSwitchView(Context context) {
+    public DayNightSwitchButton(Context context) {
         super(context);
 
         initConfiguration();
@@ -161,7 +161,7 @@ public class DarkLightSwitchView extends View {
         }
         canvas.drawCircle(centerX, centerY, radius, this.basePaint);
 
-        final int padding = (int) UnitConverter.fromDpToPx(getContext(), 4f);
+        final int padding = (int) UnitConverter.fromDpToPx(getContext(), 3f);
 
         this.reusableRect.set((centerX - radius) + padding,
                 (centerY - radius) + padding,

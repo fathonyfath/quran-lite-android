@@ -72,7 +72,7 @@ public class PutDayNightPreferenceUseCase extends BaseUseCase {
                     } else {
                         postResultToMainThread(true);
                     }
-                } else if (previous != updateWith) {
+                } else {
                     postResultToMainThread(true);
                 }
             }
