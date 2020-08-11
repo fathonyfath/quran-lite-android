@@ -7,6 +7,13 @@ import id.fathonyfath.quran.lite.themes.BaseTheme;
 
 public class ThemeContext extends ContextWrapper {
 
+    private final BaseTheme theme;
+
+    public ThemeContext(Context base, BaseTheme theme) {
+        super(base);
+        this.theme = theme;
+    }
+
     public static BaseTheme saveUnwrapTheme(Context context) {
         if (context instanceof ThemeContext) {
             ThemeContext themeContext = (ThemeContext) context;
@@ -14,12 +21,5 @@ public class ThemeContext extends ContextWrapper {
         }
 
         return null;
-    }
-
-    private final BaseTheme theme;
-
-    public ThemeContext(Context base, BaseTheme theme) {
-        super(base);
-        this.theme = theme;
     }
 }

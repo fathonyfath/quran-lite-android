@@ -1,10 +1,8 @@
 package id.fathonyfath.quran.lite.utils;
 
 import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 

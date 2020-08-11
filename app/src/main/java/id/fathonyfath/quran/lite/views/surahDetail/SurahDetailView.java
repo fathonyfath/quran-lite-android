@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,8 +32,6 @@ import id.fathonyfath.quran.lite.utils.viewLifecycle.ViewCallback;
 import id.fathonyfath.quran.lite.views.common.DayNightSwitchButton;
 import id.fathonyfath.quran.lite.views.common.ProgressView;
 import id.fathonyfath.quran.lite.views.common.WrapperView;
-import id.fathonyfath.quran.lite.views.surahList.SurahListView;
-import id.fathonyfath.quran.lite.views.surahList.SurahView;
 
 public class SurahDetailView extends WrapperView implements ViewCallback {
 
@@ -43,33 +40,6 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
     private final AyahDetailAdapter ayahDetailAdapter;
     private final ProgressView progressView;
     private final DayNightSwitchButton dayNightSwitchButton;
-    private Surah currentSurah;
-    private Parcelable listViewState;
-    private boolean newPage = false;
-    private int firstVisibleItem = 0;
-    private int lastVisibleItem = -1;
-    private final UseCaseCallback<SurahDetail> fetchSurahDetailCallback = new UseCaseCallback<SurahDetail>() {
-        @Override
-        public void onProgress(float progress) {
-            updateTextProgress(progress);
-        }
-
-        @Override
-        public void onResult(SurahDetail data) {
-            // Don't forget to do some cleanups
-            unregisterFetchSurahDetailUseCaseCallback();
-            clearSurahDetailUseCase();
-
-            processSurahDetail(data);
-        }
-
-        @Override
-        public void onError(Throwable throwable) {
-            // Don't forget to do some cleanups
-            unregisterFetchSurahDetailUseCaseCallback();
-            clearSurahDetailUseCase();
-        }
-    };
     private final UseCaseCallback<DayNightPreference> dayNightPreferenceCallback = new UseCaseCallback<DayNightPreference>() {
         @Override
         public void onProgress(float progress) {
@@ -111,6 +81,39 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
             unregisterAndClearPutDayNightPreferenceUseCaseCallback();
         }
     };
+    private final View.OnClickListener onDayNightPreferenceClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            createAndRunPutDayNightPreferenceUseCase(dayNightSwitchButton.cycleNextPreference());
+        }
+    };
+    private Surah currentSurah;
+    private Parcelable listViewState;
+    private boolean newPage = false;
+    private final UseCaseCallback<SurahDetail> fetchSurahDetailCallback = new UseCaseCallback<SurahDetail>() {
+        @Override
+        public void onProgress(float progress) {
+            updateTextProgress(progress);
+        }
+
+        @Override
+        public void onResult(SurahDetail data) {
+            // Don't forget to do some cleanups
+            unregisterFetchSurahDetailUseCaseCallback();
+            clearSurahDetailUseCase();
+
+            processSurahDetail(data);
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            // Don't forget to do some cleanups
+            unregisterFetchSurahDetailUseCaseCallback();
+            clearSurahDetailUseCase();
+        }
+    };
+    private int firstVisibleItem = 0;
+    private int lastVisibleItem = -1;
     private final AbsListView.OnScrollListener onSurahScrollListener = new AbsListView.OnScrollListener() {
         @Override
         public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -121,12 +124,6 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
             int lastVisibleItem = firstVisibleItem + visibleItemCount - 1;
             updateTitleWithSurahNumber(firstVisibleItem, lastVisibleItem);
-        }
-    };
-    private final View.OnClickListener onDayNightPreferenceClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            createAndRunPutDayNightPreferenceUseCase(dayNightSwitchButton.cycleNextPreference());
         }
     };
 

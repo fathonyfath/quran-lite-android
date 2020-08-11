@@ -5,12 +5,10 @@ import android.graphics.Color;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import id.fathonyfath.quran.lite.Res;

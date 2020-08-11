@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import id.fathonyfath.quran.lite.Res;

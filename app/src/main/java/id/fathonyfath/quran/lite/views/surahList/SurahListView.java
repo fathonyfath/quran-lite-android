@@ -102,6 +102,12 @@ public class SurahListView extends WrapperView implements ViewCallback {
             unregisterAndClearPutDayNightPreferenceUseCaseCallback();
         }
     };
+    private final View.OnClickListener onDayNightPreferenceClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            createAndRunPutDayNightPreferenceUseCase(dayNightSwitchButton.cycleNextPreference());
+        }
+    };
     private OnViewEventListener onViewEventListener;
     private final AdapterView.OnItemClickListener onSurahItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
@@ -110,12 +116,6 @@ public class SurahListView extends WrapperView implements ViewCallback {
                 Surah selectedSurah = SurahListView.this.surahAdapter.getItem(position);
                 SurahListView.this.onViewEventListener.onSurahSelected(selectedSurah);
             }
-        }
-    };
-    private final View.OnClickListener onDayNightPreferenceClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            createAndRunPutDayNightPreferenceUseCase(dayNightSwitchButton.cycleNextPreference());
         }
     };
 
@@ -299,6 +299,13 @@ public class SurahListView extends WrapperView implements ViewCallback {
         this.surahList.addAll(surahList);
     }
 
+    private void applyStyleBasedOnTheme() {
+        BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
+        if (theme != null) {
+            this.setBackgroundColor(theme.baseColor());
+        }
+    }
+
     public interface OnViewEventListener {
         void onSurahSelected(Surah selectedSurah);
     }
@@ -346,13 +353,6 @@ public class SurahListView extends WrapperView implements ViewCallback {
             out.writeInt(this.surahList.size());
             Surah[] surahArray = this.surahList.toArray(new Surah[0]);
             out.writeTypedArray(surahArray, flags);
-        }
-    }
-
-    private void applyStyleBasedOnTheme() {
-        BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
-        if (theme != null) {
-            this.setBackgroundColor(theme.baseColor());
         }
     }
 }

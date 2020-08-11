@@ -11,6 +11,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class NetworkHelper {
 
@@ -28,7 +29,7 @@ public class NetworkHelper {
             final StringBuilder sb = new StringBuilder();
 
             byte[] contentByteArray = outputStream.toByteArray();
-            sb.append(new String(contentByteArray, 0, contentByteArray.length, Charset.forName("UTF-8")));
+            sb.append(new String(contentByteArray, 0, contentByteArray.length, StandardCharsets.UTF_8));
 
             outputStream.close();
 
