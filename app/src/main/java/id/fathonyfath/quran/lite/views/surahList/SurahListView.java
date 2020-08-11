@@ -183,6 +183,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
 
         unregisterFetchAllSurahUseCaseCallback();
         unregisterAndClearGetDayNightPreferenceUseCaseCallback();
+        unregisterAndClearPutDayNightPreferenceUseCaseCallback();
     }
 
     @Override
