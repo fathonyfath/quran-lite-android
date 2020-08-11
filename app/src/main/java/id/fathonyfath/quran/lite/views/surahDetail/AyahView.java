@@ -34,7 +34,17 @@ public class AyahView extends RelativeLayout {
         applyStyleBasedOnTheme();
     }
 
+    public AyahDetailViewType.AyahViewModel getAyahViewModel() {
+        Object viewModel = this.getTag();
+        if (viewModel instanceof AyahDetailViewType.AyahViewModel) {
+            return (AyahDetailViewType.AyahViewModel) viewModel;
+        } else {
+            return null;
+        }
+    }
+
     public void updateAyah(AyahDetailViewType.AyahViewModel viewModel) {
+        this.setTag(viewModel);
         this.ayahNumberText.setText(viewModel.ayahNumber.toString());
         this.ayahText.setText(viewModel.ayahContent);
         this.ayahTranslationText.setText(viewModel.ayahTranslation);
