@@ -4,28 +4,37 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 import id.fathonyfath.quran.lite.Res;
 import id.fathonyfath.quran.lite.models.Surah;
 import id.fathonyfath.quran.lite.models.SurahDetail;
+import id.fathonyfath.quran.lite.models.config.DayNightPreference;
 import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.useCase.FetchSurahDetailUseCase;
+import id.fathonyfath.quran.lite.useCase.GetDayNightPreferenceUseCase;
+import id.fathonyfath.quran.lite.useCase.PutDayNightPreferenceUseCase;
 import id.fathonyfath.quran.lite.useCase.UseCaseCallback;
 import id.fathonyfath.quran.lite.useCase.UseCaseProvider;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
 import id.fathonyfath.quran.lite.utils.ViewUtil;
 import id.fathonyfath.quran.lite.utils.viewLifecycle.ViewCallback;
+import id.fathonyfath.quran.lite.views.common.DayNightSwitchButton;
 import id.fathonyfath.quran.lite.views.common.ProgressView;
 import id.fathonyfath.quran.lite.views.common.WrapperView;
+import id.fathonyfath.quran.lite.views.surahList.SurahListView;
+import id.fathonyfath.quran.lite.views.surahList.SurahView;
 
 public class SurahDetailView extends WrapperView implements ViewCallback {
 
@@ -33,9 +42,12 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
     private final ListView ayahListView;
     private final AyahDetailAdapter ayahDetailAdapter;
     private final ProgressView progressView;
+    private final DayNightSwitchButton dayNightSwitchButton;
     private Surah currentSurah;
     private Parcelable listViewState;
     private boolean newPage = false;
+    private int firstVisibleItem = 0;
+    private int lastVisibleItem = -1;
     private final UseCaseCallback<SurahDetail> fetchSurahDetailCallback = new UseCaseCallback<SurahDetail>() {
         @Override
         public void onProgress(float progress) {
@@ -45,8 +57,8 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         @Override
         public void onResult(SurahDetail data) {
             // Don't forget to do some cleanups
-            unregisterUseCaseCallback();
-            clearUseCase();
+            unregisterFetchSurahDetailUseCaseCallback();
+            clearSurahDetailUseCase();
 
             processSurahDetail(data);
         }
@@ -54,8 +66,67 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         @Override
         public void onError(Throwable throwable) {
             // Don't forget to do some cleanups
-            unregisterUseCaseCallback();
-            clearUseCase();
+            unregisterFetchSurahDetailUseCaseCallback();
+            clearSurahDetailUseCase();
+        }
+    };
+    private final UseCaseCallback<DayNightPreference> dayNightPreferenceCallback = new UseCaseCallback<DayNightPreference>() {
+        @Override
+        public void onProgress(float progress) {
+
+        }
+
+        @Override
+        public void onResult(DayNightPreference data) {
+            // Do some cleanups
+            unregisterAndClearGetDayNightPreferenceUseCaseCallback();
+
+            setDayNightPreferenceView(data);
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            unregisterAndClearGetDayNightPreferenceUseCaseCallback();
+        }
+    };
+    private final UseCaseCallback<Boolean> putDayNightPreferenceCallback = new UseCaseCallback<Boolean>() {
+        @Override
+        public void onProgress(float progress) {
+
+        }
+
+        @Override
+        public void onResult(Boolean isUpdateDifferentFromPrevious) {
+            unregisterAndClearPutDayNightPreferenceUseCaseCallback();
+
+            if (isUpdateDifferentFromPrevious) {
+                ViewUtil.recreateActivity(SurahDetailView.this);
+            } else {
+                createAndRunGetDayNightPreferenceUseCase();
+            }
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            unregisterAndClearPutDayNightPreferenceUseCaseCallback();
+        }
+    };
+    private final AbsListView.OnScrollListener onSurahScrollListener = new AbsListView.OnScrollListener() {
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            int lastVisibleItem = firstVisibleItem + visibleItemCount - 1;
+            updateTitleWithSurahNumber(firstVisibleItem, lastVisibleItem);
+        }
+    };
+    private final View.OnClickListener onDayNightPreferenceClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            createAndRunPutDayNightPreferenceUseCase(dayNightSwitchButton.cycleNextPreference());
         }
     };
 
@@ -69,6 +140,9 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         this.ayahDetailAdapter = new AyahDetailAdapter(context, this.ayahViewTypeList);
 
         this.progressView = new ProgressView(getContext());
+
+        this.dayNightSwitchButton = new DayNightSwitchButton(getContext());
+        this.dayNightSwitchButton.setOnClickListener(onDayNightPreferenceClickListener);
 
         this.setElevationAlpha(0.1f);
 
@@ -102,29 +176,41 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
 
     @Override
     public void onResume() {
+        this.ayahListView.setOnScrollListener(this.onSurahScrollListener);
+
         if (this.currentSurah != null) {
             this.progressView.setVisibility(View.VISIBLE);
 
-            this.setToolbarTitle("QS. " + this.currentSurah.getNameInLatin() +
-                    " [" + this.currentSurah.getNumber() + "]");
+            updateToolbarTitle(this.currentSurah.getNameInLatin(), this.currentSurah.getNumber(),
+                    -1, -1);
 
             if (!tryToRestoreUseCase()) {
-                createAndRunUseCase();
+                createAndRunFetchSurahDetailUseCase();
             }
         } else {
             ViewUtil.onBackPressed(this);
         }
+
+        createAndRunGetDayNightPreferenceUseCase();
     }
 
     @Override
     public void onPause() {
         clearView();
-        unregisterUseCaseCallback();
+
+        this.ayahListView.setOnScrollListener(null);
+
+        unregisterFetchSurahDetailUseCaseCallback();
+        unregisterAndClearGetDayNightPreferenceUseCaseCallback();
+        unregisterAndClearPutDayNightPreferenceUseCaseCallback();
     }
 
     @Override
     public void onStop() {
-        clearUseCase();
+        clearSurahDetailUseCase();
+
+        unregisterAndClearGetDayNightPreferenceUseCaseCallback();
+        unregisterAndClearPutDayNightPreferenceUseCaseCallback();
     }
 
     public void setState(Surah selectedSurah) {
@@ -159,6 +245,13 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         }
     }
 
+    private void setDayNightPreferenceView(DayNightPreference preference) {
+        final HashSet<View> views = new HashSet<>();
+        this.dayNightSwitchButton.setDayNightPreference(preference);
+        views.add(this.dayNightSwitchButton);
+        setToolbarRightViews(views);
+    }
+
     private void processSurahDetail(SurahDetail surahDetail) {
         this.progressView.setVisibility(View.GONE);
         updateTextProgress(0f);
@@ -189,6 +282,57 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         this.progressView.updateProgress(progress);
     }
 
+    private void updateTitleWithSurahNumber(int firstVisibleItem, int lastVisibleItem) {
+        if (this.firstVisibleItem == firstVisibleItem && this.lastVisibleItem == lastVisibleItem) {
+            return;
+        }
+
+        this.firstVisibleItem = firstVisibleItem;
+        this.lastVisibleItem = lastVisibleItem;
+
+        View firstView = this.ayahListView.getChildAt(0);
+        View lastView = this.ayahListView.getChildAt(this.ayahListView.getChildCount() - 1);
+
+        if (firstView instanceof AyahView && lastView instanceof AyahView) {
+            AyahView firstAyahView = (AyahView) firstView;
+            AyahView lastAyahView = (AyahView) lastView;
+            final int firstAyahNumber = firstAyahView.getAyahViewModel().ayahNumber;
+            final int lastAyahNumber = lastAyahView.getAyahViewModel().ayahNumber;
+
+            updateToolbarTitle(this.currentSurah.getNameInLatin(), this.currentSurah.getNumber(),
+                    firstAyahNumber, lastAyahNumber);
+        } else if (firstView instanceof BasmalahView && lastView instanceof AyahView) {
+            // Since the possibility BasmallahView only searchable only on topmost we only lookup
+            // for firstView and check the view after
+            AyahView firstAyahView = (AyahView) this.ayahListView.getChildAt(1);
+            AyahView lastAyahView = (AyahView) lastView;
+
+            final int firstAyahNumber = firstAyahView.getAyahViewModel().ayahNumber;
+            final int lastAyahNumber = lastAyahView.getAyahViewModel().ayahNumber;
+
+            updateToolbarTitle(this.currentSurah.getNameInLatin(), this.currentSurah.getNumber(),
+                    firstAyahNumber, lastAyahNumber);
+        }
+    }
+
+    private void updateToolbarTitle(String surahNameInLatin, int surahNumber, int firstAyahNumber, int lastAyahNumber) {
+        if (firstAyahNumber < 0 && lastAyahNumber < 0) {
+            this.setToolbarTitle("QS. " + this.currentSurah.getNameInLatin()
+                    + " [" + this.currentSurah.getNumber() + "]");
+            return;
+        }
+
+        if (firstAyahNumber == lastAyahNumber) {
+            this.setToolbarTitle("QS. " + this.currentSurah.getNameInLatin()
+                    + " [" + this.currentSurah.getNumber() + "]"
+                    + ": " + firstAyahNumber);
+        } else {
+            this.setToolbarTitle("QS. " + this.currentSurah.getNameInLatin()
+                    + " [" + this.currentSurah.getNumber() + "]"
+                    + ": " + firstAyahNumber + " - " + lastAyahNumber);
+        }
+    }
+
     private boolean tryToRestoreUseCase() {
         FetchSurahDetailUseCase useCase = UseCaseProvider.getUseCase(FetchSurahDetailUseCase.class);
         if (useCase != null) {
@@ -198,21 +342,52 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         return false;
     }
 
-    private void createAndRunUseCase() {
+    private void createAndRunFetchSurahDetailUseCase() {
         FetchSurahDetailUseCase useCase = UseCaseProvider.createUseCase(FetchSurahDetailUseCase.class);
         useCase.setCallback(this.fetchSurahDetailCallback);
         useCase.setArguments(this.currentSurah);
         useCase.run();
     }
 
-    private void unregisterUseCaseCallback() {
+    private void createAndRunPutDayNightPreferenceUseCase(DayNightPreference updateWith) {
+        PutDayNightPreferenceUseCase useCase = UseCaseProvider.createUseCase(PutDayNightPreferenceUseCase.class);
+        useCase.setUpdateWith(updateWith);
+        useCase.setCallback(this.putDayNightPreferenceCallback);
+        useCase.run();
+    }
+
+    private void createAndRunGetDayNightPreferenceUseCase() {
+        GetDayNightPreferenceUseCase useCase = UseCaseProvider.createUseCase(GetDayNightPreferenceUseCase.class);
+        useCase.setCallback(this.dayNightPreferenceCallback);
+        useCase.run();
+    }
+
+    private void unregisterFetchSurahDetailUseCaseCallback() {
         FetchSurahDetailUseCase useCase = UseCaseProvider.getUseCase(FetchSurahDetailUseCase.class);
         if (useCase != null) {
             useCase.setCallback(null);
         }
     }
 
-    private void clearUseCase() {
+    private void unregisterAndClearGetDayNightPreferenceUseCaseCallback() {
+        GetDayNightPreferenceUseCase useCase = UseCaseProvider.getUseCase(GetDayNightPreferenceUseCase.class);
+        if (useCase != null) {
+            useCase.setCallback(null);
+        }
+
+        UseCaseProvider.clearUseCase(GetDayNightPreferenceUseCase.class);
+    }
+
+    private void unregisterAndClearPutDayNightPreferenceUseCaseCallback() {
+        PutDayNightPreferenceUseCase useCase = UseCaseProvider.getUseCase(PutDayNightPreferenceUseCase.class);
+        if (useCase != null) {
+            useCase.setCallback(null);
+        }
+
+        UseCaseProvider.clearUseCase(PutDayNightPreferenceUseCase.class);
+    }
+
+    private void clearSurahDetailUseCase() {
         UseCaseProvider.clearUseCase(FetchSurahDetailUseCase.class);
     }
 
