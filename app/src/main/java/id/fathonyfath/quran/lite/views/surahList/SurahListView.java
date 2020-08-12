@@ -37,6 +37,7 @@ import id.fathonyfath.quran.lite.views.common.WrapperView;
 public class SurahListView extends WrapperView implements ViewCallback {
 
     private final List<Surah> surahList = new ArrayList<>();
+    private boolean isFailedToGetSurahList = false;
     private final ListView surahListView;
     private final SurahAdapter surahAdapter;
     private final ProgressView progressView;
@@ -63,6 +64,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
             unregisterFetchAllSurahUseCaseCallback();
             clearFetchAllSurahUseCase();
 
+            SurahListView.this.isFailedToGetSurahList = true;
             updateViewStateRetry();
         }
     };
@@ -123,6 +125,18 @@ public class SurahListView extends WrapperView implements ViewCallback {
             }
         }
     };
+    private final View.OnClickListener onRetryClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            SurahListView.this.isFailedToGetSurahList = false;
+
+            updateViewStateLoading();
+
+            if (!tryToRestoreFetchAllSurahUseCase()) {
+                createAndRunFetchAllSurahUseCase();
+            }
+        }
+    };
 
     public SurahListView(Context context) {
         super(context);
@@ -150,6 +164,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
     protected Parcelable onSaveInstanceState() {
         final SurahListViewState viewState = new SurahListViewState(super.onSaveInstanceState());
         viewState.surahList = this.surahList;
+        viewState.isFailedToGetSurahList = this.isFailedToGetSurahList;
         return viewState;
     }
 
@@ -158,6 +173,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
         final SurahListViewState viewState = (SurahListViewState) state;
         super.onRestoreInstanceState(viewState.getSuperState());
         restoreSurahList(viewState.surahList);
+        this.isFailedToGetSurahList = viewState.isFailedToGetSurahList;
     }
 
     @Override
@@ -172,12 +188,16 @@ public class SurahListView extends WrapperView implements ViewCallback {
 
         this.surahListView.setOnItemClickListener(onSurahItemClickListener);
 
-        if (this.surahList.isEmpty()) {
+        if (this.surahList.isEmpty() && !this.isFailedToGetSurahList) {
             updateViewStateLoading();
 
             if (!tryToRestoreFetchAllSurahUseCase()) {
                 createAndRunFetchAllSurahUseCase();
             }
+        }
+
+        if (this.isFailedToGetSurahList) {
+            updateViewStateRetry();
         }
 
         createAndRunGetDayNightPreferenceUseCase();
@@ -229,6 +249,8 @@ public class SurahListView extends WrapperView implements ViewCallback {
         );
         retryParams.gravity = Gravity.CENTER;
         this.retryView.setLayoutParams(progressParams);
+        this.retryView.setId(Res.Id.surahListView_retryView);
+        this.retryView.setOnRetryClickListener(this.onRetryClickListener);
 
         addView(this.retryView);
     }
@@ -364,6 +386,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
             }
         };
         private List<Surah> surahList = new ArrayList<>();
+        private boolean isFailedToGetSurahList = false;
 
         public SurahListViewState(Parcel source, ClassLoader loader) {
             super(source);
@@ -374,6 +397,9 @@ public class SurahListView extends WrapperView implements ViewCallback {
 
             this.surahList.clear();
             this.surahList.addAll(Arrays.asList(surahArray));
+
+            int isFailedToGetSurahList = source.readInt();
+            this.isFailedToGetSurahList = isFailedToGetSurahList > 1;
         }
 
         public SurahListViewState(Parcelable superState) {
@@ -387,6 +413,8 @@ public class SurahListView extends WrapperView implements ViewCallback {
             out.writeInt(this.surahList.size());
             Surah[] surahArray = this.surahList.toArray(new Surah[0]);
             out.writeTypedArray(surahArray, flags);
+
+            out.writeInt((this.isFailedToGetSurahList) ? 1 : 0);
         }
     }
 }
