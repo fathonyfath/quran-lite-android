@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +31,7 @@ import id.fathonyfath.quran.lite.utils.ViewUtil;
 import id.fathonyfath.quran.lite.utils.viewLifecycle.ViewCallback;
 import id.fathonyfath.quran.lite.views.common.DayNightSwitchButton;
 import id.fathonyfath.quran.lite.views.common.ProgressView;
+import id.fathonyfath.quran.lite.views.common.RetryView;
 import id.fathonyfath.quran.lite.views.common.WrapperView;
 
 public class SurahListView extends WrapperView implements ViewCallback {
@@ -38,6 +40,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
     private final ListView surahListView;
     private final SurahAdapter surahAdapter;
     private final ProgressView progressView;
+    private final RetryView retryView;
     private final DayNightSwitchButton dayNightSwitchButton;
     private final UseCaseCallback<List<Surah>> fetchAllSurahCallback = new UseCaseCallback<List<Surah>>() {
         @Override
@@ -59,6 +62,8 @@ public class SurahListView extends WrapperView implements ViewCallback {
             // Don't forget to do some cleanups
             unregisterFetchAllSurahUseCaseCallback();
             clearFetchAllSurahUseCase();
+
+            updateViewStateRetry();
         }
     };
     private final UseCaseCallback<DayNightPreference> dayNightPreferenceCallback = new UseCaseCallback<DayNightPreference>() {
@@ -128,6 +133,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
         this.surahAdapter = new SurahAdapter(getContext(), this.surahList);
 
         this.progressView = new ProgressView(getContext());
+        this.retryView = new RetryView(getContext());
 
         this.dayNightSwitchButton = new DayNightSwitchButton(getContext());
         this.dayNightSwitchButton.setOnClickListener(onDayNightPreferenceClickListener);
@@ -156,18 +162,18 @@ public class SurahListView extends WrapperView implements ViewCallback {
 
     @Override
     public void onStart() {
-        this.progressView.setVisibility(View.GONE);
+        updateViewStateComplete();
         updateTextProgress(0f);
     }
 
     @Override
     public void onResume() {
-        this.progressView.setVisibility(View.GONE);
+        updateViewStateComplete();
 
         this.surahListView.setOnItemClickListener(onSurahItemClickListener);
 
         if (this.surahList.isEmpty()) {
-            this.progressView.setVisibility(View.VISIBLE);
+            updateViewStateLoading();
 
             if (!tryToRestoreFetchAllSurahUseCase()) {
                 createAndRunFetchAllSurahUseCase();
@@ -213,8 +219,18 @@ public class SurahListView extends WrapperView implements ViewCallback {
         );
         progressParams.gravity = Gravity.CENTER;
         this.progressView.setLayoutParams(progressParams);
+        this.progressView.setId(Res.Id.surahListView_progressView);
 
         addView(this.progressView);
+
+        final FrameLayout.LayoutParams retryParams = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        retryParams.gravity = Gravity.CENTER;
+        this.retryView.setLayoutParams(progressParams);
+
+        addView(this.retryView);
     }
 
     private boolean tryToRestoreFetchAllSurahUseCase() {
@@ -282,7 +298,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
     }
 
     private void updateSurahList(List<Surah> surahList) {
-        this.progressView.setVisibility(View.GONE);
+        updateViewStateComplete();
         updateTextProgress(0f);
 
         this.surahAdapter.clear();
@@ -292,6 +308,24 @@ public class SurahListView extends WrapperView implements ViewCallback {
 
     private void updateTextProgress(float progress) {
         this.progressView.updateProgress(progress);
+    }
+
+    private void updateViewStateLoading() {
+        this.progressView.setVisibility(View.VISIBLE);
+        this.surahListView.setVisibility(View.GONE);
+        this.retryView.setVisibility(View.GONE);
+    }
+
+    private void updateViewStateRetry() {
+        this.progressView.setVisibility(View.GONE);
+        this.surahListView.setVisibility(View.GONE);
+        this.retryView.setVisibility(View.VISIBLE);
+    }
+
+    private void updateViewStateComplete() {
+        this.progressView.setVisibility(View.GONE);
+        this.surahListView.setVisibility(View.VISIBLE);
+        this.retryView.setVisibility(View.GONE);
     }
 
     private void restoreSurahList(List<Surah> surahList) {
