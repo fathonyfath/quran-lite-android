@@ -13,6 +13,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+@SuppressWarnings("CharsetObjectCanBeUsed")
 public class NetworkHelper {
 
     private NetworkHelper() {
@@ -29,7 +30,7 @@ public class NetworkHelper {
             final StringBuilder sb = new StringBuilder();
 
             byte[] contentByteArray = outputStream.toByteArray();
-            sb.append(new String(contentByteArray, 0, contentByteArray.length, StandardCharsets.UTF_8));
+            sb.append(new String(contentByteArray, 0, contentByteArray.length, Charset.forName("UTF-8")));
 
             outputStream.close();
 
@@ -75,6 +76,7 @@ public class NetworkHelper {
             urlConnection = (HttpURLConnection) indexUrl.openConnection();
             urlConnection.setRequestProperty("Accept-Encoding", "identity");
             urlConnection.setRequestMethod("GET");
+            urlConnection.setConnectTimeout(2000);
 
             urlConnection.connect();
 
