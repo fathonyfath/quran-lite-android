@@ -20,7 +20,6 @@ public class ProgressView extends LinearLayout {
 
     public ProgressView(Context context) {
         super(context);
-        setId(Res.Id.progressView);
 
         this.progressBar = new ProgressBar(context);
         this.progressText = new LpmqTextView(context);
@@ -40,8 +39,8 @@ public class ProgressView extends LinearLayout {
     @Override
     protected void onRestoreInstanceState(Parcelable state) {
         final ProgressViewState progressViewState = (ProgressViewState) state;
-        this.progressText.setText(progressViewState.currentText);
         super.onRestoreInstanceState(progressViewState.getSuperState());
+        this.progressText.setText(progressViewState.currentText);
     }
 
     public void updateProgress(float progress) {
