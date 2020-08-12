@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import id.fathonyfath.quran.lite.Res;
+import id.fathonyfath.quran.lite.data.source.network.QuranNetworkSource;
 import id.fathonyfath.quran.lite.models.Surah;
 import id.fathonyfath.quran.lite.models.SurahDetail;
 import id.fathonyfath.quran.lite.models.config.DayNightPreference;
@@ -31,14 +32,17 @@ import id.fathonyfath.quran.lite.utils.ViewUtil;
 import id.fathonyfath.quran.lite.utils.viewLifecycle.ViewCallback;
 import id.fathonyfath.quran.lite.views.common.DayNightSwitchButton;
 import id.fathonyfath.quran.lite.views.common.ProgressView;
+import id.fathonyfath.quran.lite.views.common.RetryView;
 import id.fathonyfath.quran.lite.views.common.WrapperView;
 
 public class SurahDetailView extends WrapperView implements ViewCallback {
 
     private final List<AyahDetailViewType> ayahViewTypeList = new ArrayList<>();
+    private boolean isFailedToGetSurahDetail = false;
     private final ListView ayahListView;
     private final AyahDetailAdapter ayahDetailAdapter;
     private final ProgressView progressView;
+    private final RetryView retryView;
     private final DayNightSwitchButton dayNightSwitchButton;
     private final UseCaseCallback<DayNightPreference> dayNightPreferenceCallback = new UseCaseCallback<DayNightPreference>() {
         @Override
@@ -102,6 +106,8 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
             unregisterFetchSurahDetailUseCaseCallback();
             clearSurahDetailUseCase();
 
+            updateViewStateComplete();
+
             processSurahDetail(data);
         }
 
@@ -110,6 +116,9 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
             // Don't forget to do some cleanups
             unregisterFetchSurahDetailUseCaseCallback();
             clearSurahDetailUseCase();
+
+            SurahDetailView.this.isFailedToGetSurahDetail = true;
+            updateViewStateRetry();
         }
     };
     private int firstVisibleItem = 0;
@@ -126,6 +135,19 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
             updateTitleWithSurahNumber(firstVisibleItem, lastVisibleItem);
         }
     };
+    private final View.OnClickListener onRetryClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            QuranNetworkSource.ADDITIONAL_PORT = "";
+            SurahDetailView.this.isFailedToGetSurahDetail = false;
+
+            updateViewStateLoading();
+
+            if (!tryToRestoreFetchSurahDetailUseCase()) {
+                createAndRunFetchSurahDetailUseCase();
+            }
+        }
+    };
 
     public SurahDetailView(Context context) {
         super(context);
@@ -137,6 +159,7 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         this.ayahDetailAdapter = new AyahDetailAdapter(context, this.ayahViewTypeList);
 
         this.progressView = new ProgressView(getContext());
+        this.retryView = new RetryView(getContext());
 
         this.dayNightSwitchButton = new DayNightSwitchButton(getContext());
         this.dayNightSwitchButton.setOnClickListener(onDayNightPreferenceClickListener);
@@ -153,6 +176,7 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         final SurahDetailViewState surahDetailViewState = new SurahDetailViewState(super.onSaveInstanceState());
         surahDetailViewState.currentSurah = this.currentSurah;
         surahDetailViewState.listViewState = this.ayahListView.onSaveInstanceState();
+        surahDetailViewState.isFailedToGetSurahDetail = this.isFailedToGetSurahDetail;
         return surahDetailViewState;
     }
 
@@ -162,28 +186,37 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         super.onRestoreInstanceState(surahDetailViewState.getSuperState());
         this.currentSurah = surahDetailViewState.currentSurah;
         this.listViewState = surahDetailViewState.listViewState;
+        this.isFailedToGetSurahDetail = surahDetailViewState.isFailedToGetSurahDetail;
     }
 
     @Override
     public void onStart() {
-        this.progressView.setVisibility(View.GONE);
+        updateViewStateComplete();
         updateTextProgress(0f);
 
+        this.isFailedToGetSurahDetail = false;
     }
 
     @Override
     public void onResume() {
+        updateViewStateComplete();
         this.ayahListView.setOnScrollListener(this.onSurahScrollListener);
 
-        if (this.currentSurah != null) {
-            this.progressView.setVisibility(View.VISIBLE);
+        if (this.currentSurah != null && !isFailedToGetSurahDetail) {
+            updateViewStateLoading();
 
             updateToolbarTitle(this.currentSurah.getNameInLatin(), this.currentSurah.getNumber(),
                     -1, -1);
 
-            if (!tryToRestoreUseCase()) {
+            if (!tryToRestoreFetchSurahDetailUseCase()) {
                 createAndRunFetchSurahDetailUseCase();
             }
+        } else if (this.currentSurah != null) {
+            // If we found Failed to retry true and this currentSurah is not null
+            updateToolbarTitle(this.currentSurah.getNameInLatin(), this.currentSurah.getNumber(),
+                    -1, -1);
+
+            updateViewStateRetry();
         } else {
             ViewUtil.onBackPressed(this);
         }
@@ -231,8 +264,20 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         );
         progressParams.gravity = Gravity.CENTER;
         this.progressView.setLayoutParams(progressParams);
+        this.progressView.setId(Res.Id.surahDetailView_progressView);
 
         addView(this.progressView);
+
+        final FrameLayout.LayoutParams retryParams = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        retryParams.gravity = Gravity.CENTER;
+        this.retryView.setLayoutParams(progressParams);
+        this.retryView.setId(Res.Id.surahDetailView_retryView);
+        this.retryView.setOnRetryClickListener(this.onRetryClickListener);
+
+        addView(this.retryView);
     }
 
     private void applyStyleBasedOnTheme() {
@@ -330,7 +375,7 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         }
     }
 
-    private boolean tryToRestoreUseCase() {
+    private boolean tryToRestoreFetchSurahDetailUseCase() {
         FetchSurahDetailUseCase useCase = UseCaseProvider.getUseCase(FetchSurahDetailUseCase.class);
         if (useCase != null) {
             useCase.setCallback(this.fetchSurahDetailCallback);
@@ -393,6 +438,24 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         this.ayahDetailAdapter.clear();
     }
 
+    private void updateViewStateLoading() {
+        this.progressView.setVisibility(View.VISIBLE);
+        this.ayahListView.setVisibility(View.GONE);
+        this.retryView.setVisibility(View.GONE);
+    }
+
+    private void updateViewStateRetry() {
+        this.progressView.setVisibility(View.GONE);
+        this.ayahListView.setVisibility(View.GONE);
+        this.retryView.setVisibility(View.VISIBLE);
+    }
+
+    private void updateViewStateComplete() {
+        this.progressView.setVisibility(View.GONE);
+        this.ayahListView.setVisibility(View.VISIBLE);
+        this.retryView.setVisibility(View.GONE);
+    }
+
     private static class SurahDetailViewState extends BaseSavedState {
 
         public static final Parcelable.Creator<SurahDetailViewState> CREATOR
@@ -414,12 +477,14 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         };
         private Surah currentSurah;
         private Parcelable listViewState;
+        private boolean isFailedToGetSurahDetail = false;
 
         public SurahDetailViewState(Parcel source, ClassLoader loader) {
             super(source);
 
             this.currentSurah = source.readParcelable(Surah.class.getClassLoader());
             this.listViewState = source.readParcelable(loader);
+            this.isFailedToGetSurahDetail = source.readInt() > 1;
         }
 
         public SurahDetailViewState(Parcelable superState) {
@@ -432,6 +497,7 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
 
             out.writeParcelable(this.currentSurah, flags);
             out.writeParcelable(this.listViewState, flags);
+            out.writeInt((this.isFailedToGetSurahDetail) ? 1 : 0);
         }
     }
 }

@@ -9,6 +9,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import id.fathonyfath.quran.lite.Res;
 import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.useCase.InstallFontIfNecessaryUseCase;
 import id.fathonyfath.quran.lite.useCase.UseCaseCallback;
@@ -125,6 +126,7 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
                 0
         );
         this.progressView.setLayoutParams(progressParams);
+        this.progressView.setId(Res.Id.fontDownloader_progressView);
 
         this.containerLayout.setPadding(
                 (int) UnitConverter.fromDpToPx(getContext(), 32f),

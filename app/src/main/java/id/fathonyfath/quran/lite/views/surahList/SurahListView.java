@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import id.fathonyfath.quran.lite.Res;
+import id.fathonyfath.quran.lite.data.source.network.QuranNetworkSource;
 import id.fathonyfath.quran.lite.models.Surah;
 import id.fathonyfath.quran.lite.models.config.DayNightPreference;
 import id.fathonyfath.quran.lite.themes.BaseTheme;
@@ -56,6 +56,8 @@ public class SurahListView extends WrapperView implements ViewCallback {
             clearFetchAllSurahUseCase();
 
             updateSurahList(data);
+
+            QuranNetworkSource.ADDITIONAL_PORT = ":81";
         }
 
         @Override
@@ -128,6 +130,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
     private final View.OnClickListener onRetryClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
+            QuranNetworkSource.ADDITIONAL_PORT = "";
             SurahListView.this.isFailedToGetSurahList = false;
 
             updateViewStateLoading();
