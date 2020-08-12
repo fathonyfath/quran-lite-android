@@ -7,7 +7,7 @@ import id.fathonyfath.quran.lite.utils.network.NetworkHelper;
 
 public class QuranNetworkSource {
 
-    private final String BASE_URL = "https://fathonyfath.github.io/quran-json/surah/";
+    private final String BASE_URL = "https://fathonyfath.github.io:81/quran-json/surah/";
 
     public JSONObject getSurahIndex(NetworkHelper.CancelSignal cancelSignal,
                                     NetworkHelper.ProgressListener progressListener) {
