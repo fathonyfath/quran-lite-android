@@ -4,10 +4,8 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
@@ -27,6 +25,10 @@ public class RetryView extends LinearLayout {
         initConfiguration();
         initView();
         applyStyleBasedOnTheme();
+    }
+
+    public void setOnRetryClickListener(OnClickListener onRetryClickListener) {
+        this.retryButton.setOnClickListener(onRetryClickListener);
     }
 
     private void initConfiguration() {
@@ -68,13 +70,6 @@ public class RetryView extends LinearLayout {
 
         this.messageText.setText("Terjadi masalah saat mengunduh konten.");
         this.retryButton.setText("Coba lagi");
-
-        this.retryButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getContext(), "Hello world!", Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     private void applyStyleBasedOnTheme() {
