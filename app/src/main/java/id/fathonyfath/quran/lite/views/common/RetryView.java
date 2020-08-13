@@ -88,13 +88,14 @@ public class RetryView extends LinearLayout {
         if (theme != null) {
             this.messageText.setTextColor(theme.contrastColor());
             this.retryButton.setTextColor(theme.contrastColor());
-            setRetryButtonBorderColor(theme.contrastColor());
+            setRetryButtonColor(theme.contrastColor());
         }
     }
 
-    private void setRetryButtonBorderColor(int color) {
+    private void setRetryButtonColor(int borderColor) {
         final GradientDrawable border = new GradientDrawable();
-        border.setStroke((int) UnitConverter.fromDpToPx(getContext(), 2f), color);
+        border.setColor(0x00000000);
+        border.setStroke((int) UnitConverter.fromDpToPx(getContext(), 2f), borderColor);
         this.retryButtonContainer.setBackgroundDrawable(border);
     }
 }
