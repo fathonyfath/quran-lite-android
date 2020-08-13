@@ -2,9 +2,11 @@ package id.fathonyfath.quran.lite.views.common;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import id.fathonyfath.quran.lite.themes.BaseTheme;
@@ -14,12 +16,14 @@ import id.fathonyfath.quran.lite.utils.UnitConverter;
 public class RetryView extends LinearLayout {
 
     private final LpmqTextView messageText;
+    private final FrameLayout retryButtonContainer;
     private final LpmqTextView retryButton;
 
     public RetryView(Context context) {
         super(context);
 
         this.messageText = new LpmqTextView(context);
+        this.retryButtonContainer = new FrameLayout(context);
         this.retryButton = new LpmqTextView(context);
 
         initConfiguration();
@@ -36,23 +40,6 @@ public class RetryView extends LinearLayout {
     }
 
     private void initView() {
-        LinearLayout.LayoutParams firstParams = new LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-
-        LinearLayout.LayoutParams secondParams = new LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-
-        firstParams.gravity = Gravity.CENTER_HORIZONTAL;
-        secondParams.gravity = Gravity.CENTER_HORIZONTAL;
-        secondParams.topMargin = (int) UnitConverter.fromDpToPx(getContext(), 8f);
-
-        addView(this.messageText, firstParams);
-        addView(this.retryButton, secondParams);
-
         this.messageText.setTextSize(16f);
 
         TypedValue outValue = new TypedValue();
@@ -70,6 +57,30 @@ public class RetryView extends LinearLayout {
 
         this.messageText.setText("Terjadi masalah saat mengunduh konten.");
         this.retryButton.setText("Coba lagi");
+
+        FrameLayout.LayoutParams retryButtonParams = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+
+        this.retryButtonContainer.addView(this.retryButton, retryButtonParams);
+
+        LinearLayout.LayoutParams firstParams = new LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+
+        LinearLayout.LayoutParams secondParams = new LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+
+        firstParams.gravity = Gravity.CENTER_HORIZONTAL;
+        secondParams.gravity = Gravity.CENTER_HORIZONTAL;
+        secondParams.topMargin = (int) UnitConverter.fromDpToPx(getContext(), 8f);
+
+        addView(this.messageText, firstParams);
+        addView(this.retryButtonContainer, secondParams);
     }
 
     private void applyStyleBasedOnTheme() {
@@ -77,6 +88,13 @@ public class RetryView extends LinearLayout {
         if (theme != null) {
             this.messageText.setTextColor(theme.contrastColor());
             this.retryButton.setTextColor(theme.contrastColor());
+            setRetryButtonBorderColor(theme.contrastColor());
         }
+    }
+
+    private void setRetryButtonBorderColor(int color) {
+        final GradientDrawable border = new GradientDrawable();
+        border.setStroke((int) UnitConverter.fromDpToPx(getContext(), 2f), color);
+        this.retryButtonContainer.setBackgroundDrawable(border);
     }
 }
