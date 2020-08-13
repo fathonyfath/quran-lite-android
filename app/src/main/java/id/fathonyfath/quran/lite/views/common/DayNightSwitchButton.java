@@ -36,6 +36,13 @@ public class DayNightSwitchButton extends View {
         setPaintColor();
     }
 
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+
+        updatePadding();
+    }
+
     public void setDayNightPreference(DayNightPreference preference) {
         if (preference == null) {
             preference = DayNightPreference.SYSTEM;
