@@ -7,10 +7,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+
+import javax.net.ssl.HttpsURLConnection;
 
 @SuppressWarnings("CharsetObjectCanBeUsed")
 public class NetworkHelper {
@@ -68,14 +71,15 @@ public class NetworkHelper {
     }
 
     private static boolean doGetRequest(String url, OutputStream into, CancelSignal signal, ProgressListener listener) {
-        HttpURLConnection urlConnection = null;
+        HttpsURLConnection urlConnection = null;
 
         try {
             URL indexUrl = new URL(url);
-            urlConnection = (HttpURLConnection) indexUrl.openConnection();
+            urlConnection = (HttpsURLConnection) indexUrl.openConnection();
             urlConnection.setRequestProperty("Accept-Encoding", "identity");
             urlConnection.setRequestMethod("GET");
             urlConnection.setConnectTimeout(2000);
+            urlConnection.setSSLSocketFactory(new TLSSocketFactory());
 
             urlConnection.connect();
 
@@ -106,6 +110,10 @@ public class NetworkHelper {
         } catch (MalformedURLException ignored) {
 
         } catch (IOException ignored) {
+
+        } catch (NoSuchAlgorithmException ignored) {
+
+        } catch (KeyManagementException ignored) {
 
         } finally {
             if (urlConnection != null) {
