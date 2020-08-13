@@ -7,17 +7,11 @@ import id.fathonyfath.quran.lite.utils.network.NetworkHelper;
 
 public class QuranNetworkSource {
 
-    private final String BASE_URL = "https://fathonyfath.github.io:81/quran-json/surah/";
-
-    public static String ADDITIONAL_PORT = ":81";
-
-    private String getBaseUrl() {
-        return "https://fathonyfath.github.io" + ADDITIONAL_PORT + "/quran-json/surah/";
-    }
+    private final String BASE_URL = "https://fathonyfath.github.io/quran-json/surah/";
 
     public JSONObject getSurahIndex(NetworkHelper.CancelSignal cancelSignal,
                                     NetworkHelper.ProgressListener progressListener) {
-        String result = NetworkHelper.doGetRequest(getBaseUrl() + "index.json", cancelSignal, progressListener);
+        String result = NetworkHelper.doGetRequest(BASE_URL + "index.json", cancelSignal, progressListener);
         try {
             if (result != null) {
                 return new JSONObject(result);
@@ -32,7 +26,7 @@ public class QuranNetworkSource {
                                              NetworkHelper.CancelSignal cancelSignal,
                                              NetworkHelper.ProgressListener progressListener) {
         String result = NetworkHelper.doGetRequest(
-                getBaseUrl() + surahNumber + ".json",
+                BASE_URL + surahNumber + ".json",
                 cancelSignal,
                 progressListener);
 

@@ -11,7 +11,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 @SuppressWarnings("CharsetObjectCanBeUsed")
 public class NetworkHelper {

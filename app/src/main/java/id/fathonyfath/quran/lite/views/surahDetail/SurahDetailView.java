@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import id.fathonyfath.quran.lite.Res;
-import id.fathonyfath.quran.lite.data.source.network.QuranNetworkSource;
 import id.fathonyfath.quran.lite.models.Surah;
 import id.fathonyfath.quran.lite.models.SurahDetail;
 import id.fathonyfath.quran.lite.models.config.DayNightPreference;
@@ -38,7 +37,6 @@ import id.fathonyfath.quran.lite.views.common.WrapperView;
 public class SurahDetailView extends WrapperView implements ViewCallback {
 
     private final List<AyahDetailViewType> ayahViewTypeList = new ArrayList<>();
-    private boolean isFailedToGetSurahDetail = false;
     private final ListView ayahListView;
     private final AyahDetailAdapter ayahDetailAdapter;
     private final ProgressView progressView;
@@ -91,7 +89,20 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
             createAndRunPutDayNightPreferenceUseCase(dayNightSwitchButton.cycleNextPreference());
         }
     };
+    private boolean isFailedToGetSurahDetail = false;
     private Surah currentSurah;
+    private final View.OnClickListener onRetryClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            SurahDetailView.this.isFailedToGetSurahDetail = false;
+
+            updateViewStateLoading();
+
+            if (!tryToRestoreFetchSurahDetailUseCase()) {
+                createAndRunFetchSurahDetailUseCase();
+            }
+        }
+    };
     private Parcelable listViewState;
     private boolean newPage = false;
     private final UseCaseCallback<SurahDetail> fetchSurahDetailCallback = new UseCaseCallback<SurahDetail>() {
@@ -133,19 +144,6 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
             int lastVisibleItem = firstVisibleItem + visibleItemCount - 1;
             updateTitleWithSurahNumber(firstVisibleItem, lastVisibleItem);
-        }
-    };
-    private final View.OnClickListener onRetryClickListener = new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            QuranNetworkSource.ADDITIONAL_PORT = "";
-            SurahDetailView.this.isFailedToGetSurahDetail = false;
-
-            updateViewStateLoading();
-
-            if (!tryToRestoreFetchSurahDetailUseCase()) {
-                createAndRunFetchSurahDetailUseCase();
-            }
         }
     };
 
