@@ -34,6 +34,12 @@ public class ViewBackStack implements Parcelable {
         int size = in.readInt();
         Class[] classArray = (Class[]) in.readSerializable();
 
+        if (viewBackStack == null) {
+            viewBackStack = new Stack<>();
+        }
+
+        viewBackStack.clear();
+
         for (int i = 0; i < size; i++) {
             this.viewBackStack.add(i, classArray[i]);
         }
