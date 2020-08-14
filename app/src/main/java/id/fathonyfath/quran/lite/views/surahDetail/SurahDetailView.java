@@ -240,9 +240,6 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
     @Override
     public void onStop() {
         clearSurahDetailUseCase();
-
-        unregisterAndClearGetDayNightPreferenceUseCaseCallback();
-        unregisterAndClearPutDayNightPreferenceUseCaseCallback();
     }
 
     public void setState(Surah selectedSurah) {
