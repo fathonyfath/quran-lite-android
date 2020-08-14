@@ -164,7 +164,7 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         this.dayNightSwitchButton = new DayNightSwitchButton(getContext());
         this.dayNightSwitchButton.setOnClickListener(onDayNightPreferenceClickListener);
 
-        this.revealThreshold = UnitConverter.fromDpToPx(context, 8f);
+        this.revealThreshold = UnitConverter.fromDpToPx(context, 48f);
 
         this.setElevationAlpha(0.1f);
 
