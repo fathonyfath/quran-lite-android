@@ -27,6 +27,7 @@ import id.fathonyfath.quran.lite.useCase.PutDayNightPreferenceUseCase;
 import id.fathonyfath.quran.lite.useCase.UseCaseCallback;
 import id.fathonyfath.quran.lite.useCase.UseCaseProvider;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
+import id.fathonyfath.quran.lite.utils.UnitConverter;
 import id.fathonyfath.quran.lite.utils.ViewUtil;
 import id.fathonyfath.quran.lite.utils.viewLifecycle.ViewCallback;
 import id.fathonyfath.quran.lite.views.common.DayNightSwitchButton;
@@ -132,8 +133,9 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
             }
         }
     };
-    private int firstVisibleItem = 0;
-    private int lastVisibleItem = -1;
+    private int firstAyahNumber = 0;
+    private int lastAyahNumber = -1;
+    private final float revealThreshold;
     private final AbsListView.OnScrollListener onSurahScrollListener = new AbsListView.OnScrollListener() {
         @Override
         public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -161,6 +163,8 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
 
         this.dayNightSwitchButton = new DayNightSwitchButton(getContext());
         this.dayNightSwitchButton.setOnClickListener(onDayNightPreferenceClickListener);
+
+        this.revealThreshold = UnitConverter.fromDpToPx(context, 8f);
 
         this.setElevationAlpha(0.1f);
 
@@ -323,21 +327,40 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
     }
 
     private void updateTitleWithSurahNumber(int firstVisibleItem, int lastVisibleItem) {
-        if (this.firstVisibleItem == firstVisibleItem && this.lastVisibleItem == lastVisibleItem) {
+        View firstView = this.ayahListView.getChildAt(0);
+        View lastView = this.ayahListView.getChildAt(this.ayahListView.getChildCount() - 1);
+
+        if (firstView == null || lastView == null || this.ayahListView.getMeasuredHeight() == 0) {
             return;
         }
 
-        this.firstVisibleItem = firstVisibleItem;
-        this.lastVisibleItem = lastVisibleItem;
+        int listViewHeight = this.ayahListView.getMeasuredHeight();
+        float firstViewYPosition = firstView.getY();
+        float lastViewYPosition = lastView.getY();
 
-        View firstView = this.ayahListView.getChildAt(0);
-        View lastView = this.ayahListView.getChildAt(this.ayahListView.getChildCount() - 1);
+        float firstItemRemainingVisibleHeight = firstView.getMeasuredHeight() + firstViewYPosition;
+        float lastItemRemainingVisibleHeight = listViewHeight - lastViewYPosition;
+
+        boolean isFirstItemVisible = firstItemRemainingVisibleHeight > this.revealThreshold;
+        boolean isLastItemVisible = lastItemRemainingVisibleHeight > this.revealThreshold;
+
+        if (!isFirstItemVisible) {
+            firstView = this.ayahListView.getChildAt(1);
+        }
+
+        if (!isLastItemVisible) {
+            lastView = this.ayahListView.getChildAt(this.ayahListView.getChildCount() - 2);
+        }
 
         if (firstView instanceof AyahView && lastView instanceof AyahView) {
             AyahView firstAyahView = (AyahView) firstView;
             AyahView lastAyahView = (AyahView) lastView;
             final int firstAyahNumber = firstAyahView.getAyahViewModel().ayahNumber;
             final int lastAyahNumber = lastAyahView.getAyahViewModel().ayahNumber;
+
+            if (this.firstAyahNumber == firstAyahNumber && this.lastAyahNumber == lastAyahNumber) {
+                return;
+            }
 
             updateToolbarTitle(this.currentSurah.getNameInLatin(), this.currentSurah.getNumber(),
                     firstAyahNumber, lastAyahNumber);
@@ -349,6 +372,10 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
 
             final int firstAyahNumber = firstAyahView.getAyahViewModel().ayahNumber;
             final int lastAyahNumber = lastAyahView.getAyahViewModel().ayahNumber;
+
+            if (this.firstAyahNumber == firstAyahNumber && this.lastAyahNumber == lastAyahNumber) {
+                return;
+            }
 
             updateToolbarTitle(this.currentSurah.getNameInLatin(), this.currentSurah.getNumber(),
                     firstAyahNumber, lastAyahNumber);
