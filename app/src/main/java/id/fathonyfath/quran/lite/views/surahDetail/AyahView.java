@@ -12,6 +12,7 @@ import id.fathonyfath.quran.lite.Res;
 import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
 import id.fathonyfath.quran.lite.utils.UnitConverter;
+import id.fathonyfath.quran.lite.utils.ViewUtil;
 import id.fathonyfath.quran.lite.views.common.LpmqTextView;
 
 public class AyahView extends RelativeLayout {
@@ -108,6 +109,8 @@ public class AyahView extends RelativeLayout {
             this.setBackgroundColor(theme.baseColor());
             this.ayahText.setBackgroundColor(theme.ayahBackColor());
             this.ayahNumberText.setBackgroundColor(theme.ayahNumberBackColor());
+
+            ViewUtil.setDefaultSelectableBackgroundDrawable(this, theme.contrastColor());
         }
     }
 }

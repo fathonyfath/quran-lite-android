@@ -90,8 +90,21 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
             createAndRunPutDayNightPreferenceUseCase(dayNightSwitchButton.cycleNextPreference());
         }
     };
+    private final float revealThreshold;
     private boolean isFailedToGetSurahDetail = false;
     private Surah currentSurah;
+    private final View.OnClickListener onRetryClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            SurahDetailView.this.isFailedToGetSurahDetail = false;
+
+            updateViewStateLoading();
+
+            if (!tryToRestoreFetchSurahDetailUseCase()) {
+                createAndRunFetchSurahDetailUseCase();
+            }
+        }
+    };
     private Parcelable listViewState;
     private boolean newPage = false;
     private final UseCaseCallback<SurahDetail> fetchSurahDetailCallback = new UseCaseCallback<SurahDetail>() {
@@ -121,21 +134,8 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
             updateViewStateRetry();
         }
     };
-    private final View.OnClickListener onRetryClickListener = new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            SurahDetailView.this.isFailedToGetSurahDetail = false;
-
-            updateViewStateLoading();
-
-            if (!tryToRestoreFetchSurahDetailUseCase()) {
-                createAndRunFetchSurahDetailUseCase();
-            }
-        }
-    };
     private int firstAyahNumber = 0;
     private int lastAyahNumber = -1;
-    private final float revealThreshold;
     private final AbsListView.OnScrollListener onSurahScrollListener = new AbsListView.OnScrollListener() {
         @Override
         public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -286,6 +286,7 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
         if (theme != null) {
             this.setBackgroundColor(theme.baseColor());
+            ViewUtil.setDefaultSelectableBackgroundDrawable(this.ayahListView, theme.contrastColor());
         }
     }
 

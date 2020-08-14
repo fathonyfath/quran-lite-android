@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
 import id.fathonyfath.quran.lite.MainActivity;
 import id.fathonyfath.quran.lite.views.common.LpmqTextView;
@@ -56,6 +57,12 @@ public class ViewUtil {
 
     public static void setDefaultSelectableBackgroundDrawable(View view, int selectedColor) {
         view.setBackground(DrawableUtil.getStateListDrawable(selectedColor));
-        view.getBackground().mutate().setAlpha(40);
+        view.getBackground().mutate().setAlpha(20);
+    }
+
+    public static void setDefaultSelectableBackgroundDrawable(ListView view, int selectedColor) {
+        view.setSelector(DrawableUtil.getStateListDrawable(selectedColor));
+        view.getSelector().mutate().setAlpha(20);
+        view.setOverScrollMode(View.OVER_SCROLL_NEVER);
     }
 }

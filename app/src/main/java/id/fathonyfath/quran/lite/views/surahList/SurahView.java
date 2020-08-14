@@ -9,6 +9,7 @@ import id.fathonyfath.quran.lite.models.Surah;
 import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
 import id.fathonyfath.quran.lite.utils.UnitConverter;
+import id.fathonyfath.quran.lite.utils.ViewUtil;
 import id.fathonyfath.quran.lite.views.common.LpmqTextView;
 import id.fathonyfath.quran.lite.views.common.TwoLineTextView;
 
@@ -72,6 +73,8 @@ public class SurahView extends RelativeLayout {
         if (theme != null) {
             this.setBackgroundColor(theme.baseColor());
             this.surahNumberTextView.setTextColor(theme.contrastColor());
+
+            ViewUtil.setDefaultSelectableBackgroundDrawable(this, theme.contrastColor());
         }
     }
 }

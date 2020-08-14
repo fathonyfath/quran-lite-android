@@ -3,7 +3,6 @@ package id.fathonyfath.quran.lite.views.common;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;

@@ -358,6 +358,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
         BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
         if (theme != null) {
             this.setBackgroundColor(theme.baseColor());
+            ViewUtil.setDefaultSelectableBackgroundDrawable(this.surahListView, theme.contrastColor());
         }
     }
 

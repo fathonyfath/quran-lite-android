@@ -17,9 +17,8 @@ public class DrawableUtil {
 
         ColorDrawable greyColor = new ColorDrawable();
         greyColor.setColor((int) color);
-        Drawable mutatedGreyColor = greyColor.mutate();
 
-        drawable.addState(new int[]{android.R.attr.state_pressed}, mutatedGreyColor);
+        drawable.addState(new int[]{android.R.attr.state_pressed}, greyColor);
         drawable.addState(StateSet.WILD_CARD, transparentColor);
 
         return drawable;

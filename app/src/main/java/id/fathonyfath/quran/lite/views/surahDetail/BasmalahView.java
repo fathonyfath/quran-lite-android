@@ -9,6 +9,7 @@ import android.widget.TextView;
 import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
 import id.fathonyfath.quran.lite.utils.UnitConverter;
+import id.fathonyfath.quran.lite.utils.ViewUtil;
 import id.fathonyfath.quran.lite.views.common.LpmqTextView;
 
 public class BasmalahView extends FrameLayout {
@@ -53,6 +54,8 @@ public class BasmalahView extends FrameLayout {
         if (theme != null) {
             this.setBackgroundColor(theme.baseColor());
             this.basmalahText.setBackgroundColor(theme.ayahBackColor());
+
+            ViewUtil.setDefaultSelectableBackgroundDrawable(this, theme.contrastColor());
         }
     }
 }
