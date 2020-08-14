@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
 import id.fathonyfath.quran.lite.utils.UnitConverter;
+import id.fathonyfath.quran.lite.utils.ViewUtil;
 
 public class RetryView extends LinearLayout {
 
@@ -42,9 +43,6 @@ public class RetryView extends LinearLayout {
     private void initView() {
         this.messageText.setTextSize(16f);
 
-        TypedValue outValue = new TypedValue();
-        getContext().getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
-        this.retryButton.setBackgroundResource(outValue.resourceId);
         this.retryButton.setClickable(true);
         this.retryButton.setAllCaps(true);
         this.retryButton.setMinHeight((int) UnitConverter.fromDpToPx(getContext(), 48f));
@@ -89,6 +87,8 @@ public class RetryView extends LinearLayout {
             this.messageText.setTextColor(theme.contrastColor());
             this.retryButton.setTextColor(theme.contrastColor());
             setRetryButtonColor(theme.contrastColor());
+
+            ViewUtil.setDefaultSelectableBackgroundDrawable(this.retryButton, theme.contrastColor());
         }
     }
 
@@ -96,6 +96,6 @@ public class RetryView extends LinearLayout {
         final GradientDrawable border = new GradientDrawable();
         border.setColor(0x00000000);
         border.setStroke((int) UnitConverter.fromDpToPx(getContext(), 2f), borderColor);
-        this.retryButtonContainer.setBackgroundDrawable(border);
+        this.retryButtonContainer.setBackground(border);
     }
 }

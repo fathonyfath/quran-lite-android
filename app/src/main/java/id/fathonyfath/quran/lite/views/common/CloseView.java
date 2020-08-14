@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
 import id.fathonyfath.quran.lite.utils.UnitConverter;
+import id.fathonyfath.quran.lite.utils.ViewUtil;
 
 public class CloseView extends View {
 
@@ -46,6 +47,7 @@ public class CloseView extends View {
         }
 
         this.paint.setColor(colorToApply);
+        ViewUtil.setDefaultSelectableBackgroundDrawable(this, colorToApply);
     }
 
     @Override
@@ -101,10 +103,6 @@ public class CloseView extends View {
         ));
 
         updatePadding();
-
-        TypedValue outValue = new TypedValue();
-        getContext().getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
-        setBackgroundResource(outValue.resourceId);
         setClickable(true);
     }
 
