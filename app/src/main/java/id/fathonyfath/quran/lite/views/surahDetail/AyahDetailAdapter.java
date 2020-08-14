@@ -51,11 +51,6 @@ public class AyahDetailAdapter extends ArrayAdapter<AyahDetailViewType> {
         return 2;
     }
 
-    @Override
-    public boolean isEnabled(int position) {
-        return false;
-    }
-
     private View getViewForType(int type) {
         if (type == BASMALAH_VIEW_TYPE) {
             final BasmalahView view = new BasmalahView(getContext());
