@@ -14,6 +14,7 @@ public class FontProvider {
     private final File fontFile;
     private final FontRemoteSource fontRemoteSource;
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public FontProvider(Context context, FontRemoteSource fontRemoteSource) {
         this.fontRemoteSource = fontRemoteSource;
 

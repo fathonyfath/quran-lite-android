@@ -24,11 +24,11 @@ buildscript {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         applicationId "id.fathonyfath.quran.lite"
-        minSdkVersion 15
-        targetSdkVersion 28
+        minSdkVersion 18
+        targetSdkVersion 29
         versionCode project.ext.version.code
         versionName "${project.ext.version.name}-${gitSha()} (${buildTime()})"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
