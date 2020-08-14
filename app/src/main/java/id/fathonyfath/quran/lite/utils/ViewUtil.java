@@ -53,4 +53,9 @@ public class ViewUtil {
             textView.applyTypeface();
         }
     }
+
+    public static void setDefaultSelectableBackgroundDrawable(View view, int selectedColor) {
+        view.setBackground(DrawableUtil.getStateListDrawable(selectedColor));
+        view.getBackground().mutate().setAlpha(40);
+    }
 }

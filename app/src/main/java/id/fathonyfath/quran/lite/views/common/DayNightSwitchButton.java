@@ -7,7 +7,6 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -15,6 +14,7 @@ import id.fathonyfath.quran.lite.models.config.DayNightPreference;
 import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
 import id.fathonyfath.quran.lite.utils.UnitConverter;
+import id.fathonyfath.quran.lite.utils.ViewUtil;
 
 public class DayNightSwitchButton extends View {
 
@@ -33,7 +33,7 @@ public class DayNightSwitchButton extends View {
         this.basePaint = new Paint();
         this.clearPaint = new Paint();
 
-        setPaintColor();
+        applyColorFromTheme();
     }
 
     @Override
@@ -80,7 +80,7 @@ public class DayNightSwitchButton extends View {
         }
     }
 
-    private void setPaintColor() {
+    private void applyColorFromTheme() {
         int colorToApply = Color.parseColor("#FF000000");
 
         BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
@@ -93,6 +93,8 @@ public class DayNightSwitchButton extends View {
 
         final PorterDuff.Mode mode = PorterDuff.Mode.CLEAR;
         this.clearPaint.setXfermode(new PorterDuffXfermode(mode));
+
+        ViewUtil.setDefaultSelectableBackgroundDrawable(this, colorToApply);
     }
 
     private void initConfiguration() {
@@ -103,9 +105,6 @@ public class DayNightSwitchButton extends View {
 
         updatePadding();
 
-        TypedValue outValue = new TypedValue();
-        getContext().getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
-        setBackgroundResource(outValue.resourceId);
         setClickable(true);
 
         setLayerType(LAYER_TYPE_HARDWARE, null);
