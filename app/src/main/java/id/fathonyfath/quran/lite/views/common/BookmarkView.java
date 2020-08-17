@@ -70,7 +70,7 @@ public class BookmarkView extends LinearLayout {
 
         this.bookmarkText.setGravity(Gravity.CENTER_VERTICAL);
         this.bookmarkText.setPadding((int) UnitConverter.fromDpToPx(getContext(), 16f), 0, 0, 0);
-        this.bookmarkText.setTextSize(18f);
+        this.bookmarkText.setTextSize(16f);
     }
 
     private void applyStyleBasedOnTheme() {
