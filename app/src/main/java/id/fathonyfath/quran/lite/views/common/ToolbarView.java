@@ -71,6 +71,8 @@ public class ToolbarView extends RelativeLayout {
     }
 
     public void setRightView(Set<View> rightView) {
+        rightView.add(new BookmarkIconView(getContext()));
+
         this.setOnRightView = rightView;
         if (this.setOnRightView == null) {
             this.setOnRightView = new HashSet<>();
