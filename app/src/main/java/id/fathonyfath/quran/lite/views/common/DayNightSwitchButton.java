@@ -102,6 +102,7 @@ public class DayNightSwitchButton extends View {
             colorToApply = theme.contrastColor();
         }
 
+        this.basePaint.setColor(colorToApply);
         ViewUtil.setDefaultSelectableBackgroundDrawable(this, colorToApply);
     }
 
