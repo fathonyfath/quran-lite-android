@@ -17,10 +17,12 @@ import java.util.HashSet;
 import java.util.List;
 
 import id.fathonyfath.quran.lite.Res;
+import id.fathonyfath.quran.lite.models.Bookmark;
 import id.fathonyfath.quran.lite.models.Surah;
 import id.fathonyfath.quran.lite.models.config.DayNightPreference;
 import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.useCase.FetchAllSurahUseCase;
+import id.fathonyfath.quran.lite.useCase.GetBookmarkUseCase;
 import id.fathonyfath.quran.lite.useCase.GetDayNightPreferenceUseCase;
 import id.fathonyfath.quran.lite.useCase.PutDayNightPreferenceUseCase;
 import id.fathonyfath.quran.lite.useCase.UseCaseCallback;
@@ -28,6 +30,7 @@ import id.fathonyfath.quran.lite.useCase.UseCaseProvider;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
 import id.fathonyfath.quran.lite.utils.ViewUtil;
 import id.fathonyfath.quran.lite.utils.viewLifecycle.ViewCallback;
+import id.fathonyfath.quran.lite.views.common.BookmarkView;
 import id.fathonyfath.quran.lite.views.common.DayNightSwitchButton;
 import id.fathonyfath.quran.lite.views.common.ProgressView;
 import id.fathonyfath.quran.lite.views.common.RetryView;
@@ -40,6 +43,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
     private final SurahAdapter surahAdapter;
     private final ProgressView progressView;
     private final RetryView retryView;
+    private final BookmarkView bookmarkView;
     private final DayNightSwitchButton dayNightSwitchButton;
     private final UseCaseCallback<DayNightPreference> dayNightPreferenceCallback = new UseCaseCallback<DayNightPreference>() {
         @Override
@@ -52,12 +56,32 @@ public class SurahListView extends WrapperView implements ViewCallback {
             // Do some cleanups
             unregisterAndClearGetDayNightPreferenceUseCaseCallback();
 
-            setDayNightPreferenceView(data);
+            setDayNightPreferenceData(data);
         }
 
         @Override
         public void onError(Throwable throwable) {
             unregisterAndClearGetDayNightPreferenceUseCaseCallback();
+        }
+    };
+    private final UseCaseCallback<Bookmark> bookmarkUseCaseCallback = new UseCaseCallback<Bookmark>() {
+        @Override
+        public void onProgress(float progress) {
+
+        }
+
+        @Override
+        public void onResult(Bookmark data) {
+            // Do some cleanups
+            unregisterAndClearGetBookmarkUseCaseCallback();
+
+            Bookmark bookmark = new Bookmark(19, "Ahaaa", "ahhh", 22);
+            setBookmarkData(bookmark);
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            unregisterAndClearGetBookmarkUseCaseCallback();
         }
     };
     private final UseCaseCallback<Boolean> putDayNightPreferenceCallback = new UseCaseCallback<Boolean>() {
@@ -80,6 +104,13 @@ public class SurahListView extends WrapperView implements ViewCallback {
         @Override
         public void onError(Throwable throwable) {
             unregisterAndClearPutDayNightPreferenceUseCaseCallback();
+        }
+    };
+    private final View.OnClickListener onBookmarkClickListener = new View.OnClickListener() {
+
+        @Override
+        public void onClick(View v) {
+
         }
     };
     private final View.OnClickListener onDayNightPreferenceClickListener = new View.OnClickListener() {
@@ -148,8 +179,11 @@ public class SurahListView extends WrapperView implements ViewCallback {
         this.progressView = new ProgressView(getContext());
         this.retryView = new RetryView(getContext());
 
+        this.bookmarkView = new BookmarkView(getContext());
+        this.bookmarkView.setOnClickListener(this.onBookmarkClickListener);
+
         this.dayNightSwitchButton = new DayNightSwitchButton(getContext());
-        this.dayNightSwitchButton.setOnClickListener(onDayNightPreferenceClickListener);
+        this.dayNightSwitchButton.setOnClickListener(this.onDayNightPreferenceClickListener);
 
         this.setToolbarTitle("Al-Qur'an Lite");
         this.setElevationAlpha(0.1f);
@@ -200,6 +234,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
         }
 
         createAndRunGetDayNightPreferenceUseCase();
+        createAndRunGetBookmarkUseCase();
     }
 
     @Override
@@ -273,6 +308,12 @@ public class SurahListView extends WrapperView implements ViewCallback {
         useCase.run();
     }
 
+    private void createAndRunGetBookmarkUseCase() {
+        GetBookmarkUseCase useCase = UseCaseProvider.createUseCase(GetBookmarkUseCase.class);
+        useCase.setCallback(this.bookmarkUseCaseCallback);
+        useCase.run();
+    }
+
     private void createAndRunPutDayNightPreferenceUseCase(DayNightPreference updateWith) {
         PutDayNightPreferenceUseCase useCase = UseCaseProvider.createUseCase(PutDayNightPreferenceUseCase.class);
         useCase.setArguments(updateWith);
@@ -296,6 +337,15 @@ public class SurahListView extends WrapperView implements ViewCallback {
         UseCaseProvider.clearUseCase(GetDayNightPreferenceUseCase.class);
     }
 
+    private void unregisterAndClearGetBookmarkUseCaseCallback() {
+        GetBookmarkUseCase useCase = UseCaseProvider.getUseCase(GetBookmarkUseCase.class);
+        if (useCase != null) {
+            useCase.setCallback(null);
+        }
+
+        UseCaseProvider.clearUseCase(GetBookmarkUseCase.class);
+    }
+
     private void unregisterAndClearPutDayNightPreferenceUseCaseCallback() {
         PutDayNightPreferenceUseCase useCase = UseCaseProvider.getUseCase(PutDayNightPreferenceUseCase.class);
         if (useCase != null) {
@@ -309,9 +359,19 @@ public class SurahListView extends WrapperView implements ViewCallback {
         UseCaseProvider.clearUseCase(FetchAllSurahUseCase.class);
     }
 
-    private void setDayNightPreferenceView(DayNightPreference preference) {
-        final HashSet<View> views = new HashSet<>();
+    private void setDayNightPreferenceData(DayNightPreference preference) {
         this.dayNightSwitchButton.setDayNightPreference(preference);
+        refreshRightToolbar();
+    }
+
+    private void setBookmarkData(Bookmark bookmark) {
+        this.bookmarkView.setBookmark(bookmark);
+        refreshRightToolbar();
+    }
+
+    private void refreshRightToolbar() {
+        final HashSet<View> views = new HashSet<>();
+        views.add(this.bookmarkView);
         views.add(this.dayNightSwitchButton);
         setToolbarRightViews(views);
     }

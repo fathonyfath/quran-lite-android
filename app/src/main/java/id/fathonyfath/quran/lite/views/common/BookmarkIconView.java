@@ -67,8 +67,6 @@ public class BookmarkIconView extends View {
         updatePadding();
         updateWorkingSpace();
         updatePath();
-
-        setClickable(true);
     }
 
     private void updatePadding() {
