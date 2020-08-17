@@ -3,7 +3,6 @@ package id.fathonyfath.quran.lite.views.common;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
-import android.os.Build;
 import android.view.View;
 
 public class ElevationView extends View {

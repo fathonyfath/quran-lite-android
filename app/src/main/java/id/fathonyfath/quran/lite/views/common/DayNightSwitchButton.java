@@ -5,8 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.view.View;
@@ -21,12 +19,11 @@ import id.fathonyfath.quran.lite.utils.ViewUtil;
 public class DayNightSwitchButton extends View {
 
     private final Paint basePaint;
-    private final Paint clearPaint;
-
-    private final RectF reusableRect;
 
     private final Rect workingSpace;
 
+    private final Path brightnessLeftPath;
+    private final Path brightnessRightPath;
     private final Path[] raysPaths;
     private final Path moonPath;
 
@@ -35,14 +32,14 @@ public class DayNightSwitchButton extends View {
     public DayNightSwitchButton(Context context) {
         super(context);
 
-        this.reusableRect = new RectF();
         this.basePaint = new Paint();
-        this.clearPaint = new Paint();
 
         this.workingSpace = new Rect();
-        this.moonPath = new Path();
 
+        this.brightnessLeftPath = new Path();
+        this.brightnessRightPath = new Path();
         this.raysPaths = new Path[8];
+        this.moonPath = new Path();
 
         initConfiguration();
         applyColorFromTheme();
@@ -54,6 +51,7 @@ public class DayNightSwitchButton extends View {
 
         updatePadding();
         updateWorkingSpace();
+        updateBrightnessPath();
         updateSunPath();
         updateMoonPath();
     }
@@ -104,11 +102,6 @@ public class DayNightSwitchButton extends View {
             colorToApply = theme.contrastColor();
         }
 
-        this.basePaint.setColor(colorToApply);
-
-        final PorterDuff.Mode mode = PorterDuff.Mode.CLEAR;
-        this.clearPaint.setXfermode(new PorterDuffXfermode(mode));
-
         ViewUtil.setDefaultSelectableBackgroundDrawable(this, colorToApply);
     }
 
@@ -120,6 +113,7 @@ public class DayNightSwitchButton extends View {
 
         updatePadding();
         updateWorkingSpace();
+        updateBrightnessPath();
         updateSunPath();
         updateMoonPath();
 
@@ -144,6 +138,30 @@ public class DayNightSwitchButton extends View {
                 getMeasuredWidth() - getPaddingRight(),
                 getMeasuredHeight() - getPaddingBottom()
         );
+    }
+
+    private void drawBrightness(final Canvas canvas) {
+        canvas.drawPath(this.brightnessRightPath, this.basePaint);
+        canvas.drawPath(this.brightnessLeftPath, this.basePaint);
+    }
+
+    private void updateBrightnessPath() {
+        final float differenceRadius = UnitConverter.fromDpToPx(getContext(), 3f);
+
+        final Circle outerCircle = RectHelper.findCircleOnRect(this.workingSpace, getMeasuredHeight(), getMeasuredWidth());
+        final Circle innerCircle = new Circle(
+                new Vec2(outerCircle.position.x, outerCircle.position.y),
+                outerCircle.radius - differenceRadius
+        );
+
+        this.brightnessRightPath.reset();
+        this.brightnessRightPath.arcTo(outerCircle.getBounds(), 270.0f, 180.0f);
+        this.brightnessRightPath.arcTo(innerCircle.getBounds(), 90.0f, -180.0f);
+        this.brightnessRightPath.close();
+
+        this.brightnessLeftPath.reset();
+        this.brightnessRightPath.arcTo(outerCircle.getBounds(), 90.0f, 180.0f);
+        this.brightnessLeftPath.close();
     }
 
     private void drawSun(final Canvas canvas) {
@@ -186,37 +204,13 @@ public class DayNightSwitchButton extends View {
         Vec2 rightLeg = raysCircle.getPointAtAngleDeg(degree + 35.0f);
 
         path.reset();
-
         path.moveTo(rightLeg.x, rightLeg.y);
         path.lineTo(topTriangle.x, topTriangle.y);
         path.lineTo(leftLeg.x, leftLeg.y);
         path.arcTo(raysCircle.getBounds(), degree - 22.5f, 45.0f);
-
         path.close();
 
         return path;
-    }
-
-    private void drawBrightness(final Canvas canvas) {
-        final int availableWidth = getWidth() - getPaddingLeft() - getPaddingRight();
-        final int availableHeight = getHeight() - getPaddingTop() - getPaddingBottom();
-        final int centerX = getPaddingLeft() + (availableWidth / 2);
-        final int centerY = getPaddingTop() + (availableHeight / 2);
-        final int radius;
-        if (availableHeight < availableWidth) {
-            radius = availableHeight / 2;
-        } else {
-            radius = availableWidth / 2;
-        }
-        canvas.drawCircle(centerX, centerY, radius, this.basePaint);
-
-        final int padding = (int) UnitConverter.fromDpToPx(getContext(), 3f);
-
-        this.reusableRect.set((centerX - radius) + padding,
-                (centerY - radius) + padding,
-                (centerX + radius) - padding,
-                (centerY + radius) - padding);
-        canvas.drawArc(this.reusableRect, 270f, 180f, false, this.clearPaint);
     }
 
     private void drawMoon(final Canvas canvas) {
@@ -234,7 +228,6 @@ public class DayNightSwitchButton extends View {
     }
 
     private void updateMoonPath() {
-        this.moonPath.reset();
 
         int offsets = (int) UnitConverter.fromDpToPx(getContext(), 4f);
         int radiusOffsets = (int) UnitConverter.fromDpToPx(getContext(), 2f);
@@ -257,13 +250,13 @@ public class DayNightSwitchButton extends View {
         double degreeFromInnerCircle = innerCircle.degrees(outerCircle);
         double degreeFromOuterCircle = outerCircle.degrees(innerCircle);
 
+        this.moonPath.reset();
         this.moonPath.arcTo(innerCircleRect, (float) degreeFromInnerCircle, 360.0f - ((float) (degreeFromInnerCircle * 2.0)));
         if (degreeFromOuterCircle > 0.0) {
             this.moonPath.arcTo(outerCircleRect, (float) (180.0f + degreeFromOuterCircle), (float) -(degreeFromOuterCircle * 2.0));
         } else {
             this.moonPath.arcTo(outerCircleRect, (float) (360.0f + degreeFromOuterCircle), (float) -(360.0f + (degreeFromOuterCircle * 2.0)));
         }
-
         this.moonPath.close();
     }
 
