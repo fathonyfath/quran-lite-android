@@ -1,6 +1,7 @@
 package id.fathonyfath.quran.lite;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -15,6 +16,7 @@ import id.fathonyfath.quran.lite.data.source.network.QuranNetworkSource;
 import id.fathonyfath.quran.lite.data.source.preferences.BookmarkPreferencesSource;
 import id.fathonyfath.quran.lite.data.source.preferences.DayNightPreferencesSource;
 import id.fathonyfath.quran.lite.models.DayNight;
+import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.themes.DayTheme;
 import id.fathonyfath.quran.lite.themes.NightTheme;
 import id.fathonyfath.quran.lite.useCase.FetchAllSurahUseCase;
@@ -28,6 +30,7 @@ import id.fathonyfath.quran.lite.useCase.PutDayNightPreferenceUseCase;
 import id.fathonyfath.quran.lite.useCase.UseCaseCallback;
 import id.fathonyfath.quran.lite.useCase.UseCaseProvider;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
+import id.fathonyfath.quran.lite.utils.dialogManager.DialogManager;
 import id.fathonyfath.quran.lite.views.MainView;
 
 public class MainActivity extends Activity implements UseCaseCallback<DayNight> {
@@ -43,6 +46,7 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight> 
     private ConfigRepository configRepository;
 
     private MainView mainView = null;
+    private BaseTheme activeTheme = new DayTheme();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +54,7 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight> 
 
         initService();
         registerUseCaseFactory();
+        registerDialogFactory();
 
         GetDayNightUseCase useCase = UseCaseProvider.createUseCase(GetDayNightUseCase.class);
         if (useCase != null) {
@@ -57,13 +62,16 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight> 
             useCase.run();
         } else {
             // Fallback to Light Theme
-            showViewWithLightTheme();
+            this.activeTheme = new DayTheme();
+            showViewWithActiveTheme();
         }
     }
 
     public void relaunchActivity() {
         getWindow().setWindowAnimations(R.style.WindowAnimation);
         recreate();
+
+        showDialog(1);
     }
 
     @Override
@@ -112,12 +120,14 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight> 
 
         switch (data) {
             case DAY:
-                showViewWithLightTheme();
+                this.activeTheme = new DayTheme();
                 break;
             case NIGHT:
-                showViewWithDarkTheme();
+                this.activeTheme = new NightTheme();
                 break;
         }
+
+        showViewWithActiveTheme();
     }
 
     @Override
@@ -151,13 +161,17 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight> 
         UseCaseProvider.registerFactory(PutDayNightPreferenceUseCase.class, new PutDayNightPreferenceUseCase.Factory(this, this.configRepository));
     }
 
-    private void showViewWithLightTheme() {
-        this.mainView = new MainView(new ThemeContext(this, new DayTheme()));
+    private void registerDialogFactory() {
+
+    }
+
+    private void showViewWithActiveTheme() {
+        this.mainView = new MainView(new ThemeContext(this, this.activeTheme));
         setContentView(MainActivity.this.mainView);
     }
 
-    private void showViewWithDarkTheme() {
-        this.mainView = new MainView(new ThemeContext(this, new NightTheme()));
-        setContentView(MainActivity.this.mainView);
+    @Override
+    protected Dialog onCreateDialog(int id, Bundle args) {
+        return DialogManager.createDialog(id, new ThemeContext(this, this.activeTheme), args);
     }
 }
