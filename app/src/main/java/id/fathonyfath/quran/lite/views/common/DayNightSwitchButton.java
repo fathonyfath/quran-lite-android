@@ -4,8 +4,10 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,19 +22,25 @@ public class DayNightSwitchButton extends View {
 
     private final Paint basePaint;
     private final Paint clearPaint;
+
     private final RectF reusableRect;
+
+    private final Rect workingSpace;
+    private final Path moonPath;
 
     private DayNightPreference currentPreference = DayNightPreference.SYSTEM;
 
     public DayNightSwitchButton(Context context) {
         super(context);
 
-        initConfiguration();
-
         this.reusableRect = new RectF();
         this.basePaint = new Paint();
         this.clearPaint = new Paint();
 
+        this.workingSpace = new Rect();
+        this.moonPath = new Path();
+
+        initConfiguration();
         applyColorFromTheme();
     }
 
@@ -41,6 +49,8 @@ public class DayNightSwitchButton extends View {
         super.onSizeChanged(w, h, oldw, oldh);
 
         updatePadding();
+        updateWorkingSpace();
+        updateMoonPath();
     }
 
     public void setDayNightPreference(DayNightPreference preference) {
@@ -104,6 +114,8 @@ public class DayNightSwitchButton extends View {
         ));
 
         updatePadding();
+        updateWorkingSpace();
+        updateMoonPath();
 
         setClickable(true);
 
@@ -116,6 +128,15 @@ public class DayNightSwitchButton extends View {
                 (int) UnitConverter.fromDpToPx(getContext(), 8f),
                 (int) UnitConverter.fromDpToPx(getContext(), 12f),
                 (int) UnitConverter.fromDpToPx(getContext(), 8f)
+        );
+    }
+
+    private void updateWorkingSpace() {
+        workingSpace.set(
+                getPaddingLeft(),
+                getPaddingTop(),
+                getMeasuredWidth() - getPaddingRight(),
+                getMeasuredHeight() - getPaddingBottom()
         );
     }
 
@@ -178,24 +199,129 @@ public class DayNightSwitchButton extends View {
 
     private void drawMoon(final Canvas canvas) {
         canvas.save();
-        int offsets = (int) UnitConverter.fromDpToPx(getContext(), 4f);
-        int radiusOffsets = (int) UnitConverter.fromDpToPx(getContext(), 2f);
 
         final int availableWidth = getWidth() - getPaddingLeft() - getPaddingRight();
         final int availableHeight = getHeight() - getPaddingTop() - getPaddingBottom();
         final int centerX = getPaddingLeft() + (availableWidth / 2);
         final int centerY = getPaddingTop() + (availableHeight / 2);
-        final int radius;
-        if (availableHeight < availableWidth) {
-            radius = availableHeight / 2;
-        } else {
-            radius = availableWidth / 2;
-        }
 
         canvas.rotate(-45, centerX, centerY);
-        canvas.drawCircle(centerX, centerY, radius, this.basePaint);
+        canvas.drawPath(this.moonPath, this.basePaint);
 
-        canvas.drawCircle(centerX + offsets, centerY, radius - radiusOffsets, this.clearPaint);
         canvas.restore();
+    }
+
+    private void updateMoonPath() {
+        this.moonPath.reset();
+
+        int offsets = (int) UnitConverter.fromDpToPx(getContext(), 4f);
+        int radiusOffsets = (int) UnitConverter.fromDpToPx(getContext(), 2f);
+
+        final RectF innerCircleRect = RectHelper.findSquareRect(this.workingSpace, getMeasuredHeight(), getMeasuredWidth());
+        final Circle innerCircle = RectHelper.findCircleOnRect(this.workingSpace, getMeasuredHeight(), getMeasuredWidth());
+
+        final Rect outerCircleRectContainer = new Rect(this.workingSpace);
+        outerCircleRectContainer.left += offsets;
+        outerCircleRectContainer.right += offsets;
+
+        outerCircleRectContainer.top += radiusOffsets;
+        outerCircleRectContainer.bottom -= radiusOffsets;
+        outerCircleRectContainer.left += radiusOffsets;
+        outerCircleRectContainer.right -= radiusOffsets;
+
+        final RectF outerCircleRect = RectHelper.findSquareRect(outerCircleRectContainer, getMeasuredHeight(), getMeasuredWidth());
+        final Circle outerCircle = RectHelper.findCircleOnRect(outerCircleRectContainer, getMeasuredHeight(), getMeasuredWidth());
+
+        double degreeFromInnerCircle = innerCircle.degrees(outerCircle);
+        double degreeFromOuterCircle = outerCircle.degrees(innerCircle);
+
+        this.moonPath.arcTo(innerCircleRect, (float) degreeFromInnerCircle, 360.0f - ((float) (degreeFromInnerCircle * 2.0)));
+        if (degreeFromOuterCircle > 0.0) {
+            this.moonPath.arcTo(outerCircleRect, (float) (180.0f + degreeFromOuterCircle), (float) -(degreeFromOuterCircle * 2.0));
+        } else {
+            this.moonPath.arcTo(outerCircleRect, (float) (360.0f + degreeFromOuterCircle), (float) -(360.0f + (degreeFromOuterCircle * 2.0)));
+        }
+
+        this.moonPath.close();
+    }
+
+    private static final class RectHelper {
+        public static RectF findSquareRect(Rect rect, float containerHeight, float containerWidth) {
+            final float availableHeight = rect.bottom - rect.top;
+            final float availableWidth = rect.right - rect.left;
+
+            final RectF circleRect = new RectF();
+
+            if (availableHeight < availableWidth) {
+                final float left = (containerWidth - availableHeight) / 2.0f;
+                final float right = left + availableHeight;
+
+                circleRect.set(
+                        left,
+                        rect.top,
+                        right,
+                        rect.bottom
+                );
+            } else {
+                final float top = (containerHeight - availableWidth) / 2.0f;
+                final float bottom = top + availableWidth;
+
+                circleRect.set(
+                        rect.left,
+                        top,
+                        rect.right,
+                        bottom
+                );
+            }
+
+            return circleRect;
+        }
+
+        public static Circle findCircleOnRect(Rect rect, float containerHeight, float containerWidth) {
+            final RectF circleRect = findSquareRect(rect, containerHeight, containerWidth);
+
+            final float diameter = circleRect.bottom - circleRect.top;
+            final float radius = diameter / 2.0f;
+            final float x = circleRect.left + radius;
+            final float y = circleRect.top + radius;
+
+            return new Circle(new Vec2(x, y), radius);
+        }
+    }
+
+    private static class Vec2 {
+        public final float x, y;
+
+        Vec2(float x, float y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public float distance(Vec2 other) {
+            return (float) Math.sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y));
+        }
+    }
+
+    private static final class Circle {
+        public final Vec2 position;
+        public final float radius;
+
+        Circle(Vec2 position, float radius) {
+            this.position = position;
+            this.radius = radius;
+        }
+
+        public double degrees(Circle other) {
+            final float d = position.distance(other.position);
+            final float powOfThisR = (float) Math.pow(this.radius, 2);
+            final float powOfOtherR = (float) Math.pow(other.radius, 2);
+            final float powOfD = (float) Math.pow(d, 2);
+            final float a = (powOfThisR - powOfOtherR + powOfD) / (2 * d);
+            final float h = (float) Math.sqrt(powOfThisR - (a * a));
+
+            final double radians = Math.atan(h / a);
+
+            return Math.toDegrees(radians);
+        }
     }
 }

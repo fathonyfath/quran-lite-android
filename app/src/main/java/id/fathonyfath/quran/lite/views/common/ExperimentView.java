@@ -6,21 +6,24 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
+import android.graphics.RectF;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
 import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
 import id.fathonyfath.quran.lite.utils.UnitConverter;
+import id.fathonyfath.quran.lite.utils.ViewUtil;
 
-public class BookmarkIconView extends View {
+public class ExperimentView extends View {
 
     private final Paint paint;
 
     private final Rect workingSpace = new Rect();
-    private final Path bookmarkPath = new Path();
+    private final Path path = new Path();
 
-    public BookmarkIconView(Context context) {
+    public ExperimentView(Context context) {
         super(context);
 
         initConfiguration();
@@ -40,6 +43,7 @@ public class BookmarkIconView extends View {
         }
 
         this.paint.setColor(colorToApply);
+        ViewUtil.setDefaultSelectableBackgroundDrawable(this, colorToApply);
     }
 
     @Override
@@ -48,14 +52,13 @@ public class BookmarkIconView extends View {
 
         updatePadding();
         updateWorkingSpace();
-        updatePath();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        canvas.drawPath(this.bookmarkPath, this.paint);
+        canvas.drawPath(this.path, this.paint);
     }
 
     private void initConfiguration() {
@@ -66,7 +69,6 @@ public class BookmarkIconView extends View {
 
         updatePadding();
         updateWorkingSpace();
-        updatePath();
 
         setClickable(true);
     }
@@ -88,30 +90,5 @@ public class BookmarkIconView extends View {
                 getMeasuredHeight() - getPaddingBottom()
         );
     }
-
-    private void updatePath() {
-        this.bookmarkPath.reset();
-
-        final float addedPaddingHorizontal = UnitConverter.fromDpToPx(getContext(), 4f);
-        final float addedPaddingVertical = UnitConverter.fromDpToPx(getContext(), 3f);
-        final float tailSize = UnitConverter.fromDpToPx(getContext(), 8f);
-
-        final Rect size = new Rect(this.workingSpace);
-        size.top += addedPaddingVertical;
-        size.bottom -= addedPaddingVertical;
-        size.left += addedPaddingHorizontal;
-        size.right -= addedPaddingHorizontal;
-
-        final float middleWorkingSpace = size.left + ((float) (size.right - size.left) / 2f);
-        final float tailLength = size.bottom - tailSize;
-
-        this.bookmarkPath.moveTo(size.left, size.top);
-        this.bookmarkPath.lineTo(size.right, size.top);
-        this.bookmarkPath.lineTo(size.right, size.bottom);
-        this.bookmarkPath.lineTo(middleWorkingSpace, tailLength);
-        this.bookmarkPath.lineTo(size.left, size.bottom);
-        this.bookmarkPath.lineTo(size.left, size.top);
-
-        this.bookmarkPath.close();
-    }
 }
+
