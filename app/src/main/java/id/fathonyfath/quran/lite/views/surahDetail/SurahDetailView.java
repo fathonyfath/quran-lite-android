@@ -416,7 +416,7 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
 
     private void createAndRunPutDayNightPreferenceUseCase(DayNightPreference updateWith) {
         PutDayNightPreferenceUseCase useCase = UseCaseProvider.createUseCase(PutDayNightPreferenceUseCase.class);
-        useCase.setUpdateWith(updateWith);
+        useCase.setArguments(updateWith);
         useCase.setCallback(this.putDayNightPreferenceCallback);
         useCase.run();
     }

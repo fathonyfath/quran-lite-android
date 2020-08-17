@@ -20,7 +20,7 @@ public class PutDayNightPreferenceUseCase extends BaseUseCase {
         this.configRepository = configRepository;
     }
 
-    public void setUpdateWith(DayNightPreference updateWith) {
+    public void setArguments(DayNightPreference updateWith) {
         this.updateWith = updateWith;
     }
 
