@@ -21,10 +21,6 @@ public class ElevationView extends View {
                 Color.TRANSPARENT
         });
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            setBackground(drawable);
-        } else {
-            setBackgroundDrawable(drawable);
-        }
+        setBackground(drawable);
     }
 }

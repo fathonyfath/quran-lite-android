@@ -26,6 +26,8 @@ public class DayNightSwitchButton extends View {
     private final RectF reusableRect;
 
     private final Rect workingSpace;
+
+    private final Path[] raysPaths;
     private final Path moonPath;
 
     private DayNightPreference currentPreference = DayNightPreference.SYSTEM;
@@ -40,6 +42,8 @@ public class DayNightSwitchButton extends View {
         this.workingSpace = new Rect();
         this.moonPath = new Path();
 
+        this.raysPaths = new Path[8];
+
         initConfiguration();
         applyColorFromTheme();
     }
@@ -50,6 +54,7 @@ public class DayNightSwitchButton extends View {
 
         updatePadding();
         updateWorkingSpace();
+        updateSunPath();
         updateMoonPath();
     }
 
@@ -115,6 +120,7 @@ public class DayNightSwitchButton extends View {
 
         updatePadding();
         updateWorkingSpace();
+        updateSunPath();
         updateMoonPath();
 
         setClickable(true);
@@ -141,8 +147,6 @@ public class DayNightSwitchButton extends View {
     }
 
     private void drawSun(final Canvas canvas) {
-        canvas.save();
-
         final int availableWidth = getWidth() - getPaddingLeft() - getPaddingRight();
         final int availableHeight = getHeight() - getPaddingTop() - getPaddingBottom();
         final int radius;
@@ -154,25 +158,43 @@ public class DayNightSwitchButton extends View {
         final int centerX = getPaddingLeft() + (availableWidth / 2);
         final int centerY = getPaddingTop() + (availableHeight / 2);
 
-        final float bottom = (float) (centerY + (radius * Math.sin(Math.toRadians(45))));
-        final float right = (float) (centerX + (radius * Math.cos(Math.toRadians(45))));
-        final float top = (float) (centerY + (radius * Math.sin(Math.toRadians(225))));
-        final float left = (float) (centerX + (radius * Math.cos(Math.toRadians(225))));
+        final float padding = UnitConverter.fromDpToPx(getContext(), 5.5f);
 
-        canvas.rotate(-45, centerX, centerY);
+        canvas.drawCircle(centerX, centerY, radius - padding, this.basePaint);
 
-        canvas.drawRect(left, top, right, bottom, this.basePaint);
+        for (Path path : this.raysPaths) {
+            canvas.drawPath(path, this.basePaint);
+        }
+    }
 
-        canvas.restore();
+    private void updateSunPath() {
+        for (int i = 0; i < this.raysPaths.length; i++) {
+            this.raysPaths[i] = generatePathForRays(i * 45.0f);
+        }
+    }
 
-        canvas.drawRect(left, top, right, bottom, this.basePaint);
+    private Path generatePathForRays(float degree) {
+        final Path path = new Path();
 
-        final int radiusCircleOutside = (int) (centerX - top);
-        final int radiusCircleInside = radiusCircleOutside - (int) UnitConverter.fromDpToPx(getContext(), 2f);
+        final float raysSize = UnitConverter.fromDpToPx(getContext(), 4.0f);
 
-        canvas.drawCircle(centerX, centerY, radiusCircleOutside, this.clearPaint);
+        Circle circle = RectHelper.findCircleOnRect(this.workingSpace, getMeasuredHeight(), getMeasuredWidth());
+        Circle raysCircle = new Circle(new Vec2(circle.position.x, circle.position.y), circle.radius - raysSize);
 
-        canvas.drawCircle(centerX, centerY, radiusCircleInside, this.basePaint);
+        Vec2 topTriangle = circle.getPointAtAngleDeg(degree);
+        Vec2 leftLeg = raysCircle.getPointAtAngleDeg(degree - 35.0f);
+        Vec2 rightLeg = raysCircle.getPointAtAngleDeg(degree + 35.0f);
+
+        path.reset();
+
+        path.moveTo(rightLeg.x, rightLeg.y);
+        path.lineTo(topTriangle.x, topTriangle.y);
+        path.lineTo(leftLeg.x, leftLeg.y);
+        path.arcTo(raysCircle.getBounds(), degree - 22.5f, 45.0f);
+
+        path.close();
+
+        return path;
     }
 
     private void drawBrightness(final Canvas canvas) {
@@ -322,6 +344,23 @@ public class DayNightSwitchButton extends View {
             final double radians = Math.atan(h / a);
 
             return Math.toDegrees(radians);
+        }
+
+        Vec2 getPointAtAngleDeg(float degree) {
+            final double radians = Math.toRadians(degree);
+            final float x = (float) (this.position.x + (this.radius * Math.cos(radians)));
+            final float y = (float) (this.position.y + (this.radius * Math.sin(radians)));
+
+            return new Vec2(x, y);
+        }
+
+        RectF getBounds() {
+            return new RectF(
+                    this.position.x - this.radius,
+                    this.position.y - this.radius,
+                    this.position.x + this.radius,
+                    this.position.y + this.radius
+            );
         }
     }
 }
