@@ -13,7 +13,7 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import id.fathonyfath.quran.lite.Res;
@@ -75,8 +75,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
             // Do some cleanups
             unregisterAndClearGetBookmarkUseCaseCallback();
 
-            Bookmark bookmark = new Bookmark(19, "Ahaaa", "ahhh", 22);
-            setBookmarkData(bookmark);
+            setBookmarkData(data);
         }
 
         @Override
@@ -370,7 +369,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
     }
 
     private void refreshRightToolbar() {
-        final HashSet<View> views = new HashSet<>();
+        final LinkedHashSet<View> views = new LinkedHashSet<>();
         views.add(this.bookmarkView);
         views.add(this.dayNightSwitchButton);
         setToolbarRightViews(views);
