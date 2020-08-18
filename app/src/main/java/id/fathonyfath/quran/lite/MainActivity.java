@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import id.fathonyfath.quran.lite.data.BookmarkRepository;
 import id.fathonyfath.quran.lite.data.ConfigRepository;
 import id.fathonyfath.quran.lite.data.FontProvider;
@@ -32,11 +35,14 @@ import id.fathonyfath.quran.lite.useCase.UseCaseCallback;
 import id.fathonyfath.quran.lite.useCase.UseCaseProvider;
 import id.fathonyfath.quran.lite.utils.DialogUtil;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
+import id.fathonyfath.quran.lite.utils.dialogManager.DialogEvent;
+import id.fathonyfath.quran.lite.utils.dialogManager.DialogEventListener;
 import id.fathonyfath.quran.lite.utils.dialogManager.DialogManager;
 import id.fathonyfath.quran.lite.views.MainView;
 import id.fathonyfath.quran.lite.views.noBookmarkDialog.NoBookmarkDialog;
+import id.fathonyfath.quran.lite.views.resumeBookmarkDialog.ResumeBookmarkDialog;
 
-public class MainActivity extends Activity implements UseCaseCallback<DayNight> {
+public class MainActivity extends Activity implements UseCaseCallback<DayNight>, DialogEventListener {
 
     public static final String QURAN_REPOSITORY_SERVICE = "MainActivity.QuranRepository";
     public static final String FONT_PROVIDER_SERVICE = "MainActivity.FontProvider";
@@ -47,6 +53,8 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight> 
     private FontProvider fontProvider;
     private BookmarkRepository bookmarkRepository;
     private ConfigRepository configRepository;
+
+    private final List<DialogEventListener> dialogEventListeners = new ArrayList<>();
 
     private MainView mainView = null;
     private BaseTheme activeTheme = new DayTheme();
@@ -77,6 +85,8 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight> 
 
     @Override
     protected void onDestroy() {
+        this.dialogEventListeners.clear();
+
         if (isFinishing()) {
             UseCaseProvider.clearAllUseCase();
         }
@@ -164,6 +174,7 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight> 
 
     private void registerDialogFactory() {
         DialogManager.registerFactory(NoBookmarkDialog.class, new NoBookmarkDialog.Factory());
+        DialogManager.registerFactory(ResumeBookmarkDialog.class, new ResumeBookmarkDialog.Factory());
     }
 
     private void showViewWithActiveTheme() {
@@ -171,9 +182,20 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight> 
         setContentView(MainActivity.this.mainView);
     }
 
+    public List<DialogEventListener> getDialogEventListeners() {
+        return dialogEventListeners;
+    }
+
     @Override
     protected Dialog onCreateDialog(int id, Bundle args) {
         Parcelable arguments = DialogUtil.getArguments(args);
-        return DialogManager.createDialog(id, new ThemeContext(this, this.activeTheme), arguments);
+        return DialogManager.createDialog(id, new ThemeContext(this, this.activeTheme), arguments, this);
+    }
+
+    @Override
+    public void onEvent(DialogEvent event, Parcelable arguments) {
+        for (DialogEventListener listener : this.dialogEventListeners) {
+            listener.onEvent(event, arguments);
+        }
     }
 }

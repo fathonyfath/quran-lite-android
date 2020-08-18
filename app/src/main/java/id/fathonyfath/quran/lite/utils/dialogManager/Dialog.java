@@ -8,11 +8,13 @@ import android.view.Window;
 public abstract class Dialog extends android.app.Dialog {
 
     private Parcelable arguments;
+    private DialogEventListener listener;
 
-    public Dialog(Context context, Parcelable arguments) {
+    public Dialog(Context context, Parcelable arguments, DialogEventListener listener) {
         super(context);
 
         this.arguments = arguments;
+        this.listener = listener;
 
         if (getWindow() != null) {
             getWindow().requestFeature(Window.FEATURE_NO_TITLE);
@@ -24,6 +26,10 @@ public abstract class Dialog extends android.app.Dialog {
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
         );
+    }
+
+    protected void sendDialogEvent(DialogEvent event, Parcelable arguments) {
+        this.listener.onEvent(event, arguments);
     }
 
     @SuppressWarnings("unchecked")
@@ -49,6 +55,6 @@ public abstract class Dialog extends android.app.Dialog {
     }
 
     public interface Factory {
-        Dialog create(Context context, Parcelable parcelable);
+        Dialog create(Context context, Parcelable parcelable, DialogEventListener listener);
     }
 }

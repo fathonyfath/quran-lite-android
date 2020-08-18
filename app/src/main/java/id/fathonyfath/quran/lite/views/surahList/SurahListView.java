@@ -30,6 +30,8 @@ import id.fathonyfath.quran.lite.useCase.UseCaseProvider;
 import id.fathonyfath.quran.lite.utils.DialogUtil;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
 import id.fathonyfath.quran.lite.utils.ViewUtil;
+import id.fathonyfath.quran.lite.utils.dialogManager.DialogEvent;
+import id.fathonyfath.quran.lite.utils.dialogManager.DialogEventListener;
 import id.fathonyfath.quran.lite.utils.viewLifecycle.ViewCallback;
 import id.fathonyfath.quran.lite.views.common.BookmarkView;
 import id.fathonyfath.quran.lite.views.common.DayNightSwitchButton;
@@ -37,6 +39,7 @@ import id.fathonyfath.quran.lite.views.common.ProgressView;
 import id.fathonyfath.quran.lite.views.common.RetryView;
 import id.fathonyfath.quran.lite.views.common.WrapperView;
 import id.fathonyfath.quran.lite.views.noBookmarkDialog.NoBookmarkDialog;
+import id.fathonyfath.quran.lite.views.resumeBookmarkDialog.ResumeBookmarkDialog;
 
 public class SurahListView extends WrapperView implements ViewCallback {
 
@@ -168,6 +171,17 @@ public class SurahListView extends WrapperView implements ViewCallback {
             }
         }
     };
+    private final DialogEventListener dialogEventListener = new DialogEventListener() {
+        @Override
+        public void onEvent(DialogEvent event, Parcelable arguments) {
+            if (event instanceof ResumeBookmarkDialog.ResumeBookmarkEvent) {
+                if (arguments.getClass().isAssignableFrom(Bookmark.class)) {
+                    final Bookmark bookmark = (Bookmark) arguments;
+                    resumeFromBookmark(bookmark);
+                }
+            }
+        }
+    };
 
     public SurahListView(Context context) {
         super(context);
@@ -236,6 +250,8 @@ public class SurahListView extends WrapperView implements ViewCallback {
 
         createAndRunGetDayNightPreferenceUseCase();
         createAndRunGetBookmarkUseCase();
+
+        DialogUtil.addListener(this, this.dialogEventListener);
     }
 
     @Override
@@ -245,6 +261,8 @@ public class SurahListView extends WrapperView implements ViewCallback {
         unregisterFetchAllSurahUseCaseCallback();
         unregisterAndClearGetDayNightPreferenceUseCaseCallback();
         unregisterAndClearPutDayNightPreferenceUseCaseCallback();
+
+        DialogUtil.removeListener(this, this.dialogEventListener);
     }
 
     @Override
@@ -293,7 +311,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
         if (bookmark == null) {
             DialogUtil.showDialog(this, NoBookmarkDialog.class, null);
         } else {
-
+            DialogUtil.showDialog(this, ResumeBookmarkDialog.class, bookmark);
         }
     }
 
@@ -375,6 +393,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
     }
 
     private void setBookmarkData(Bookmark bookmark) {
+        bookmark = new Bookmark(12, "Surah - 12", "Suraah - 12", 911);
         this.bookmarkView.setBookmark(bookmark);
         refreshRightToolbar();
     }
@@ -427,6 +446,15 @@ public class SurahListView extends WrapperView implements ViewCallback {
         if (theme != null) {
             this.setBackgroundColor(theme.baseColor());
             ViewUtil.setDefaultSelectableBackgroundDrawable(this.surahListView, theme.contrastColor());
+        }
+    }
+
+    private void resumeFromBookmark(Bookmark bookmark) {
+        final int position = bookmark.getSurahNumber() - 1;
+        surahListView.setSelection(position);
+        if (this.onViewEventListener != null) {
+            Surah selectedSurah = this.surahAdapter.getItem(position);
+            this.onViewEventListener.onSurahSelected(selectedSurah);
         }
     }
 

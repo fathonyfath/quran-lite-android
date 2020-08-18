@@ -120,7 +120,7 @@ public class DayNightSwitchButton extends View {
 
         setClickable(true);
 
-        setLayerType(LAYER_TYPE_HARDWARE, null);
+        this.basePaint.setAntiAlias(true);
     }
 
     private void updatePadding() {

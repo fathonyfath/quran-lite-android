@@ -9,6 +9,7 @@ import android.view.View;
 
 import id.fathonyfath.quran.lite.MainActivity;
 import id.fathonyfath.quran.lite.utils.dialogManager.Dialog;
+import id.fathonyfath.quran.lite.utils.dialogManager.DialogEventListener;
 
 public class DialogUtil {
 
@@ -42,6 +43,38 @@ public class DialogUtil {
         if (hostingActivity instanceof MainActivity) {
             MainActivity activity = (MainActivity) hostingActivity;
             activity.showDialog(dialogClass.hashCode(), createBundle(arguments));
+        }
+    }
+
+    public static void addListener(View view, DialogEventListener listener) {
+        Activity hostingActivity = null;
+        Context context = view.getContext();
+        while (context instanceof ContextWrapper) {
+            if (context instanceof Activity) {
+                hostingActivity = (Activity) context;
+            }
+            context = ((ContextWrapper) context).getBaseContext();
+        }
+
+        if (hostingActivity instanceof MainActivity) {
+            MainActivity activity = (MainActivity) hostingActivity;
+            activity.getDialogEventListeners().add(listener);
+        }
+    }
+
+    public static void removeListener(View view, DialogEventListener listener) {
+        Activity hostingActivity = null;
+        Context context = view.getContext();
+        while (context instanceof ContextWrapper) {
+            if (context instanceof Activity) {
+                hostingActivity = (Activity) context;
+            }
+            context = ((ContextWrapper) context).getBaseContext();
+        }
+
+        if (hostingActivity instanceof MainActivity) {
+            MainActivity activity = (MainActivity) hostingActivity;
+            activity.getDialogEventListeners().remove(listener);
         }
     }
 }

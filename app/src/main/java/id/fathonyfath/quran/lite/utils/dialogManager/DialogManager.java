@@ -15,13 +15,16 @@ public class DialogManager {
         }
     }
 
-    public static <T extends Dialog> Dialog createDialog(int classHashCode, Context context, Parcelable arguments) {
+    public static <T extends Dialog> Dialog createDialog(int classHashCode,
+                                                         Context context,
+                                                         Parcelable arguments,
+                                                         DialogEventListener listener) {
         Dialog.Factory factory = DialogManager.dialogFactoryHolder.get(classHashCode);
         if (factory == null) {
             throw new IllegalStateException("No factory registered for class with hashCode " + classHashCode);
         }
 
-        return factory.create(context, arguments);
+        return factory.create(context, arguments, listener);
     }
 }
 

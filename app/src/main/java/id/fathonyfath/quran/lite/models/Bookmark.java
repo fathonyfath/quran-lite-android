@@ -1,6 +1,21 @@
 package id.fathonyfath.quran.lite.models;
 
-public class Bookmark {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Bookmark implements Parcelable {
+
+    public static final Creator<Bookmark> CREATOR = new Creator<Bookmark>() {
+        @Override
+        public Bookmark createFromParcel(Parcel in) {
+            return new Bookmark(in);
+        }
+
+        @Override
+        public Bookmark[] newArray(int size) {
+            return new Bookmark[size];
+        }
+    };
 
     private final int surahNumber;
     private final String surahName;
@@ -12,6 +27,17 @@ public class Bookmark {
         this.surahName = surahName;
         this.surahNameInLatin = surahNameInLatin;
         this.lastReadAyah = lastReadAyah;
+    }
+
+    /**
+     * Parcelable implementation.
+     */
+
+    protected Bookmark(Parcel in) {
+        surahNumber = in.readInt();
+        surahName = in.readString();
+        surahNameInLatin = in.readString();
+        lastReadAyah = in.readInt();
     }
 
     public int getSurahNumber() {
@@ -28,5 +54,18 @@ public class Bookmark {
 
     public int getLastReadAyah() {
         return lastReadAyah;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(surahNumber);
+        dest.writeString(surahName);
+        dest.writeString(surahNameInLatin);
+        dest.writeInt(lastReadAyah);
     }
 }

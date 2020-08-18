@@ -26,6 +26,7 @@ public class BookmarkIconView extends View {
         initConfiguration();
 
         this.paint = new Paint();
+        this.paint.setAntiAlias(true);
 
         setPaintColor();
     }
