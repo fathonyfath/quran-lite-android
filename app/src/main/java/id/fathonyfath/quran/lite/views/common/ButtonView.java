@@ -12,7 +12,7 @@ import id.fathonyfath.quran.lite.utils.ThemeContext;
 import id.fathonyfath.quran.lite.utils.UnitConverter;
 import id.fathonyfath.quran.lite.utils.ViewUtil;
 
-class ButtonView extends FrameLayout {
+public class ButtonView extends FrameLayout {
 
     private final LpmqTextView retryButton;
 

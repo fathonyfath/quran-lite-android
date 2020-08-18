@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 
 import id.fathonyfath.quran.lite.data.BookmarkRepository;
@@ -29,6 +30,7 @@ import id.fathonyfath.quran.lite.useCase.PutBookmarkUseCase;
 import id.fathonyfath.quran.lite.useCase.PutDayNightPreferenceUseCase;
 import id.fathonyfath.quran.lite.useCase.UseCaseCallback;
 import id.fathonyfath.quran.lite.useCase.UseCaseProvider;
+import id.fathonyfath.quran.lite.utils.DialogUtil;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
 import id.fathonyfath.quran.lite.utils.dialogManager.DialogManager;
 import id.fathonyfath.quran.lite.views.MainView;
@@ -71,8 +73,6 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight> 
     public void relaunchActivity() {
         getWindow().setWindowAnimations(R.style.WindowAnimation);
         recreate();
-
-        showDialog(NoBookmarkDialog.class.hashCode());
     }
 
     @Override
@@ -173,6 +173,7 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight> 
 
     @Override
     protected Dialog onCreateDialog(int id, Bundle args) {
-        return DialogManager.createDialog(id, new ThemeContext(this, this.activeTheme), args);
+        Parcelable arguments = DialogUtil.getArguments(args);
+        return DialogManager.createDialog(id, new ThemeContext(this, this.activeTheme), arguments);
     }
 }

@@ -27,6 +27,7 @@ import id.fathonyfath.quran.lite.useCase.GetDayNightPreferenceUseCase;
 import id.fathonyfath.quran.lite.useCase.PutDayNightPreferenceUseCase;
 import id.fathonyfath.quran.lite.useCase.UseCaseCallback;
 import id.fathonyfath.quran.lite.useCase.UseCaseProvider;
+import id.fathonyfath.quran.lite.utils.DialogUtil;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
 import id.fathonyfath.quran.lite.utils.ViewUtil;
 import id.fathonyfath.quran.lite.utils.viewLifecycle.ViewCallback;
@@ -35,6 +36,7 @@ import id.fathonyfath.quran.lite.views.common.DayNightSwitchButton;
 import id.fathonyfath.quran.lite.views.common.ProgressView;
 import id.fathonyfath.quran.lite.views.common.RetryView;
 import id.fathonyfath.quran.lite.views.common.WrapperView;
+import id.fathonyfath.quran.lite.views.noBookmarkDialog.NoBookmarkDialog;
 
 public class SurahListView extends WrapperView implements ViewCallback {
 
@@ -109,7 +111,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
 
         @Override
         public void onClick(View v) {
-
+            processOnBookmarkClick();
         }
     };
     private final View.OnClickListener onDayNightPreferenceClickListener = new View.OnClickListener() {
@@ -284,6 +286,15 @@ public class SurahListView extends WrapperView implements ViewCallback {
         this.retryView.setOnRetryClickListener(this.onRetryClickListener);
 
         addView(this.retryView);
+    }
+
+    private void processOnBookmarkClick() {
+        final Bookmark bookmark = this.bookmarkView.getBookmark();
+        if (bookmark == null) {
+            DialogUtil.showDialog(this, NoBookmarkDialog.class, null);
+        } else {
+
+        }
     }
 
     private boolean tryToRestoreFetchAllSurahUseCase() {

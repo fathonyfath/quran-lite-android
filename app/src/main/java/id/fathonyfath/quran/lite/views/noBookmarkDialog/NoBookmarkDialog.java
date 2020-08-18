@@ -11,6 +11,7 @@ import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
 import id.fathonyfath.quran.lite.utils.UnitConverter;
 import id.fathonyfath.quran.lite.utils.dialogManager.Dialog;
+import id.fathonyfath.quran.lite.views.common.ButtonView;
 import id.fathonyfath.quran.lite.views.common.LpmqTextView;
 
 public class NoBookmarkDialog extends Dialog {
@@ -20,6 +21,15 @@ public class NoBookmarkDialog extends Dialog {
     private final LpmqTextView titleText;
     private final View separator;
     private final LpmqTextView descriptionText;
+    private final ButtonView confirmation;
+
+    private final View.OnClickListener onConfirmationClickListener = new View.OnClickListener() {
+
+        @Override
+        public void onClick(View v) {
+            NoBookmarkDialog.this.dismiss();
+        }
+    };
 
     public NoBookmarkDialog(Context context, Parcelable arguments) {
         super(context, arguments);
@@ -29,6 +39,7 @@ public class NoBookmarkDialog extends Dialog {
         this.titleText = new LpmqTextView(context);
         this.separator = new View(context);
         this.descriptionText = new LpmqTextView(context);
+        this.confirmation = new ButtonView(context);
 
         initDialog();
         applyStyleBasedOnTheme();
@@ -49,12 +60,15 @@ public class NoBookmarkDialog extends Dialog {
                 0
         );
 
+        this.confirmation.setText("Mengerti");
+        this.confirmation.setOnClickListener(this.onConfirmationClickListener);
+
         this.descriptionText.setTextSize(16.0f);
         this.descriptionText.setPadding(
                 (int) UnitConverter.fromDpToPx(getContext(), 16.0f),
-                (int) UnitConverter.fromDpToPx(getContext(), 8.0f),
+                0,
                 (int) UnitConverter.fromDpToPx(getContext(), 16.0f),
-                (int) UnitConverter.fromDpToPx(getContext(), 8.0f)
+                0
         );
 
         this.container.addView(this.titleText, new LinearLayout.LayoutParams(
@@ -69,6 +83,16 @@ public class NoBookmarkDialog extends Dialog {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
         ));
+
+        final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+
+        final int margin = (int) UnitConverter.fromDpToPx(getContext(), 4.0f);
+        params.setMargins(margin, margin, margin, margin);
+
+        this.container.addView(this.confirmation, params);
 
         setContentView(this.container, new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,

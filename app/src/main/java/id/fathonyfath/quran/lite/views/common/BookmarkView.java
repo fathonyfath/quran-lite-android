@@ -17,6 +17,8 @@ public class BookmarkView extends LinearLayout {
     private final LpmqTextView bookmarkText;
     private final BookmarkIconView bookmarkIcon;
 
+    private Bookmark bookmark;
+
     public BookmarkView(Context context) {
         super(context);
 
@@ -30,7 +32,13 @@ public class BookmarkView extends LinearLayout {
         applyStyleBasedOnTheme();
     }
 
+    public Bookmark getBookmark() {
+        return bookmark;
+    }
+
     public void setBookmark(Bookmark bookmark) {
+        this.bookmark = bookmark;
+
         if (bookmark == null) {
             this.bookmarkText.setVisibility(View.GONE);
             return;
