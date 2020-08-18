@@ -8,8 +8,10 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,23 +19,31 @@ import java.util.List;
 import java.util.Map;
 
 import id.fathonyfath.quran.lite.Res;
+import id.fathonyfath.quran.lite.models.Bookmark;
+import id.fathonyfath.quran.lite.models.SelectedAyah;
 import id.fathonyfath.quran.lite.models.Surah;
 import id.fathonyfath.quran.lite.models.SurahDetail;
 import id.fathonyfath.quran.lite.models.config.DayNightPreference;
 import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.useCase.FetchSurahDetailUseCase;
 import id.fathonyfath.quran.lite.useCase.GetDayNightPreferenceUseCase;
+import id.fathonyfath.quran.lite.useCase.PutBookmarkUseCase;
 import id.fathonyfath.quran.lite.useCase.PutDayNightPreferenceUseCase;
 import id.fathonyfath.quran.lite.useCase.UseCaseCallback;
 import id.fathonyfath.quran.lite.useCase.UseCaseProvider;
+import id.fathonyfath.quran.lite.utils.DialogUtil;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
 import id.fathonyfath.quran.lite.utils.UnitConverter;
 import id.fathonyfath.quran.lite.utils.ViewUtil;
+import id.fathonyfath.quran.lite.utils.dialogManager.DialogEvent;
+import id.fathonyfath.quran.lite.utils.dialogManager.DialogEventListener;
 import id.fathonyfath.quran.lite.utils.viewLifecycle.ViewCallback;
+import id.fathonyfath.quran.lite.views.ayahDetailDialog.AyahDetailDialog;
 import id.fathonyfath.quran.lite.views.common.DayNightSwitchButton;
 import id.fathonyfath.quran.lite.views.common.ProgressView;
 import id.fathonyfath.quran.lite.views.common.RetryView;
 import id.fathonyfath.quran.lite.views.common.WrapperView;
+import id.fathonyfath.quran.lite.views.resumeBookmarkDialog.ResumeBookmarkDialog;
 
 public class SurahDetailView extends WrapperView implements ViewCallback {
 
@@ -149,6 +159,54 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
             updateTitleWithSurahNumber(firstVisibleItem, lastVisibleItem);
         }
     };
+    private final AbsListView.OnItemLongClickListener onSurahLongClickListener = new AbsListView.OnItemLongClickListener() {
+
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            AyahDetailViewType ayahViewType = SurahDetailView.this.ayahDetailAdapter.getItem(position);
+            if (ayahViewType instanceof AyahDetailViewType.AyahViewModel) {
+                AyahDetailViewType.AyahViewModel ayahViewModel = (AyahDetailViewType.AyahViewModel) ayahViewType;
+                openAyahDetailDialog(ayahViewModel);
+
+                return true;
+            }
+            return false;
+        }
+    };
+    private final DialogEventListener dialogEventListener = new DialogEventListener() {
+        @Override
+        public void onEvent(DialogEvent event, Parcelable arguments) {
+            if (event instanceof AyahDetailDialog.ReadTafsirEvent) {
+                if (arguments.getClass().isAssignableFrom(SelectedAyah.class)) {
+                    final SelectedAyah selectedAyah = (SelectedAyah) arguments;
+                    readTafsir(selectedAyah);
+                }
+            } else if (event instanceof AyahDetailDialog.PutBookmarkEvent) {
+                if (arguments.getClass().isAssignableFrom(SelectedAyah.class)) {
+                    final SelectedAyah selectedAyah = (SelectedAyah) arguments;
+                    putBookmark(selectedAyah);
+                }
+            }
+        }
+    };
+    private final UseCaseCallback<Boolean> putBookmarkCallback = new UseCaseCallback<Boolean>() {
+        @Override
+        public void onProgress(float progress) {
+
+        }
+
+        @Override
+        public void onResult(Boolean success) {
+            Toast.makeText(getContext(), "Berhasil menandai ayat.", Toast.LENGTH_SHORT).show();
+
+            unregisterAndClearPutBookmarkUseCaseCallback();
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            unregisterAndClearPutBookmarkUseCaseCallback();
+        }
+    };
 
     public SurahDetailView(Context context) {
         super(context);
@@ -204,6 +262,7 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
     public void onResume() {
         updateViewStateComplete();
         this.ayahListView.setOnScrollListener(this.onSurahScrollListener);
+        this.ayahListView.setOnItemLongClickListener(this.onSurahLongClickListener);
 
         if (this.currentSurah != null && !isFailedToGetSurahDetail) {
             updateViewStateLoading();
@@ -225,6 +284,8 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         }
 
         createAndRunGetDayNightPreferenceUseCase();
+
+        DialogUtil.addListener(this, this.dialogEventListener);
     }
 
     @Override
@@ -232,10 +293,13 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         clearView();
 
         this.ayahListView.setOnScrollListener(null);
+        this.ayahListView.setOnItemLongClickListener(null);
 
         unregisterFetchSurahDetailUseCaseCallback();
         unregisterAndClearGetDayNightPreferenceUseCaseCallback();
         unregisterAndClearPutDayNightPreferenceUseCaseCallback();
+
+        DialogUtil.addListener(this, this.dialogEventListener);
     }
 
     @Override
@@ -433,6 +497,13 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         useCase.run();
     }
 
+    private void createAndRunPutBookmarkUseCase(Bookmark bookmark) {
+        PutBookmarkUseCase useCase = UseCaseProvider.createUseCase(PutBookmarkUseCase.class);
+        useCase.setArguments(bookmark);
+        useCase.setCallback(this.putBookmarkCallback);
+        useCase.run();
+    }
+
     private void createAndRunGetDayNightPreferenceUseCase() {
         GetDayNightPreferenceUseCase useCase = UseCaseProvider.createUseCase(GetDayNightPreferenceUseCase.class);
         useCase.setCallback(this.dayNightPreferenceCallback);
@@ -464,6 +535,30 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         UseCaseProvider.clearUseCase(PutDayNightPreferenceUseCase.class);
     }
 
+    private void unregisterAndClearPutBookmarkUseCaseCallback() {
+        PutBookmarkUseCase useCase = UseCaseProvider.getUseCase(PutBookmarkUseCase.class);
+        if (useCase != null) {
+            useCase.setCallback(null);
+        }
+
+        UseCaseProvider.clearUseCase(PutBookmarkUseCase.class);
+    }
+
+    private void putBookmark(SelectedAyah selectedAyah) {
+        final Bookmark bookmark = new Bookmark(
+                selectedAyah.getSurah().getNumber(),
+                selectedAyah.getSurah().getName(),
+                selectedAyah.getSurah().getNameInLatin(),
+                selectedAyah.getAyahNumber()
+        );
+
+        createAndRunPutBookmarkUseCase(bookmark);
+    }
+
+    private void readTafsir(SelectedAyah selectedAyah) {
+
+    }
+
     private void clearSurahDetailUseCase() {
         UseCaseProvider.clearUseCase(FetchSurahDetailUseCase.class);
     }
@@ -489,6 +584,17 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         this.progressView.setVisibility(View.GONE);
         this.ayahListView.setVisibility(View.VISIBLE);
         this.retryView.setVisibility(View.GONE);
+    }
+
+    private void openAyahDetailDialog(AyahDetailViewType.AyahViewModel ayahViewModel) {
+        DialogUtil.showDialog(
+                this,
+                AyahDetailDialog.class,
+                new SelectedAyah(
+                        this.currentSurah,
+                        ayahViewModel.ayahNumber
+                )
+        );
     }
 
     private static class SurahDetailViewState extends BaseSavedState {

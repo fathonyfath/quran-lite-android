@@ -33,6 +33,7 @@ import id.fathonyfath.quran.lite.utils.ViewUtil;
 import id.fathonyfath.quran.lite.utils.dialogManager.DialogEvent;
 import id.fathonyfath.quran.lite.utils.dialogManager.DialogEventListener;
 import id.fathonyfath.quran.lite.utils.viewLifecycle.ViewCallback;
+import id.fathonyfath.quran.lite.views.ayahDetailDialog.AyahDetailDialog;
 import id.fathonyfath.quran.lite.views.common.BookmarkView;
 import id.fathonyfath.quran.lite.views.common.DayNightSwitchButton;
 import id.fathonyfath.quran.lite.views.common.ProgressView;

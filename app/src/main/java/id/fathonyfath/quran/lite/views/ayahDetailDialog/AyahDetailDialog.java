@@ -1,4 +1,4 @@
-package id.fathonyfath.quran.lite.views.resumeBookmarkDialog;
+package id.fathonyfath.quran.lite.views.ayahDetailDialog;
 
 import android.content.Context;
 import android.os.Parcelable;
@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import id.fathonyfath.quran.lite.models.Bookmark;
+import id.fathonyfath.quran.lite.models.SelectedAyah;
 import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
 import id.fathonyfath.quran.lite.utils.UnitConverter;
@@ -17,7 +17,7 @@ import id.fathonyfath.quran.lite.utils.dialogManager.DialogEventListener;
 import id.fathonyfath.quran.lite.views.common.ButtonView;
 import id.fathonyfath.quran.lite.views.common.LpmqTextView;
 
-public class ResumeBookmarkDialog extends Dialog {
+public class AyahDetailDialog extends Dialog {
 
     private final LinearLayout container;
 
@@ -25,31 +25,35 @@ public class ResumeBookmarkDialog extends Dialog {
     private final View separator;
     private final LpmqTextView descriptionText;
 
-    private final LinearLayout buttonContainer;
-    private final ButtonView continueReading;
-    private final ButtonView close;
+    private final ButtonView tafsir;
+    private final ButtonView bookmark;
 
-    private final View.OnClickListener onCloseClickListener = new View.OnClickListener() {
+    private final View.OnClickListener onTafsirClickListener = new View.OnClickListener() {
 
         @Override
         public void onClick(View v) {
-            ResumeBookmarkDialog.this.dismiss();
+            AyahDetailDialog.this.dismiss();
+
+            final SelectedAyah selectedAyah = getSelectedAyah();
+            if (selectedAyah != null) {
+                AyahDetailDialog.this.sendDialogEvent(new ReadTafsirEvent(), selectedAyah);
+            }
         }
     };
-    private final View.OnClickListener onContinueReadingClickListener = new View.OnClickListener() {
+    private final View.OnClickListener onBookmarkClickListener = new View.OnClickListener() {
 
         @Override
         public void onClick(View v) {
-            ResumeBookmarkDialog.this.dismiss();
+            AyahDetailDialog.this.dismiss();
 
-            final Bookmark bookmark = getBookmark();
-            if (bookmark != null) {
-                ResumeBookmarkDialog.this.sendDialogEvent(new ResumeBookmarkEvent(), bookmark);
+            final SelectedAyah selectedAyah = getSelectedAyah();
+            if (selectedAyah != null) {
+                AyahDetailDialog.this.sendDialogEvent(new PutBookmarkEvent(), selectedAyah);
             }
         }
     };
 
-    public ResumeBookmarkDialog(Context context, Parcelable arguments, DialogEventListener listener) {
+    public AyahDetailDialog(Context context, Parcelable arguments, DialogEventListener listener) {
         super(context, arguments, listener);
 
         this.container = new LinearLayout(context);
@@ -57,31 +61,26 @@ public class ResumeBookmarkDialog extends Dialog {
         this.titleText = new LpmqTextView(context);
         this.separator = new View(context);
         this.descriptionText = new LpmqTextView(context);
-        this.buttonContainer = new LinearLayout(context);
-        this.continueReading = new ButtonView(context);
-        this.close = new ButtonView(context);
+        this.tafsir = new ButtonView(context);
+        this.bookmark = new ButtonView(context);
 
         initDialog();
         applyStyleBasedOnTheme();
     }
 
-    private Bookmark getBookmark() {
-        return getSafeCastArguments();
-    }
-
     private void initDialog() {
         this.container.setOrientation(LinearLayout.VERTICAL);
 
-        String message = "";
-        final Bookmark bookmark = getBookmark();
-        if (bookmark != null) {
-            message = "Lanjutkan membaca dari QS. "
-                    + bookmark.getSurahNameInLatin()
-                    + " [" + bookmark.getSurahNumber() + "] pada ayat " + bookmark.getLastReadAyah() + "?";
+        String title = "";
+        final SelectedAyah selectedAyah = getSelectedAyah();
+        if (selectedAyah != null) {
+            title = "QS. " + selectedAyah.getSurah().getNameInLatin()
+                    + " [" + selectedAyah.getSurah().getNumber() + "]: "
+                    + selectedAyah.getAyahNumber();
         }
 
-        this.titleText.setText("Penanda ayat");
-        this.descriptionText.setText(message);
+        this.titleText.setText(title);
+        this.descriptionText.setText("Silahkan pilih tindakan yang tersedia.");
 
         this.titleText.setTextSize(20.0f);
         this.titleText.setGravity(Gravity.CENTER_VERTICAL);
@@ -91,37 +90,6 @@ public class ResumeBookmarkDialog extends Dialog {
                 (int) UnitConverter.fromDpToPx(getContext(), 16.0f),
                 0
         );
-
-        this.buttonContainer.setOrientation(LinearLayout.HORIZONTAL);
-        this.buttonContainer.setWeightSum(2);
-
-        this.close.setText("Tutup");
-        this.continueReading.setText("Lanjutkan");
-
-        this.close.setOnClickListener(this.onCloseClickListener);
-        this.continueReading.setOnClickListener(this.onContinueReadingClickListener);
-
-        int halfPadding = (int) UnitConverter.fromDpToPx(getContext(), 2.0f);
-
-        final LinearLayout.LayoutParams firstParams = new LinearLayout.LayoutParams(
-                0,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                1.0f
-        );
-        firstParams.setMargins(0, 0, halfPadding, 0);
-
-        final LinearLayout.LayoutParams secondParams = new LinearLayout.LayoutParams(
-                0,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                1.0f
-        );
-        secondParams.setMargins(halfPadding, 0, 0, 0);
-
-        this.buttonContainer.addView(this.close, firstParams);
-        this.buttonContainer.addView(this.continueReading, secondParams);
-
-        int padding = (int) UnitConverter.fromDpToPx(getContext(), 4.0f);
-        this.buttonContainer.setPadding(padding, padding, padding, padding);
 
         this.descriptionText.setTextSize(16.0f);
         this.descriptionText.setPadding(
@@ -143,10 +111,30 @@ public class ResumeBookmarkDialog extends Dialog {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
         ));
-        this.container.addView(this.buttonContainer, new LinearLayout.LayoutParams(
+
+        this.tafsir.setText("Lihat Tafsir");
+        this.bookmark.setText("Tandai");
+
+        this.tafsir.setOnClickListener(this.onTafsirClickListener);
+        this.bookmark.setOnClickListener(this.onBookmarkClickListener);
+
+        int padding = (int) UnitConverter.fromDpToPx(getContext(), 4.0f);
+        int halfPadding = (int) UnitConverter.fromDpToPx(getContext(), 2.0f);
+        final LinearLayout.LayoutParams firstParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
-        ));
+        );
+
+        firstParams.setMargins(padding, padding, padding, padding);
+
+        final LinearLayout.LayoutParams secondParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        secondParams.setMargins(padding, halfPadding, padding, padding);
+
+        this.container.addView(this.tafsir, firstParams);
+        this.container.addView(this.bookmark, secondParams);
 
         setContentView(this.container, new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -162,15 +150,23 @@ public class ResumeBookmarkDialog extends Dialog {
         }
     }
 
+    private SelectedAyah getSelectedAyah() {
+        return getSafeCastArguments();
+    }
+
     public static class Factory implements Dialog.Factory {
 
         @Override
         public Dialog create(Context context, Parcelable parcelable, DialogEventListener listener) {
-            return new ResumeBookmarkDialog(context, parcelable, listener);
+            return new AyahDetailDialog(context, parcelable, listener);
         }
     }
 
-    public class ResumeBookmarkEvent extends DialogEvent {
+    public class ReadTafsirEvent extends DialogEvent {
+
+    }
+
+    public class PutBookmarkEvent extends DialogEvent {
 
     }
 }

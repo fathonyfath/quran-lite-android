@@ -39,6 +39,7 @@ import id.fathonyfath.quran.lite.utils.dialogManager.DialogEvent;
 import id.fathonyfath.quran.lite.utils.dialogManager.DialogEventListener;
 import id.fathonyfath.quran.lite.utils.dialogManager.DialogManager;
 import id.fathonyfath.quran.lite.views.MainView;
+import id.fathonyfath.quran.lite.views.ayahDetailDialog.AyahDetailDialog;
 import id.fathonyfath.quran.lite.views.noBookmarkDialog.NoBookmarkDialog;
 import id.fathonyfath.quran.lite.views.resumeBookmarkDialog.ResumeBookmarkDialog;
 
@@ -175,6 +176,7 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight>,
     private void registerDialogFactory() {
         DialogManager.registerFactory(NoBookmarkDialog.class, new NoBookmarkDialog.Factory());
         DialogManager.registerFactory(ResumeBookmarkDialog.class, new ResumeBookmarkDialog.Factory());
+        DialogManager.registerFactory(AyahDetailDialog.class, new AyahDetailDialog.Factory());
     }
 
     private void showViewWithActiveTheme() {
