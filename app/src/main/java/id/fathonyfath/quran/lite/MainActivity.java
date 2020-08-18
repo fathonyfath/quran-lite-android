@@ -32,6 +32,7 @@ import id.fathonyfath.quran.lite.useCase.UseCaseProvider;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
 import id.fathonyfath.quran.lite.utils.dialogManager.DialogManager;
 import id.fathonyfath.quran.lite.views.MainView;
+import id.fathonyfath.quran.lite.views.noBookmarkDialog.NoBookmarkDialog;
 
 public class MainActivity extends Activity implements UseCaseCallback<DayNight> {
 
@@ -71,7 +72,7 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight> 
         getWindow().setWindowAnimations(R.style.WindowAnimation);
         recreate();
 
-        showDialog(1);
+        showDialog(NoBookmarkDialog.class.hashCode());
     }
 
     @Override
@@ -162,7 +163,7 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight> 
     }
 
     private void registerDialogFactory() {
-
+        DialogManager.registerFactory(NoBookmarkDialog.class, new NoBookmarkDialog.Factory());
     }
 
     private void showViewWithActiveTheme() {

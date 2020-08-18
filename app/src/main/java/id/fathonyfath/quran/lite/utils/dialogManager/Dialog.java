@@ -1,16 +1,15 @@
 package id.fathonyfath.quran.lite.utils.dialogManager;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.os.Parcelable;
 import android.view.ViewGroup;
 import android.view.Window;
 
-public abstract class SimpleDialog extends Dialog {
+public abstract class Dialog extends android.app.Dialog {
 
     private Parcelable arguments;
 
-    public SimpleDialog(Context context, Parcelable arguments) {
+    public Dialog(Context context, Parcelable arguments) {
         super(context);
 
         this.arguments = arguments;
@@ -29,9 +28,13 @@ public abstract class SimpleDialog extends Dialog {
 
     @SuppressWarnings("unchecked")
     protected final <T extends Parcelable> T getSafeCastArguments() {
-        try {
-            return (T) arguments;
-        } catch (ClassCastException ignored) {
+        if (arguments != null) {
+            try {
+                return (T) arguments;
+            } catch (ClassCastException ignored) {
+                return null;
+            }
+        } else {
             return null;
         }
     }
@@ -46,6 +49,6 @@ public abstract class SimpleDialog extends Dialog {
     }
 
     public interface Factory {
-        SimpleDialog create(Context context, Parcelable parcelable);
+        Dialog create(Context context, Parcelable parcelable);
     }
 }

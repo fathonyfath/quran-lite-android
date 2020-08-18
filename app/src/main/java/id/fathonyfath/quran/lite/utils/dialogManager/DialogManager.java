@@ -7,16 +7,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DialogManager {
-    private static Map<Integer, SimpleDialog.Factory> dialogFactoryHolder = new HashMap<>();
+    private static Map<Integer, Dialog.Factory> dialogFactoryHolder = new HashMap<>();
 
-    public static <T extends SimpleDialog> void registerFactory(Class<T> dialogClass, SimpleDialog.Factory factory) {
+    public static <T extends Dialog> void registerFactory(Class<T> dialogClass, Dialog.Factory factory) {
         if (!DialogManager.dialogFactoryHolder.containsKey(dialogClass.hashCode())) {
             DialogManager.dialogFactoryHolder.put(dialogClass.hashCode(), factory);
         }
     }
 
-    public static <T extends SimpleDialog> SimpleDialog createDialog(int classHashCode, Context context, Parcelable arguments) {
-        SimpleDialog.Factory factory = DialogManager.dialogFactoryHolder.get(classHashCode);
+    public static <T extends Dialog> Dialog createDialog(int classHashCode, Context context, Parcelable arguments) {
+        Dialog.Factory factory = DialogManager.dialogFactoryHolder.get(classHashCode);
         if (factory == null) {
             throw new IllegalStateException("No factory registered for class with hashCode " + classHashCode);
         }
