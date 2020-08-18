@@ -167,7 +167,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             if (SurahListView.this.onViewEventListener != null) {
                 Surah selectedSurah = SurahListView.this.surahAdapter.getItem(position);
-                SurahListView.this.onViewEventListener.onSurahSelected(selectedSurah);
+                SurahListView.this.onViewEventListener.onSurahSelected(selectedSurah, 0);
             }
         }
     };
@@ -393,7 +393,6 @@ public class SurahListView extends WrapperView implements ViewCallback {
     }
 
     private void setBookmarkData(Bookmark bookmark) {
-        bookmark = new Bookmark(12, "Surah - 12", "Suraah - 12", 911);
         this.bookmarkView.setBookmark(bookmark);
         refreshRightToolbar();
     }
@@ -454,12 +453,12 @@ public class SurahListView extends WrapperView implements ViewCallback {
         surahListView.setSelection(position);
         if (this.onViewEventListener != null) {
             Surah selectedSurah = this.surahAdapter.getItem(position);
-            this.onViewEventListener.onSurahSelected(selectedSurah);
+            this.onViewEventListener.onSurahSelected(selectedSurah, bookmark.getLastReadAyah());
         }
     }
 
     public interface OnViewEventListener {
-        void onSurahSelected(Surah selectedSurah);
+        void onSurahSelected(Surah selectedSurah, int lastReadingAyah);
     }
 
     private static class SurahListViewState extends BaseSavedState {

@@ -34,8 +34,8 @@ public class MainView extends BackStackNavigationView {
 
     private final SurahListView.OnViewEventListener surahListEventListener = new SurahListView.OnViewEventListener() {
         @Override
-        public void onSurahSelected(Surah selectedSurah) {
-            routeToSurahDetailView(selectedSurah);
+        public void onSurahSelected(Surah selectedSurah, int lastReadingAyah) {
+            routeToSurahDetailView(selectedSurah, lastReadingAyah);
         }
     };
 
@@ -74,9 +74,9 @@ public class MainView extends BackStackNavigationView {
         this.pushView(SurahListView.class);
     }
 
-    private void routeToSurahDetailView(Surah selectedSurah) {
+    private void routeToSurahDetailView(Surah selectedSurah, int lastReadingAyah) {
         SurahDetailView surahDetailView = this.findChildWithClass(SurahDetailView.class);
-        surahDetailView.setState(selectedSurah);
+        surahDetailView.setState(selectedSurah, lastReadingAyah);
 
         this.pushView(SurahDetailView.class);
     }

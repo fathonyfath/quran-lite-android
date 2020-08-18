@@ -93,6 +93,7 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
     private final float revealThreshold;
     private boolean isFailedToGetSurahDetail = false;
     private Surah currentSurah;
+    private int lastReadingAyah;
     private Parcelable listViewState;
     private boolean newPage = false;
     private final UseCaseCallback<SurahDetail> fetchSurahDetailCallback = new UseCaseCallback<SurahDetail>() {
@@ -242,8 +243,9 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         clearSurahDetailUseCase();
     }
 
-    public void setState(Surah selectedSurah) {
+    public void setState(Surah selectedSurah, int lastReadingAyah) {
         this.currentSurah = selectedSurah;
+        this.lastReadingAyah = lastReadingAyah;
         this.newPage = true;
     }
 
@@ -300,9 +302,11 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
 
         this.ayahViewTypeList.clear();
 
+        boolean basmalahAddedProgrammatically = false;
 
         if (surahDetail.getNumber() != 1) {
             this.ayahViewTypeList.add(new AyahDetailViewType.BasmalahViewModel());
+            basmalahAddedProgrammatically = true;
         }
 
         for (Map.Entry<Integer, String> entry : surahDetail.getContents().entrySet()) {
@@ -317,6 +321,14 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
 
         if (this.listViewState != null && !newPage) {
             this.ayahListView.onRestoreInstanceState(this.listViewState);
+        }
+
+        if (this.lastReadingAyah > 0 && newPage) {
+            if (basmalahAddedProgrammatically) {
+                this.ayahListView.setSelection(this.lastReadingAyah);
+            } else {
+                this.ayahListView.setSelection(this.lastReadingAyah - 1);
+            }
         }
     }
 
