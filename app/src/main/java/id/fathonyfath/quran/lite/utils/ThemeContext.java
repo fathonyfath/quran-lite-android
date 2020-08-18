@@ -2,6 +2,7 @@ package id.fathonyfath.quran.lite.utils;
 
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.view.ContextThemeWrapper;
 
 import id.fathonyfath.quran.lite.themes.BaseTheme;
 
@@ -18,6 +19,11 @@ public class ThemeContext extends ContextWrapper {
         if (context instanceof ThemeContext) {
             ThemeContext themeContext = (ThemeContext) context;
             return themeContext.theme;
+        } else if (context instanceof ContextThemeWrapper) {
+            Context baseContext = ((ContextThemeWrapper) context).getBaseContext();
+            if (baseContext != null) {
+                return saveUnwrapTheme(baseContext);
+            }
         }
 
         return null;
