@@ -105,14 +105,14 @@ public class ResumeBookmarkDialog extends Dialog {
 
         final LinearLayout.LayoutParams firstParams = new LinearLayout.LayoutParams(
                 0,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
+                (int) UnitConverter.fromDpToPx(getContext(), 48.0f),
                 1.0f
         );
         firstParams.setMargins(0, 0, halfPadding, 0);
 
         final LinearLayout.LayoutParams secondParams = new LinearLayout.LayoutParams(
                 0,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
+                (int) UnitConverter.fromDpToPx(getContext(), 48.0f),
                 1.0f
         );
         secondParams.setMargins(halfPadding, 0, 0, 0);

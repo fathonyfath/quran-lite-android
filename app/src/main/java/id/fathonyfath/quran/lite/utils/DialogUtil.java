@@ -42,6 +42,8 @@ public class DialogUtil {
 
         if (hostingActivity instanceof MainActivity) {
             MainActivity activity = (MainActivity) hostingActivity;
+
+            activity.removeDialog(dialogClass.hashCode());
             activity.showDialog(dialogClass.hashCode(), createBundle(arguments));
         }
     }
