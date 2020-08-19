@@ -34,7 +34,6 @@ public class LpmqEditText extends EditText {
         BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
         if (theme != null) {
             this.setTextColor(theme.contrastColor());
-            ViewUtil.setCursorColor(this, theme.contrastColor());
         }
     }
 }
