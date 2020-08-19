@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
@@ -60,6 +61,13 @@ public abstract class WrapperView extends RelativeLayout {
         if (this.toolbarView != null) {
             this.toolbarView.setRightView(viewSet);
         }
+    }
+
+    protected EditText getSearchInput() {
+        if (this.toolbarView != null) {
+            return this.toolbarView.getSearchInput();
+        }
+        return null;
     }
 
     @Override

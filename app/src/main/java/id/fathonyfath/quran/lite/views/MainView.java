@@ -45,6 +45,13 @@ public class MainView extends BackStackNavigationView {
         }
     };
 
+    private final SearchSurahView.OnViewEventListener searchSurahEventListener = new SearchSurahView.OnViewEventListener() {
+        @Override
+        public void onCloseClicked() {
+            MainView.this.popView();
+        }
+    };
+
     public MainView(Context context) {
         super(context);
 
@@ -66,6 +73,7 @@ public class MainView extends BackStackNavigationView {
         surahListView.setOnViewEventListener(this.surahListEventListener);
 
         final SearchSurahView searchSurahView = new SearchSurahView(getContext());
+        searchSurahView.setOnViewEventListener(this.searchSurahEventListener);
 
         final SurahDetailView surahDetailView = new SurahDetailView(getContext());
 

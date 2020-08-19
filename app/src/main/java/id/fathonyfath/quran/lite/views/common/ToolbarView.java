@@ -79,6 +79,10 @@ public class ToolbarView extends RelativeLayout {
         updateSearchMode();
     }
 
+    public EditText getSearchInput() {
+        return this.searchInputText;
+    }
+
     public void setLeftView(View leftView) {
         this.leftView = leftView;
         if (this.leftView != null) {
