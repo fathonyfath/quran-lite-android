@@ -35,6 +35,7 @@ import id.fathonyfath.quran.lite.utils.dialogManager.DialogEventListener;
 import id.fathonyfath.quran.lite.utils.viewLifecycle.ViewCallback;
 import id.fathonyfath.quran.lite.views.ayahDetailDialog.AyahDetailDialog;
 import id.fathonyfath.quran.lite.views.common.BookmarkView;
+import id.fathonyfath.quran.lite.views.common.CloseView;
 import id.fathonyfath.quran.lite.views.common.DayNightSwitchButton;
 import id.fathonyfath.quran.lite.views.common.ProgressView;
 import id.fathonyfath.quran.lite.views.common.RetryView;
@@ -200,6 +201,18 @@ public class SurahListView extends WrapperView implements ViewCallback {
 
         this.dayNightSwitchButton = new DayNightSwitchButton(getContext());
         this.dayNightSwitchButton.setOnClickListener(this.onDayNightPreferenceClickListener);
+
+        CloseView closeView = new CloseView(getContext());
+        closeView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(onViewEventListener != null) {
+                    onViewEventListener.onSearchClicked();
+                }
+            }
+        });
+
+        this.setToolbarLeftView(closeView);
 
         this.setToolbarTitle("Al-Qur'an Lite");
         this.setElevationAlpha(0.1f);
@@ -460,6 +473,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
 
     public interface OnViewEventListener {
         void onSurahSelected(Surah selectedSurah, int lastReadingAyah);
+        void onSearchClicked();
     }
 
     private static class SurahListViewState extends BaseSavedState {

@@ -9,6 +9,7 @@ import id.fathonyfath.quran.lite.utils.TypefaceLoader;
 import id.fathonyfath.quran.lite.utils.ViewUtil;
 import id.fathonyfath.quran.lite.views.common.BackStackNavigationView;
 import id.fathonyfath.quran.lite.views.fontDownloader.FontDownloaderView;
+import id.fathonyfath.quran.lite.views.searchSurah.SearchSurahView;
 import id.fathonyfath.quran.lite.views.surahDetail.SurahDetailView;
 import id.fathonyfath.quran.lite.views.surahList.SurahListView;
 
@@ -37,6 +38,11 @@ public class MainView extends BackStackNavigationView {
         public void onSurahSelected(Surah selectedSurah, int lastReadingAyah) {
             routeToSurahDetailView(selectedSurah, lastReadingAyah);
         }
+
+        @Override
+        public void onSearchClicked() {
+            routeToSearchSurahView();
+        }
     };
 
     public MainView(Context context) {
@@ -59,10 +65,13 @@ public class MainView extends BackStackNavigationView {
         final SurahListView surahListView = new SurahListView(getContext());
         surahListView.setOnViewEventListener(this.surahListEventListener);
 
+        final SearchSurahView searchSurahView = new SearchSurahView(getContext());
+
         final SurahDetailView surahDetailView = new SurahDetailView(getContext());
 
         this.registerView(FontDownloaderView.class, fontDownloaderView);
         this.registerView(SurahListView.class, surahListView);
+        this.registerView(SearchSurahView.class, searchSurahView);
         this.registerView(SurahDetailView.class, surahDetailView);
     }
 
@@ -72,6 +81,10 @@ public class MainView extends BackStackNavigationView {
 
     private void routeToSurahListView() {
         this.pushView(SurahListView.class);
+    }
+
+    private void routeToSearchSurahView() {
+        this.pushView(SearchSurahView.class);
     }
 
     private void routeToSurahDetailView(Surah selectedSurah, int lastReadingAyah) {

@@ -57,6 +57,8 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
     public FontDownloaderView(Context context) {
         super(context);
 
+        setId(Res.Id.fontDownloaderView);
+
         this.containerLayout = new LinearLayout(context);
         this.informationTextView = new TextView(context);
         this.progressView = new ProgressView(context);
@@ -126,7 +128,7 @@ public class FontDownloaderView extends FrameLayout implements ViewCallback {
                 0
         );
         this.progressView.setLayoutParams(progressParams);
-        this.progressView.setId(Res.Id.fontDownloader_progressView);
+        this.progressView.setId(Res.Id.fontDownloaderView_progressView);
 
         this.containerLayout.setPadding(
                 (int) UnitConverter.fromDpToPx(getContext(), 32f),

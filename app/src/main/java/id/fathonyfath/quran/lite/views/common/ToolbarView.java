@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
@@ -19,12 +20,14 @@ import id.fathonyfath.quran.lite.utils.UnitConverter;
 public class ToolbarView extends RelativeLayout {
 
     private final LpmqTextView titleView;
+    private final LpmqEditText searchInputText;
 
     private View leftView;
     private Set<View> setOnRightView;
     private LinearLayout collectionRightView;
 
     private String title;
+    private boolean isSearchMode;
 
     public ToolbarView(Context context) {
         super(context);
@@ -36,9 +39,19 @@ public class ToolbarView extends RelativeLayout {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
         ));
+
         this.titleView.setGravity(Gravity.CENTER_VERTICAL);
         this.titleView.setPadding((int) UnitConverter.fromDpToPx(getContext(), 16f), 0, 0, 0);
         this.titleView.setTextSize(18f);
+
+        this.searchInputText = new LpmqEditText(getContext());
+        this.searchInputText.setLayoutParams(new RelativeLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+        ));
+        this.searchInputText.setGravity(Gravity.CENTER_VERTICAL);
+        this.searchInputText.setBackground(null);
+        this.searchInputText.setTextSize(18f);
 
         final RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -59,6 +72,11 @@ public class ToolbarView extends RelativeLayout {
     public void setTitle(String title) {
         this.title = title;
         updateToolbarTitle();
+    }
+
+    public void setSearchMode(boolean searchMode) {
+        this.isSearchMode = searchMode;
+        updateSearchMode();
     }
 
     public void setLeftView(View leftView) {
@@ -89,6 +107,7 @@ public class ToolbarView extends RelativeLayout {
             addView(this.leftView);
         }
         addView(this.titleView);
+        addView(this.searchInputText);
         addView(this.collectionRightView);
 
         updateLayoutConfiguration();
@@ -103,6 +122,7 @@ public class ToolbarView extends RelativeLayout {
         setBackgroundColor(Color.WHITE);
 
         updateToolbarTitle();
+        updateSearchMode();
     }
 
     private void applyStyleBasedOnTheme() {
@@ -110,6 +130,7 @@ public class ToolbarView extends RelativeLayout {
         if (theme != null) {
             this.setBackgroundColor(theme.toolbarColor());
             this.titleView.setTextColor(theme.contrastColor());
+            this.searchInputText.setTextColor(theme.contrastColor());
         }
     }
 
@@ -117,17 +138,35 @@ public class ToolbarView extends RelativeLayout {
         this.titleView.setText(this.title);
     }
 
+    private void updateSearchMode() {
+        if (this.isSearchMode) {
+            this.collectionRightView.setVisibility(View.GONE);
+            this.titleView.setVisibility(View.GONE);
+            this.searchInputText.setVisibility(View.VISIBLE);
+        } else {
+            this.collectionRightView.setVisibility(View.VISIBLE);
+            this.titleView.setVisibility(View.VISIBLE);
+            this.searchInputText.setVisibility(View.GONE);
+        }
+    }
+
     private void updateLayoutConfiguration() {
-        RelativeLayout.LayoutParams params = new LayoutParams(this.titleView.getLayoutParams());
-        params.addRule(RelativeLayout.RIGHT_OF, 0);
+        RelativeLayout.LayoutParams titleParams = new LayoutParams(this.titleView.getLayoutParams());
+        titleParams.addRule(RelativeLayout.RIGHT_OF, 0);
+
+        RelativeLayout.LayoutParams searchParams = new LayoutParams(this.searchInputText.getLayoutParams());
+        searchParams.addRule(RelativeLayout.RIGHT_OF, 0);
 
         if (this.leftView != null) {
-            params.addRule(RIGHT_OF, this.leftView.getId());
+            titleParams.addRule(RIGHT_OF, this.leftView.getId());
+            searchParams.addRule(RIGHT_OF, this.leftView.getId());
         }
 
-        params.addRule(LEFT_OF, this.collectionRightView.getId());
+        titleParams.addRule(LEFT_OF, this.collectionRightView.getId());
+        searchParams.addRule(LEFT_OF, this.collectionRightView.getId());
 
-        this.titleView.setLayoutParams(params);
+        this.titleView.setLayoutParams(titleParams);
+        this.searchInputText.setLayoutParams(searchParams);
     }
 
     private void updateLeftViewConfiguration() {
