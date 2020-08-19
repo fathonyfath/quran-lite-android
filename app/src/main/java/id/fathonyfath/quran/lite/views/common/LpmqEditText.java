@@ -10,6 +10,7 @@ import id.fathonyfath.quran.lite.data.FontProvider;
 import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
 import id.fathonyfath.quran.lite.utils.TypefaceLoader;
+import id.fathonyfath.quran.lite.utils.ViewUtil;
 
 public class LpmqEditText extends EditText {
 
@@ -33,6 +34,7 @@ public class LpmqEditText extends EditText {
         BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
         if (theme != null) {
             this.setTextColor(theme.contrastColor());
+            ViewUtil.setCursorColor(this, theme.contrastColor());
         }
     }
 }

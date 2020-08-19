@@ -1,8 +1,10 @@
 package id.fathonyfath.quran.lite.utils;
 
+import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
+import android.os.Build;
 import android.util.StateSet;
 
 public class DrawableUtil {
@@ -22,5 +24,13 @@ public class DrawableUtil {
         drawable.addState(StateSet.WILD_CARD, transparentColor);
 
         return drawable;
+    }
+
+    public static Drawable getDrawable(Context context, int id) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            return context.getResources().getDrawable(id);
+        } else {
+            return context.getDrawable(id);
+        }
     }
 }
