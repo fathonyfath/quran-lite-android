@@ -24,12 +24,21 @@ public class SurahJSONParser {
         return response;
     }
 
-    private static SurahJSON parseJSONObjectToSurahJSON(JSONObject index) throws JSONException {
+    public static SurahJSON parseJSONObjectToSurahJSON(JSONObject index) throws JSONException {
         final SurahJSON surah = new SurahJSON();
         surah.number = index.getInt("number");
         surah.name = index.getString("name");
         surah.name_latin = index.getString("name_latin");
         surah.number_of_ayah = index.getInt("number_of_ayah");
         return surah;
+    }
+
+    public static JSONObject parseSurahJSONToJSONObject(SurahJSON surahJSON) throws JSONException {
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("number", surahJSON.number);
+        jsonObject.put("name", surahJSON.name);
+        jsonObject.put("name_latin", surahJSON.name_latin);
+        jsonObject.put("number_of_ayah", surahJSON.number_of_ayah);
+        return jsonObject;
     }
 }
