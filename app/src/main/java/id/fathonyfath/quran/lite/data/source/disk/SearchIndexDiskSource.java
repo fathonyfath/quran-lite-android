@@ -2,8 +2,8 @@ package id.fathonyfath.quran.lite.data.source.disk;
 
 import android.content.Context;
 
+import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -23,7 +23,7 @@ public class SearchIndexDiskSource {
         this.destDir.mkdirs();
     }
 
-    public JSONObject getSearchIndex() {
+    public JSONArray getSearchIndexes() {
         final File indexFile = new File(this.destDir, searchIndexFileName);
         if (!indexFile.exists()) {
             return null;
@@ -36,25 +36,25 @@ public class SearchIndexDiskSource {
                 return null;
             }
 
-            return new JSONObject(jsonFile);
+            return new JSONArray(jsonFile);
         } catch (JSONException ignored) {
 
         }
         return null;
     }
 
-    public boolean isSearchIndexExist() {
+    public boolean isSearchIndexesExist() {
         final File indexFile = new File(this.destDir, searchIndexFileName);
         return indexFile.exists();
     }
 
-    public boolean saveSearchIndex(JSONObject jsonObject) {
+    public boolean saveSearchIndexes(JSONArray jsonArray) {
         final File indexFile = new File(this.destDir, searchIndexFileName);
         if (indexFile.exists()) {
             indexFile.delete();
         }
 
-        return saveStringToFile(indexFile, jsonObject.toString());
+        return saveStringToFile(indexFile, jsonArray.toString());
     }
 
     private String readStringFromFile(File source) {
