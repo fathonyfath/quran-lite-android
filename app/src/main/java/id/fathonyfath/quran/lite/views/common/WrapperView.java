@@ -51,6 +51,12 @@ public abstract class WrapperView extends RelativeLayout {
         }
     }
 
+    protected void setOnSearchListener(ToolbarView.OnSearchListener listener) {
+        if (this.toolbarView != null) {
+            this.toolbarView.setOnSearchListener(listener);
+        }
+    }
+
     protected void setToolbarLeftView(View view) {
         if (this.toolbarView != null) {
             this.toolbarView.setLeftView(view);

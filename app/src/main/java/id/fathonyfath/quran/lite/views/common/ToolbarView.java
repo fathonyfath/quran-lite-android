@@ -3,11 +3,14 @@ package id.fathonyfath.quran.lite.views.common;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,6 +31,21 @@ public class ToolbarView extends RelativeLayout {
 
     private String title;
     private boolean isSearchMode;
+
+    private OnSearchListener onSearchListener;
+
+    private final TextView.OnEditorActionListener onSearchActionListener = new TextView.OnEditorActionListener() {
+        @Override
+        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                if (onSearchListener != null) {
+                    onSearchListener.onSearch(v.getText().toString());
+                }
+                return true;
+            }
+            return false;
+        }
+    };
 
     public ToolbarView(Context context) {
         super(context);
@@ -52,6 +70,9 @@ public class ToolbarView extends RelativeLayout {
         this.searchInputText.setGravity(Gravity.CENTER_VERTICAL);
         this.searchInputText.setBackground(null);
         this.searchInputText.setTextSize(18f);
+        this.searchInputText.setSingleLine();
+        this.searchInputText.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
+        this.searchInputText.setOnEditorActionListener(onSearchActionListener);
 
         final RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -77,6 +98,10 @@ public class ToolbarView extends RelativeLayout {
     public void setSearchMode(boolean searchMode) {
         this.isSearchMode = searchMode;
         updateSearchMode();
+    }
+
+    public void setOnSearchListener(OnSearchListener onSearchListener) {
+        this.onSearchListener = onSearchListener;
     }
 
     public EditText getSearchInput() {
@@ -188,5 +213,9 @@ public class ToolbarView extends RelativeLayout {
 
             this.collectionRightView.addView(view);
         }
+    }
+
+    public interface OnSearchListener {
+        void onSearch(String query);
     }
 }

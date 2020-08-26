@@ -19,8 +19,8 @@ public class DoSearchUseCase extends BaseUseCase {
     private final QuranRepository quranRepository;
     private final SearchIndexRepository searchIndexRepository;
 
-    private final int nGramValue = 2;
-    private final float coefficientThreshold = 0.75f;
+    private final int nGramValue = 4;
+    private final float coefficientThreshold = 0.0f;
 
     private UseCaseCallback<List<Surah>> callback;
     private String searchQuery;
@@ -34,8 +34,17 @@ public class DoSearchUseCase extends BaseUseCase {
         this.searchQuery = searchQuery;
     }
 
+    public void setCallback(UseCaseCallback<List<Surah>> callback) {
+        this.callback = callback;
+    }
+
     @Override
     protected void task() {
+        if (searchQuery == null || searchQuery.isEmpty() || searchQuery.length() < nGramValue) {
+            postErrorToMainThread(new IllegalStateException("Search query does not met the requirement."));
+            return;
+        }
+
         Schedulers.IO().execute(new Runnable() {
             @Override
             public void run() {
@@ -76,7 +85,7 @@ public class DoSearchUseCase extends BaseUseCase {
     }
 
     private SearchIndex createSearchIndex(Surah surah) {
-        final String keywordsBuilder = "qs. quran surat " + surah.getNameInLatin() + " nomor surat : " + surah.getNumber();
+        final String keywordsBuilder = surah.getNameInLatin() + " " + surah.getNumber();
         final String keywords = keywordsBuilder.toLowerCase();
         final int indexesLength = keywords.length() - nGramValue + 1;
         final String[] indexes = new String[indexesLength];
@@ -130,6 +139,17 @@ public class DoSearchUseCase extends BaseUseCase {
             public void run() {
                 if (callback != null) {
                     callback.onResult(searchResult);
+                }
+            }
+        });
+    }
+
+    private void postErrorToMainThread(final Exception e) {
+        Schedulers.Main().execute(new Runnable() {
+            @Override
+            public void run() {
+                if (callback != null) {
+                    callback.onError(e);
                 }
             }
         });

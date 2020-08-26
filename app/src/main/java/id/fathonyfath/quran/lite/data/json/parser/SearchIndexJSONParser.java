@@ -34,7 +34,7 @@ public class SearchIndexJSONParser {
     private static SearchIndexJSON parseJSONObjectToSearchIndexJSON(JSONObject jsonObject) throws JSONException {
         final SearchIndexJSON searchIndex = new SearchIndexJSON();
         final JSONArray indexesJSON = jsonObject.getJSONArray("indexes");
-        final String[] indexes = new String[jsonObject.length()];
+        final String[] indexes = new String[indexesJSON.length()];
         for (int i = 0; i < indexesJSON.length(); i++) {
             indexes[i] = indexesJSON.getString(i);
         }
