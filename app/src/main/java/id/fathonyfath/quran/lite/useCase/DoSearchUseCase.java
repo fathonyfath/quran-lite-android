@@ -54,7 +54,7 @@ public class DoSearchUseCase extends BaseUseCase {
     }
 
     private void startSearchProcess() {
-        if (!searchIndexRepository.isSearchIndexesExist()) {
+        if (!searchIndexRepository.isSearchIndexesExist() || !checkIfNGramsIsSame()) {
             final List<Surah> surahList = quranRepository.fetchAllSurah(null, null);
             Schedulers.Computation().execute(new Runnable() {
                 @Override
@@ -73,6 +73,25 @@ public class DoSearchUseCase extends BaseUseCase {
         } else {
             getSearchIndexesAndDoSearch();
         }
+    }
+
+    private boolean checkIfNGramsIsSame() {
+        final List<SearchIndex> searchIndexes = searchIndexRepository.fetchSearchIndexes();
+        if (searchIndexes.isEmpty()) {
+            return false;
+        }
+
+        final SearchIndex firstSearchIndex = searchIndexes.get(0);
+        if (firstSearchIndex.getIndexes().length == 0) {
+            return false;
+        }
+
+        final String index = firstSearchIndex.getIndexes()[0];
+        if (index.isEmpty() || index.length() != nGramValue) {
+            return false;
+        }
+
+        return true;
     }
 
     private List<SearchIndex> createSearchIndexesForSurahList(List<Surah> surahList) {
