@@ -1,12 +1,15 @@
 package id.fathonyfath.quran.lite.useCase;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import id.fathonyfath.quran.lite.data.QuranRepository;
 import id.fathonyfath.quran.lite.data.SearchIndexRepository;
@@ -19,8 +22,8 @@ public class DoSearchUseCase extends BaseUseCase {
     private final QuranRepository quranRepository;
     private final SearchIndexRepository searchIndexRepository;
 
-    private final int nGramValue = 3;
-    private final float coefficientThreshold = 0.0f;
+    private final int nGramValue = 2;
+    private final float coefficientThreshold = 0.15f;
 
     private UseCaseCallback<List<Surah>> callback;
     private String searchQuery;
@@ -172,6 +175,11 @@ public class DoSearchUseCase extends BaseUseCase {
 
     private float calculateDifferentialsBetween(String[] surahIndex, String[] searchQueryIndex) {
         int commonCount = 0;
+        final Set<String> uniqueKeyword = new HashSet<>();
+
+        uniqueKeyword.addAll(Arrays.asList(surahIndex));
+        uniqueKeyword.addAll(Arrays.asList(searchQueryIndex));
+
         for (String sourceIndex : surahIndex) {
             for (String targetIndex : searchQueryIndex) {
                 if (sourceIndex.equalsIgnoreCase(targetIndex)) {
@@ -181,7 +189,7 @@ public class DoSearchUseCase extends BaseUseCase {
         }
 
         float commonFloat = (float) commonCount;
-        float dividerFloat = Math.max((float) surahIndex.length, (float) searchQueryIndex.length);
+        float dividerFloat = uniqueKeyword.size();
         return commonFloat / dividerFloat;
     }
 

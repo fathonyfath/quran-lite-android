@@ -1,23 +1,37 @@
 package id.fathonyfath.quran.lite.views.searchSurah;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import id.fathonyfath.quran.lite.Res;
 import id.fathonyfath.quran.lite.models.Surah;
+import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.useCase.DoSearchUseCase;
 import id.fathonyfath.quran.lite.useCase.UseCaseCallback;
 import id.fathonyfath.quran.lite.useCase.UseCaseProvider;
+import id.fathonyfath.quran.lite.utils.ThemeContext;
+import id.fathonyfath.quran.lite.utils.ViewUtil;
 import id.fathonyfath.quran.lite.utils.viewLifecycle.ViewCallback;
 import id.fathonyfath.quran.lite.views.common.CloseView;
 import id.fathonyfath.quran.lite.views.common.ToolbarView;
 import id.fathonyfath.quran.lite.views.common.WrapperView;
+import id.fathonyfath.quran.lite.views.surahList.SurahAdapter;
 
 public class SearchSurahView extends WrapperView implements ViewCallback {
+
+    private final List<Surah> surahList = new ArrayList<>();
+    private final ListView surahListView;
+    private final SurahAdapter surahAdapter;
 
     private final ToolbarView.OnSearchListener searchListener = new ToolbarView.OnSearchListener() {
         @Override
@@ -40,12 +54,16 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
 
         @Override
         public void onResult(List<Surah> data) {
-            Toast.makeText(getContext(), "Size is " + data.size(), Toast.LENGTH_SHORT).show();
+            unregisterAndClearUseCase();
+
+            updateSearchResult(data);
         }
 
         @Override
         public void onError(Throwable throwable) {
+            unregisterAndClearUseCase();
 
+            Toast.makeText(getContext(), "Keyword yang anda masukkan tidak memenuhi syarat minimum karakter.", Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -55,6 +73,9 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
         super(context);
 
         setId(Res.Id.searchSurahView);
+
+        this.surahListView = new ListView(getContext());
+        this.surahAdapter = new SurahAdapter(getContext(), this.surahList);
 
         CloseView closeView = new CloseView(context);
         closeView.setOnClickListener(new OnClickListener() {
@@ -70,10 +91,28 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
 
         this.setElevationAlpha(0.1f);
         this.setToolbarIsSearchMode(true);
+
+        initConfiguration();
+        initView();
+        applyStyleBasedOnTheme();
     }
 
     public void setOnViewEventListener(OnViewEventListener onViewEventListener) {
         this.onViewEventListener = onViewEventListener;
+    }
+
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        final SearchSurahViewState viewState = new SearchSurahViewState(super.onSaveInstanceState());
+        viewState.surahList = this.surahList;
+        return viewState;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        final SearchSurahViewState viewState = (SearchSurahViewState) state;
+        super.onRestoreInstanceState(viewState.getSuperState());
+        restoreSurahList(viewState.surahList);
     }
 
     @Override
@@ -107,6 +146,36 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
         }
 
         this.setOnSearchListener(null);
+    }
+
+    private void initConfiguration() {
+        setBackgroundColor(Color.WHITE);
+    }
+
+    private void initView() {
+        this.surahListView.setId(Res.Id.searchSurahView_surahListView);
+        this.surahListView.setAdapter(this.surahAdapter);
+
+        addView(this.surahListView);
+    }
+
+    private void applyStyleBasedOnTheme() {
+        BaseTheme theme = ThemeContext.saveUnwrapTheme(getContext());
+        if (theme != null) {
+            this.setBackgroundColor(theme.baseColor());
+            ViewUtil.setDefaultSelectableBackgroundDrawable(this.surahListView, theme.contrastColor());
+        }
+    }
+
+    private void updateSearchResult(List<Surah> surahList) {
+        this.surahAdapter.clear();
+        this.surahAdapter.addAll(surahList);
+        this.surahAdapter.notifyDataSetChanged();
+    }
+
+    private void restoreSurahList(List<Surah> surahList) {
+        this.surahList.clear();
+        this.surahList.addAll(surahList);
     }
 
     private void doSearchProcess(String query) {
@@ -149,5 +218,52 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
 
     public interface OnViewEventListener {
         void onCloseClicked();
+    }
+
+    private static class SearchSurahViewState extends BaseSavedState {
+
+        public static final Parcelable.Creator<SearchSurahViewState> CREATOR
+                = new Parcelable.ClassLoaderCreator<SearchSurahViewState>() {
+            @Override
+            public SearchSurahViewState createFromParcel(Parcel in) {
+                return new SearchSurahViewState(in, null);
+            }
+
+            @Override
+            public SearchSurahViewState createFromParcel(Parcel in, ClassLoader loader) {
+                return new SearchSurahViewState(in, loader);
+            }
+
+            @Override
+            public SearchSurahViewState[] newArray(int size) {
+                return new SearchSurahViewState[size];
+            }
+        };
+
+        private List<Surah> surahList = new ArrayList<>();
+
+        public SearchSurahViewState(Parcel source, ClassLoader loader) {
+            super(source);
+
+            int size = source.readInt();
+            Surah[] surahArray = new Surah[size];
+            source.readTypedArray(surahArray, Surah.CREATOR);
+
+            this.surahList.clear();
+            this.surahList.addAll(Arrays.asList(surahArray));
+        }
+
+        public SearchSurahViewState(Parcelable superState) {
+            super(superState);
+        }
+
+        @Override
+        public void writeToParcel(Parcel out, int flags) {
+            super.writeToParcel(out, flags);
+
+            out.writeInt(this.surahList.size());
+            Surah[] surahArray = this.surahList.toArray(new Surah[0]);
+            out.writeTypedArray(surahArray, flags);
+        }
     }
 }
