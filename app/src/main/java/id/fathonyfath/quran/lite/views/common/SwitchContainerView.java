@@ -76,6 +76,10 @@ public class SwitchContainerView extends FrameLayout {
     }
 
     private void animateHideAllVisibleChild() {
+        for (Runnable runnable : this.removeViewRunnables) {
+            runnable.run();
+        }
+
         for (int i = 0; i < this.getChildCount(); i++) {
             View currentView = this.getChildAt(i);
             if (currentView.getVisibility() != View.GONE) {
