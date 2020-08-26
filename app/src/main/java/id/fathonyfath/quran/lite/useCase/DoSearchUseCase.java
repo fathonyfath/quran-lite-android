@@ -19,7 +19,7 @@ public class DoSearchUseCase extends BaseUseCase {
     private final QuranRepository quranRepository;
     private final SearchIndexRepository searchIndexRepository;
 
-    private final int nGramValue = 4;
+    private final int nGramValue = 3;
     private final float coefficientThreshold = 0.0f;
 
     private UseCaseCallback<List<Surah>> callback;
@@ -87,11 +87,7 @@ public class DoSearchUseCase extends BaseUseCase {
         }
 
         final String index = firstSearchIndex.getIndexes()[0];
-        if (index.isEmpty() || index.length() != nGramValue) {
-            return false;
-        }
-
-        return true;
+        return !index.isEmpty() && index.length() == nGramValue;
     }
 
     private List<SearchIndex> createSearchIndexesForSurahList(List<Surah> surahList) {
