@@ -15,6 +15,9 @@ import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
 import id.fathonyfath.quran.lite.utils.UnitConverter;
 import id.fathonyfath.quran.lite.utils.ViewUtil;
+import id.fathonyfath.quran.lite.utils.drawing.Circle;
+import id.fathonyfath.quran.lite.utils.drawing.RectHelper;
+import id.fathonyfath.quran.lite.utils.drawing.Vec2;
 
 public class DayNightSwitchButton extends View {
 
@@ -261,100 +264,5 @@ public class DayNightSwitchButton extends View {
         this.moonPath.close();
     }
 
-    private static final class RectHelper {
-        public static RectF findSquareRect(Rect rect, float containerHeight, float containerWidth) {
-            final float availableHeight = rect.bottom - rect.top;
-            final float availableWidth = rect.right - rect.left;
 
-            final RectF circleRect = new RectF();
-
-            if (availableHeight < availableWidth) {
-                final float left = (containerWidth - availableHeight) / 2.0f;
-                final float right = left + availableHeight;
-
-                circleRect.set(
-                        left,
-                        rect.top,
-                        right,
-                        rect.bottom
-                );
-            } else {
-                final float top = (containerHeight - availableWidth) / 2.0f;
-                final float bottom = top + availableWidth;
-
-                circleRect.set(
-                        rect.left,
-                        top,
-                        rect.right,
-                        bottom
-                );
-            }
-
-            return circleRect;
-        }
-
-        public static Circle findCircleOnRect(Rect rect, float containerHeight, float containerWidth) {
-            final RectF circleRect = findSquareRect(rect, containerHeight, containerWidth);
-
-            final float diameter = circleRect.bottom - circleRect.top;
-            final float radius = diameter / 2.0f;
-            final float x = circleRect.left + radius;
-            final float y = circleRect.top + radius;
-
-            return new Circle(new Vec2(x, y), radius);
-        }
-    }
-
-    private static class Vec2 {
-        public final float x, y;
-
-        Vec2(float x, float y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        public float distance(Vec2 other) {
-            return (float) Math.sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y));
-        }
-    }
-
-    private static final class Circle {
-        public final Vec2 position;
-        public final float radius;
-
-        Circle(Vec2 position, float radius) {
-            this.position = position;
-            this.radius = radius;
-        }
-
-        public double degrees(Circle other) {
-            final float d = position.distance(other.position);
-            final float powOfThisR = (float) Math.pow(this.radius, 2);
-            final float powOfOtherR = (float) Math.pow(other.radius, 2);
-            final float powOfD = (float) Math.pow(d, 2);
-            final float a = (powOfThisR - powOfOtherR + powOfD) / (2 * d);
-            final float h = (float) Math.sqrt(powOfThisR - (a * a));
-
-            final double radians = Math.atan(h / a);
-
-            return Math.toDegrees(radians);
-        }
-
-        Vec2 getPointAtAngleDeg(float degree) {
-            final double radians = Math.toRadians(degree);
-            final float x = (float) (this.position.x + (this.radius * Math.cos(radians)));
-            final float y = (float) (this.position.y + (this.radius * Math.sin(radians)));
-
-            return new Vec2(x, y);
-        }
-
-        RectF getBounds() {
-            return new RectF(
-                    this.position.x - this.radius,
-                    this.position.y - this.radius,
-                    this.position.x + this.radius,
-                    this.position.y + this.radius
-            );
-        }
-    }
 }

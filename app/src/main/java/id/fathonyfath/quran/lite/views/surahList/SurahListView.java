@@ -33,12 +33,11 @@ import id.fathonyfath.quran.lite.utils.ViewUtil;
 import id.fathonyfath.quran.lite.utils.dialogManager.DialogEvent;
 import id.fathonyfath.quran.lite.utils.dialogManager.DialogEventListener;
 import id.fathonyfath.quran.lite.utils.viewLifecycle.ViewCallback;
-import id.fathonyfath.quran.lite.views.ayahDetailDialog.AyahDetailDialog;
 import id.fathonyfath.quran.lite.views.common.BookmarkView;
-import id.fathonyfath.quran.lite.views.common.CloseView;
 import id.fathonyfath.quran.lite.views.common.DayNightSwitchButton;
 import id.fathonyfath.quran.lite.views.common.ProgressView;
 import id.fathonyfath.quran.lite.views.common.RetryView;
+import id.fathonyfath.quran.lite.views.common.SearchView;
 import id.fathonyfath.quran.lite.views.common.WrapperView;
 import id.fathonyfath.quran.lite.views.noBookmarkDialog.NoBookmarkDialog;
 import id.fathonyfath.quran.lite.views.resumeBookmarkDialog.ResumeBookmarkDialog;
@@ -52,6 +51,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
     private final RetryView retryView;
     private final BookmarkView bookmarkView;
     private final DayNightSwitchButton dayNightSwitchButton;
+    private final SearchView searchView;
     private final UseCaseCallback<DayNightPreference> dayNightPreferenceCallback = new UseCaseCallback<DayNightPreference>() {
         @Override
         public void onProgress(float progress) {
@@ -184,6 +184,14 @@ public class SurahListView extends WrapperView implements ViewCallback {
             }
         }
     };
+    private final OnClickListener onSearchClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if(onViewEventListener != null) {
+                onViewEventListener.onSearchClicked();
+            }
+        }
+    };
 
     public SurahListView(Context context) {
         super(context);
@@ -202,20 +210,12 @@ public class SurahListView extends WrapperView implements ViewCallback {
         this.dayNightSwitchButton = new DayNightSwitchButton(getContext());
         this.dayNightSwitchButton.setOnClickListener(this.onDayNightPreferenceClickListener);
 
-        CloseView closeView = new CloseView(getContext());
-        closeView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(onViewEventListener != null) {
-                    onViewEventListener.onSearchClicked();
-                }
-            }
-        });
-
-        this.setToolbarLeftView(closeView);
+        this.searchView = new SearchView(getContext());
+        this.searchView.setOnClickListener(this.onSearchClickListener);
 
         this.setToolbarTitle("Al-Qur'an Lite");
         this.setElevationAlpha(0.1f);
+        this.setToolbarLeftView(this.searchView);
 
         initConfiguration();
         initView();
