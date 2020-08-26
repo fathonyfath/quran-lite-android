@@ -7,6 +7,7 @@ import android.os.Parcelable;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -105,6 +106,9 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
     protected Parcelable onSaveInstanceState() {
         final SearchSurahViewState viewState = new SearchSurahViewState(super.onSaveInstanceState());
         viewState.surahList = this.surahList;
+        if (getSearchInput() != null) {
+            viewState.searchQuery = getSearchInput().getText().toString();
+        }
         return viewState;
     }
 
@@ -113,6 +117,10 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
         final SearchSurahViewState viewState = (SearchSurahViewState) state;
         super.onRestoreInstanceState(viewState.getSuperState());
         restoreSurahList(viewState.surahList);
+
+        if (getSearchInput() != null) {
+            getSearchInput().setText(viewState.searchQuery, TextView.BufferType.EDITABLE);
+        }
     }
 
     @Override
@@ -122,18 +130,20 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
             final InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.showSoftInput(getSearchInput(), InputMethodManager.SHOW_IMPLICIT);
         }
-
-        this.setOnSearchListener(searchListener);
     }
 
     @Override
     public void onResume() {
         tryToRestoreUseCase();
+
+        this.setOnSearchListener(searchListener);
     }
 
     @Override
     public void onPause() {
         unregisterUseCase();
+
+        this.setOnSearchListener(null);
     }
 
     @Override
@@ -145,7 +155,12 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
             imm.hideSoftInputFromWindow(getSearchInput().getWindowToken(), 0);
         }
 
-        this.setOnSearchListener(null);
+        this.surahList.clear();
+        this.surahAdapter.notifyDataSetChanged();
+
+        if (getSearchInput() != null) {
+            getSearchInput().setText("", TextView.BufferType.EDITABLE);
+        }
     }
 
     private void initConfiguration() {
@@ -241,6 +256,7 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
         };
 
         private List<Surah> surahList = new ArrayList<>();
+        private String searchQuery = "";
 
         public SearchSurahViewState(Parcel source, ClassLoader loader) {
             super(source);
@@ -251,6 +267,8 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
 
             this.surahList.clear();
             this.surahList.addAll(Arrays.asList(surahArray));
+
+            this.searchQuery = source.readString();
         }
 
         public SearchSurahViewState(Parcelable superState) {
@@ -264,6 +282,8 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
             out.writeInt(this.surahList.size());
             Surah[] surahArray = this.surahList.toArray(new Surah[0]);
             out.writeTypedArray(surahArray, flags);
+
+            out.writeString(this.searchQuery);
         }
     }
 }
