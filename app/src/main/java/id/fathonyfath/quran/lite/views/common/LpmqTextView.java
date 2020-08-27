@@ -5,7 +5,6 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.widget.TextView;
 
-import id.fathonyfath.quran.lite.MainActivity;
 import id.fathonyfath.quran.lite.QuranApp;
 import id.fathonyfath.quran.lite.data.FontProvider;
 import id.fathonyfath.quran.lite.themes.BaseTheme;

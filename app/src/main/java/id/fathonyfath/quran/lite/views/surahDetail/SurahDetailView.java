@@ -136,18 +136,6 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
     };
     private boolean isFailedToGetSurahDetail = false;
     private Surah currentSurah;
-    private final View.OnClickListener onRetryClickListener = new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            SurahDetailView.this.isFailedToGetSurahDetail = false;
-
-            updateViewStateLoading();
-
-            if (!tryToRestoreFetchSurahDetailUseCase()) {
-                createAndRunFetchSurahDetailUseCase();
-            }
-        }
-    };
     private final AbsListView.OnItemLongClickListener onSurahLongClickListener = new AbsListView.OnItemLongClickListener() {
 
         @Override
@@ -190,6 +178,18 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
 
             SurahDetailView.this.isFailedToGetSurahDetail = true;
             updateViewStateRetry();
+        }
+    };
+    private final View.OnClickListener onRetryClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            SurahDetailView.this.isFailedToGetSurahDetail = false;
+
+            updateViewStateLoading();
+
+            if (!tryToRestoreFetchSurahDetailUseCase()) {
+                createAndRunFetchSurahDetailUseCase();
+            }
         }
     };
     private int firstAyahNumber = 0;

@@ -14,68 +14,17 @@ import java.util.HashMap;
 import java.util.Set;
 
 public final class LocalBroadcastManager {
-    private static final class ReceiverRecord {
-        final IntentFilter filter;
-        final BroadcastReceiver receiver;
-        boolean broadcasting;
-        boolean dead;
-
-        ReceiverRecord(IntentFilter _filter, BroadcastReceiver _receiver) {
-            filter = _filter;
-            receiver = _receiver;
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder builder = new StringBuilder(128);
-            builder.append("Receiver{");
-            builder.append(receiver);
-            builder.append(" filter=");
-            builder.append(filter);
-            if (dead) {
-                builder.append(" DEAD");
-            }
-            builder.append("}");
-            return builder.toString();
-        }
-    }
-
-    private static final class BroadcastRecord {
-        final Intent intent;
-        final ArrayList<ReceiverRecord> receivers;
-
-        BroadcastRecord(Intent _intent, ArrayList<ReceiverRecord> _receivers) {
-            intent = _intent;
-            receivers = _receivers;
-        }
-    }
-
+    static final int MSG_EXEC_PENDING_BROADCASTS = 1;
     private static final String TAG = "LocalBroadcastManager";
     private static final boolean DEBUG = false;
-
+    private static final Object mLock = new Object();
+    private static LocalBroadcastManager mInstance;
     private final Context mAppContext;
-
     private final HashMap<BroadcastReceiver, ArrayList<ReceiverRecord>> mReceivers
             = new HashMap<>();
     private final HashMap<String, ArrayList<ReceiverRecord>> mActions = new HashMap<>();
-
     private final ArrayList<BroadcastRecord> mPendingBroadcasts = new ArrayList<>();
-
-    static final int MSG_EXEC_PENDING_BROADCASTS = 1;
-
     private final Handler mHandler;
-
-    private static final Object mLock = new Object();
-    private static LocalBroadcastManager mInstance;
-
-    public static LocalBroadcastManager getInstance(Context context) {
-        synchronized (mLock) {
-            if (mInstance == null) {
-                mInstance = new LocalBroadcastManager(context.getApplicationContext());
-            }
-            return mInstance;
-        }
-    }
 
     private LocalBroadcastManager(Context context) {
         mAppContext = context;
@@ -92,6 +41,15 @@ public final class LocalBroadcastManager {
                 }
             }
         };
+    }
+
+    public static LocalBroadcastManager getInstance(Context context) {
+        synchronized (mLock) {
+            if (mInstance == null) {
+                mInstance = new LocalBroadcastManager(context.getApplicationContext());
+            }
+            return mInstance;
+        }
     }
 
     public void registerReceiver(BroadcastReceiver receiver,
@@ -255,6 +213,42 @@ public final class LocalBroadcastManager {
                     }
                 }
             }
+        }
+    }
+
+    private static final class ReceiverRecord {
+        final IntentFilter filter;
+        final BroadcastReceiver receiver;
+        boolean broadcasting;
+        boolean dead;
+
+        ReceiverRecord(IntentFilter _filter, BroadcastReceiver _receiver) {
+            filter = _filter;
+            receiver = _receiver;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder(128);
+            builder.append("Receiver{");
+            builder.append(receiver);
+            builder.append(" filter=");
+            builder.append(filter);
+            if (dead) {
+                builder.append(" DEAD");
+            }
+            builder.append("}");
+            return builder.toString();
+        }
+    }
+
+    private static final class BroadcastRecord {
+        final Intent intent;
+        final ArrayList<ReceiverRecord> receivers;
+
+        BroadcastRecord(Intent _intent, ArrayList<ReceiverRecord> _receivers) {
+            intent = _intent;
+            receivers = _receivers;
         }
     }
 }

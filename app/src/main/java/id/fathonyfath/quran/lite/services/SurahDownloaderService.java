@@ -16,15 +16,14 @@ import id.fathonyfath.quran.lite.utils.LocalBroadcastManager;
 
 public class SurahDownloaderService extends Service implements UseCaseCallback<Integer>, FetchAllSurahDetailUseCase.SurahProgress {
 
-    private final static int NOTIFICATION_ID = 1;
-
-    private final static String ACTION_START = "ACTION_START";
-    private final static String ACTION_STOP = "ACTION_STOP";
-
     public final static String ACTION_DOWNLOAD_FINISHED = "ACTION_DOWNLOAD_FINISHED";
     public final static String DOWNLOAD_FAILURE_COUNT = "DOWNLOAD_FAILURE_COUNT";
-
     public final static String ACTION_SERVICE_ALREADY_STARTED = "ACTION_SERVICE_ALREADY_STARTED";
+    private final static int NOTIFICATION_ID = 1;
+    private final static String ACTION_START = "ACTION_START";
+    private final static String ACTION_STOP = "ACTION_STOP";
+    private NotificationManager notificationManager;
+    private FetchAllSurahDetailUseCase useCase;
 
     public static void startService(Context context) {
         final Intent intent = new Intent(context, SurahDownloaderService.class);
@@ -43,10 +42,6 @@ public class SurahDownloaderService extends Service implements UseCaseCallback<I
         return PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 
     }
-
-    private NotificationManager notificationManager;
-
-    private FetchAllSurahDetailUseCase useCase;
 
     @Override
     public void onCreate() {
