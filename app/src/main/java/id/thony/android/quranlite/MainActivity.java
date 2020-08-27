@@ -2,8 +2,13 @@ package id.thony.android.quranlite;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +23,7 @@ import id.thony.android.quranlite.useCase.GetDayNightUseCase;
 import id.thony.android.quranlite.useCase.UseCaseCallback;
 import id.thony.android.quranlite.useCase.UseCaseProvider;
 import id.thony.android.quranlite.utils.DialogUtil;
+import id.thony.android.quranlite.utils.LocalBroadcastManager;
 import id.thony.android.quranlite.utils.ThemeContext;
 import id.thony.android.quranlite.utils.dialogManager.DialogEvent;
 import id.thony.android.quranlite.utils.dialogManager.DialogEventListener;
@@ -34,12 +40,32 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight>,
     private MainView mainView = null;
     private BaseTheme activeTheme = new DayTheme();
 
+    private BroadcastReceiver downloadAlreadyStartedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Toast.makeText(context, "Proses pengunduhan sedang berjalan.", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    private BroadcastReceiver downloadFinishedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final int failedDownload = intent.getIntExtra(SurahDownloaderService.DOWNLOAD_FAILURE_COUNT, 0);
+            final String message;
+            if (failedDownload > 0) {
+                message = "Proses pengunduhan selesai dengan " + failedDownload + " surat gagal diunduh. Silahkan coba lagi untuk mengunduh sisanya.";
+            } else {
+                message = "Proses pengunduhan berhasil.";
+            }
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         DownloaderNotification.createChannel(this);
-        SurahDownloaderService.startService(this);
 
         registerDialogFactory();
 
@@ -57,6 +83,26 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight>,
     public void relaunchActivity() {
         getWindow().setWindowAnimations(R.style.WindowAnimation);
         recreate();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(downloadAlreadyStartedReceiver,
+                new IntentFilter(SurahDownloaderService.ACTION_SERVICE_ALREADY_STARTED));
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(downloadFinishedReceiver,
+                new IntentFilter(SurahDownloaderService.ACTION_DOWNLOAD_FINISHED));
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(downloadAlreadyStartedReceiver);
+
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(downloadFinishedReceiver);
     }
 
     @Override
