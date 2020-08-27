@@ -47,6 +47,11 @@ public class MainView extends BackStackNavigationView {
 
     private final SearchSurahView.OnViewEventListener searchSurahEventListener = new SearchSurahView.OnViewEventListener() {
         @Override
+        public void onSurahSelected(Surah selectedSurah, int lastReadingAyah) {
+            routeToSurahDetailView(selectedSurah, lastReadingAyah);
+        }
+
+        @Override
         public void onCloseClicked() {
             MainView.this.popView();
         }

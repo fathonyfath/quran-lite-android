@@ -8,6 +8,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -32,6 +33,7 @@ import id.fathonyfath.quran.lite.views.common.CloseView;
 import id.fathonyfath.quran.lite.views.common.ToolbarView;
 import id.fathonyfath.quran.lite.views.common.WrapperView;
 import id.fathonyfath.quran.lite.views.surahList.SurahAdapter;
+import id.fathonyfath.quran.lite.views.surahList.SurahListView;
 
 public class SearchSurahView extends WrapperView implements ViewCallback {
 
@@ -89,6 +91,16 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
         public void onClick(View v) {
             if (onViewEventListener != null) {
                 onViewEventListener.onCloseClicked();
+            }
+        }
+    };
+
+    private final AdapterView.OnItemClickListener onSurahItemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            if (SearchSurahView.this.onViewEventListener != null) {
+                Surah selectedSurah = SearchSurahView.this.surahAdapter.getItem(position);
+                SearchSurahView.this.onViewEventListener.onSurahSelected(selectedSurah, 0);
             }
         }
     };
@@ -164,6 +176,7 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
         tryToRestoreUseCase();
 
         this.setOnSearchListener(searchListener);
+        this.surahListView.setOnItemClickListener(onSurahItemClickListener);
 
         if (!hasSearched) {
             updateViewStateInit();
@@ -179,6 +192,8 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
     @Override
     public void onPause() {
         unregisterUseCase();
+
+        this.surahListView.setOnItemClickListener(null);
 
         this.setOnSearchListener(null);
     }
@@ -335,6 +350,7 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
     }
 
     public interface OnViewEventListener {
+        void onSurahSelected(Surah selectedSurah, int lastReadingAyah);
         void onCloseClicked();
     }
 
