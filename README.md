@@ -6,9 +6,9 @@ Just your regular Qur'an apps on Android platform, except I'm trying to make it'
 
 ## TODOs
 
-* [FEATURE] Bookmark to your last reading page
+* ~~[FEATURE] Bookmark to your last reading page~~
 * ~~[FEATURE] Switch between Light and Dark theme~~
-* ~~[FEATURE] Prefetch all the contents~~
+* [FEATURE] Prefetch all the contents
 * ~~[FEATURE] Retry to load from cloud if there is a connection issue~~
 * ~~[FEATURE] Search Surah~~
 
