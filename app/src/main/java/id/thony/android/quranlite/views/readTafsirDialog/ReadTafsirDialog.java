@@ -7,7 +7,6 @@ import android.os.Parcelable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 
 import id.thony.android.quranlite.Res;
 import id.thony.android.quranlite.models.SelectedTafsir;
@@ -20,7 +19,7 @@ import id.thony.android.quranlite.views.common.LpmqTextView;
 
 public class ReadTafsirDialog extends Dialog {
 
-    private final ScrollView containerScroller;
+    private final MaxHeightScrollView containerScroller;
     private final LinearLayout container;
 
     private final LpmqTextView surahNameText;
@@ -31,7 +30,7 @@ public class ReadTafsirDialog extends Dialog {
     public ReadTafsirDialog(Context context, Parcelable arguments, DialogEventListener listener) {
         super(context, arguments, listener);
 
-        this.containerScroller = new ScrollView(context);
+        this.containerScroller = new MaxHeightScrollView(context);
         this.container = new LinearLayout(context);
 
         this.surahNameText = new LpmqTextView(context);
@@ -50,6 +49,17 @@ public class ReadTafsirDialog extends Dialog {
     }
 
     private void initDialog() {
+        if (getWindow() != null) {
+            Point point = new Point();
+            getWindow().getWindowManager().getDefaultDisplay().getSize(point);
+            if (point.y > point.x) {
+                // This is where we have portrait state phone
+                // We change the height to be 75% of its current value
+                float heightFloat = point.y * 0.75f;
+                this.containerScroller.setMaxHeight((int) heightFloat);
+            }
+        }
+
         this.container.setOrientation(LinearLayout.VERTICAL);
 
         this.surahNameText.setPadding(
@@ -132,11 +142,6 @@ public class ReadTafsirDialog extends Dialog {
                 // We change the height to be 75% of its current value
                 float widthFloat = point.x * 0.75f;
                 width = (int) widthFloat;
-            } else {
-                // This is where we have portrait state phone
-                // We change the width to be 75% of its current value
-                float heightFloat = point.y * 0.75f;
-                height = (int) heightFloat;
             }
         }
 
