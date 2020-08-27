@@ -118,7 +118,7 @@ public class SurahDownloaderService extends Service implements UseCaseCallback<I
                 NOTIFICATION_ID,
                 DownloaderNotification.createProgressNotification(
                         this,
-                        "Unduhan sedang berjalan...",
+                        "Pengunduh " + currentSurah.getNameInLatin() + "...",
                         currentSurahNumber + "/" + maxSurahNumber,
                         (int) progressPercentage,
                         false,
@@ -139,7 +139,7 @@ public class SurahDownloaderService extends Service implements UseCaseCallback<I
                 NOTIFICATION_ID,
                 DownloaderNotification.createProgressNotification(
                         this,
-                        "Unduhan telah selesai...",
+                        "Unduhan telah selesai.",
                         "",
                         100,
                         true
