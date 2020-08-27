@@ -21,6 +21,7 @@ import java.util.Map;
 import id.thony.android.quranlite.Res;
 import id.thony.android.quranlite.models.Bookmark;
 import id.thony.android.quranlite.models.SelectedAyah;
+import id.thony.android.quranlite.models.SelectedTafsir;
 import id.thony.android.quranlite.models.Surah;
 import id.thony.android.quranlite.models.SurahDetail;
 import id.thony.android.quranlite.models.config.DayNightPreference;
@@ -43,6 +44,7 @@ import id.thony.android.quranlite.views.common.DayNightSwitchButton;
 import id.thony.android.quranlite.views.common.ProgressView;
 import id.thony.android.quranlite.views.common.RetryView;
 import id.thony.android.quranlite.views.common.WrapperView;
+import id.thony.android.quranlite.views.readTafsirDialog.ReadTafsirDialog;
 
 public class SurahDetailView extends WrapperView implements ViewCallback {
 
@@ -136,6 +138,7 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
     };
     private boolean isFailedToGetSurahDetail = false;
     private Surah currentSurah;
+    private SurahDetail currentSurahDetail;
     private final AbsListView.OnItemLongClickListener onSurahLongClickListener = new AbsListView.OnItemLongClickListener() {
 
         @Override
@@ -298,7 +301,7 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         unregisterAndClearGetDayNightPreferenceUseCaseCallback();
         unregisterAndClearPutDayNightPreferenceUseCaseCallback();
 
-        DialogUtil.addListener(this, this.dialogEventListener);
+        DialogUtil.removeListener(this, this.dialogEventListener);
     }
 
     @Override
@@ -360,6 +363,8 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
     }
 
     private void processSurahDetail(SurahDetail surahDetail) {
+        this.currentSurahDetail = surahDetail;
+
         this.progressView.setVisibility(View.GONE);
         updateTextProgress(0f);
 
@@ -457,19 +462,15 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
 
     private void updateToolbarTitle(String surahNameInLatin, int surahNumber, int firstAyahNumber, int lastAyahNumber) {
         if (firstAyahNumber < 0 && lastAyahNumber < 0) {
-            this.setToolbarTitle("QS. " + this.currentSurah.getNameInLatin()
-                    + " [" + this.currentSurah.getNumber() + "]");
+            this.setToolbarTitle("QS. " + surahNameInLatin + " [" + surahNumber + "]");
             return;
         }
 
         if (firstAyahNumber == lastAyahNumber) {
-            this.setToolbarTitle("QS. " + this.currentSurah.getNameInLatin()
-                    + " [" + this.currentSurah.getNumber() + "]"
-                    + ": " + firstAyahNumber);
+            this.setToolbarTitle("QS. " + surahNameInLatin + " [" + surahNumber + "]: " + firstAyahNumber);
         } else {
-            this.setToolbarTitle("QS. " + this.currentSurah.getNameInLatin()
-                    + " [" + this.currentSurah.getNumber() + "]"
-                    + ": " + firstAyahNumber + " - " + lastAyahNumber);
+            this.setToolbarTitle("QS. " + surahNameInLatin + " [" + surahNumber + "]: "
+                    + firstAyahNumber + " - " + lastAyahNumber);
         }
     }
 
@@ -555,7 +556,15 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
     }
 
     private void readTafsir(SelectedAyah selectedAyah) {
+        final String tafsir = this.currentSurahDetail.getSurahTafsir().getContents().get(selectedAyah.getAyahNumber());
+        final String name = this.currentSurahDetail.getSurahTafsir().getName();
+        final String source = this.currentSurahDetail.getSurahTafsir().getSource();
+        if (tafsir != null && tafsir.length() > 0) {
+            final SelectedTafsir selectedTafsir = new SelectedTafsir(
+                    selectedAyah.getSurah(), selectedAyah.getAyahNumber(), tafsir, name, source);
 
+            DialogUtil.showDialog(this, ReadTafsirDialog.class, selectedTafsir);
+        }
     }
 
     private void clearSurahDetailUseCase() {

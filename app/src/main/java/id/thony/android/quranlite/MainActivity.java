@@ -31,6 +31,7 @@ import id.thony.android.quranlite.utils.dialogManager.DialogManager;
 import id.thony.android.quranlite.views.MainView;
 import id.thony.android.quranlite.views.ayahDetailDialog.AyahDetailDialog;
 import id.thony.android.quranlite.views.noBookmarkDialog.NoBookmarkDialog;
+import id.thony.android.quranlite.views.readTafsirDialog.ReadTafsirDialog;
 import id.thony.android.quranlite.views.resumeBookmarkDialog.ResumeBookmarkDialog;
 
 public class MainActivity extends Activity implements UseCaseCallback<DayNight>, DialogEventListener {
@@ -168,6 +169,7 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight>,
         DialogManager.registerFactory(NoBookmarkDialog.class, new NoBookmarkDialog.Factory());
         DialogManager.registerFactory(ResumeBookmarkDialog.class, new ResumeBookmarkDialog.Factory());
         DialogManager.registerFactory(AyahDetailDialog.class, new AyahDetailDialog.Factory());
+        DialogManager.registerFactory(ReadTafsirDialog.class, new ReadTafsirDialog.Factory());
     }
 
     private void showViewWithActiveTheme() {
