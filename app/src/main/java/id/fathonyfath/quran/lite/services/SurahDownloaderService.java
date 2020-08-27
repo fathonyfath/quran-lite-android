@@ -11,6 +11,7 @@ import id.fathonyfath.quran.lite.models.Surah;
 import id.fathonyfath.quran.lite.useCase.DownloadAllSurahUseCase;
 import id.fathonyfath.quran.lite.useCase.UseCaseCallback;
 import id.fathonyfath.quran.lite.useCase.UseCaseProvider;
+import id.fathonyfath.quran.lite.utils.LocalBroadcastManager;
 
 public class SurahDownloaderService extends Service implements UseCaseCallback<Integer>, DownloadAllSurahUseCase.SurahProgress {
 
@@ -18,6 +19,11 @@ public class SurahDownloaderService extends Service implements UseCaseCallback<I
 
     private final static String ACTION_START = "ACTION_START";
     private final static String ACTION_STOP = "ACTION_STOP";
+
+    public final static String ACTION_DOWNLOAD_FINISHED = "ACTION_DOWNLOAD_FINISHED";
+    public final static String DOWNLOAD_FAILURE_COUNT = "DOWNLOAD_FAILURE_COUNT";
+
+    public final static String ACTION_SERVICE_ALREADY_STARTED = "ACTION_SERVICE_ALREADY_STARTED";
 
     public static void startService(Context context) {
         final Intent intent = new Intent(context, SurahDownloaderService.class);
@@ -74,6 +80,9 @@ public class SurahDownloaderService extends Service implements UseCaseCallback<I
                                     false
                             )
                     );
+                } else {
+                    final Intent alreadyStartedIntent = new Intent(ACTION_SERVICE_ALREADY_STARTED);
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(alreadyStartedIntent);
                 }
                 break;
             case ACTION_STOP:
@@ -148,6 +157,11 @@ public class SurahDownloaderService extends Service implements UseCaseCallback<I
                         true
                 )
         );
+
+        final Intent intent = new Intent(ACTION_DOWNLOAD_FINISHED);
+        intent.putExtra(DOWNLOAD_FAILURE_COUNT, data);
+
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     @Override
