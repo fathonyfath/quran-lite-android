@@ -10,7 +10,6 @@ import id.fathonyfath.quran.lite.data.FontProvider;
 import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
 import id.fathonyfath.quran.lite.utils.TypefaceLoader;
-import id.fathonyfath.quran.lite.utils.ViewUtil;
 
 public class LpmqEditText extends EditText {
 

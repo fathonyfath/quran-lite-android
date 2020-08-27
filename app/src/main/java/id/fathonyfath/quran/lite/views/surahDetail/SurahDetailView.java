@@ -43,7 +43,6 @@ import id.fathonyfath.quran.lite.views.common.DayNightSwitchButton;
 import id.fathonyfath.quran.lite.views.common.ProgressView;
 import id.fathonyfath.quran.lite.views.common.RetryView;
 import id.fathonyfath.quran.lite.views.common.WrapperView;
-import id.fathonyfath.quran.lite.views.resumeBookmarkDialog.ResumeBookmarkDialog;
 
 public class SurahDetailView extends WrapperView implements ViewCallback {
 
@@ -101,8 +100,68 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         }
     };
     private final float revealThreshold;
+    private final UseCaseCallback<Boolean> putBookmarkCallback = new UseCaseCallback<Boolean>() {
+        @Override
+        public void onProgress(float progress) {
+
+        }
+
+        @Override
+        public void onResult(Boolean success) {
+            Toast.makeText(getContext(), "Berhasil menandai ayat.", Toast.LENGTH_SHORT).show();
+
+            unregisterAndClearPutBookmarkUseCaseCallback();
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            unregisterAndClearPutBookmarkUseCaseCallback();
+        }
+    };
+    private final DialogEventListener dialogEventListener = new DialogEventListener() {
+        @Override
+        public void onEvent(DialogEvent event, Parcelable arguments) {
+            if (event instanceof AyahDetailDialog.ReadTafsirEvent) {
+                if (arguments.getClass().isAssignableFrom(SelectedAyah.class)) {
+                    final SelectedAyah selectedAyah = (SelectedAyah) arguments;
+                    readTafsir(selectedAyah);
+                }
+            } else if (event instanceof AyahDetailDialog.PutBookmarkEvent) {
+                if (arguments.getClass().isAssignableFrom(SelectedAyah.class)) {
+                    final SelectedAyah selectedAyah = (SelectedAyah) arguments;
+                    putBookmark(selectedAyah);
+                }
+            }
+        }
+    };
     private boolean isFailedToGetSurahDetail = false;
     private Surah currentSurah;
+    private final View.OnClickListener onRetryClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            SurahDetailView.this.isFailedToGetSurahDetail = false;
+
+            updateViewStateLoading();
+
+            if (!tryToRestoreFetchSurahDetailUseCase()) {
+                createAndRunFetchSurahDetailUseCase();
+            }
+        }
+    };
+    private final AbsListView.OnItemLongClickListener onSurahLongClickListener = new AbsListView.OnItemLongClickListener() {
+
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            AyahDetailViewType ayahViewType = SurahDetailView.this.ayahDetailAdapter.getItem(position);
+            if (ayahViewType instanceof AyahDetailViewType.AyahViewModel) {
+                AyahDetailViewType.AyahViewModel ayahViewModel = (AyahDetailViewType.AyahViewModel) ayahViewType;
+                openAyahDetailDialog(ayahViewModel);
+
+                return true;
+            }
+            return false;
+        }
+    };
     private int lastReadingAyah;
     private Parcelable listViewState;
     private boolean newPage = false;
@@ -133,18 +192,6 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
             updateViewStateRetry();
         }
     };
-    private final View.OnClickListener onRetryClickListener = new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            SurahDetailView.this.isFailedToGetSurahDetail = false;
-
-            updateViewStateLoading();
-
-            if (!tryToRestoreFetchSurahDetailUseCase()) {
-                createAndRunFetchSurahDetailUseCase();
-            }
-        }
-    };
     private int firstAyahNumber = 0;
     private int lastAyahNumber = -1;
     private final AbsListView.OnScrollListener onSurahScrollListener = new AbsListView.OnScrollListener() {
@@ -157,54 +204,6 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
         public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
             int lastVisibleItem = firstVisibleItem + visibleItemCount - 1;
             updateTitleWithSurahNumber(firstVisibleItem, lastVisibleItem);
-        }
-    };
-    private final AbsListView.OnItemLongClickListener onSurahLongClickListener = new AbsListView.OnItemLongClickListener() {
-
-        @Override
-        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-            AyahDetailViewType ayahViewType = SurahDetailView.this.ayahDetailAdapter.getItem(position);
-            if (ayahViewType instanceof AyahDetailViewType.AyahViewModel) {
-                AyahDetailViewType.AyahViewModel ayahViewModel = (AyahDetailViewType.AyahViewModel) ayahViewType;
-                openAyahDetailDialog(ayahViewModel);
-
-                return true;
-            }
-            return false;
-        }
-    };
-    private final DialogEventListener dialogEventListener = new DialogEventListener() {
-        @Override
-        public void onEvent(DialogEvent event, Parcelable arguments) {
-            if (event instanceof AyahDetailDialog.ReadTafsirEvent) {
-                if (arguments.getClass().isAssignableFrom(SelectedAyah.class)) {
-                    final SelectedAyah selectedAyah = (SelectedAyah) arguments;
-                    readTafsir(selectedAyah);
-                }
-            } else if (event instanceof AyahDetailDialog.PutBookmarkEvent) {
-                if (arguments.getClass().isAssignableFrom(SelectedAyah.class)) {
-                    final SelectedAyah selectedAyah = (SelectedAyah) arguments;
-                    putBookmark(selectedAyah);
-                }
-            }
-        }
-    };
-    private final UseCaseCallback<Boolean> putBookmarkCallback = new UseCaseCallback<Boolean>() {
-        @Override
-        public void onProgress(float progress) {
-
-        }
-
-        @Override
-        public void onResult(Boolean success) {
-            Toast.makeText(getContext(), "Berhasil menandai ayat.", Toast.LENGTH_SHORT).show();
-
-            unregisterAndClearPutBookmarkUseCaseCallback();
-        }
-
-        @Override
-        public void onError(Throwable throwable) {
-            unregisterAndClearPutBookmarkUseCaseCallback();
         }
     };
 

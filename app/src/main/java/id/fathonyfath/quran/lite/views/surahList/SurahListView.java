@@ -187,7 +187,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
     private final OnClickListener onSearchClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            if(onViewEventListener != null) {
+            if (onViewEventListener != null) {
                 onViewEventListener.onSearchClicked();
             }
         }
@@ -473,6 +473,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
 
     public interface OnViewEventListener {
         void onSurahSelected(Surah selectedSurah, int lastReadingAyah);
+
         void onSearchClicked();
     }
 

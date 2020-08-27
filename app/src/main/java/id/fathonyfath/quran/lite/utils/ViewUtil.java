@@ -3,18 +3,9 @@ package id.fathonyfath.quran.lite.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.os.Build;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
-
-import java.lang.reflect.Field;
 
 import id.fathonyfath.quran.lite.MainActivity;
 import id.fathonyfath.quran.lite.views.common.LpmqTextView;

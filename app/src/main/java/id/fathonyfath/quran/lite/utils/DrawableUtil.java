@@ -1,10 +1,8 @@
 package id.fathonyfath.quran.lite.utils;
 
-import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
-import android.os.Build;
 import android.util.StateSet;
 
 public class DrawableUtil {

@@ -53,15 +53,12 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight>,
     public static final String BOOKMARK_REPOSITORY_SERVICE = "MainActivity.BookmarkRepository";
     public static final String CONFIG_REPOSITORY_SERVICE = "MainActivity.ConfigRepository";
     public static final String SEARCH_INDEX_REPOSITORY_SERVICE = "MainActivity.SearchIndexRepository";
-
+    private final List<DialogEventListener> dialogEventListeners = new ArrayList<>();
     private QuranRepository quranRepository;
     private FontProvider fontProvider;
     private BookmarkRepository bookmarkRepository;
     private ConfigRepository configRepository;
     private SearchIndexRepository searchIndexRepository;
-
-    private final List<DialogEventListener> dialogEventListeners = new ArrayList<>();
-
     private MainView mainView = null;
     private BaseTheme activeTheme = new DayTheme();
 

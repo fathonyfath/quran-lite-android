@@ -33,7 +33,6 @@ import id.fathonyfath.quran.lite.views.common.CloseView;
 import id.fathonyfath.quran.lite.views.common.ToolbarView;
 import id.fathonyfath.quran.lite.views.common.WrapperView;
 import id.fathonyfath.quran.lite.views.surahList.SurahAdapter;
-import id.fathonyfath.quran.lite.views.surahList.SurahListView;
 
 public class SearchSurahView extends WrapperView implements ViewCallback {
 
@@ -45,24 +44,6 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
     private final ProgressBar progressBar;
 
     private boolean hasSearched = false;
-
-    private final ToolbarView.OnSearchListener searchListener = new ToolbarView.OnSearchListener() {
-        @Override
-        public void onSearch(String query) {
-            if (getSearchInput() != null) {
-                getSearchInput().clearFocus();
-                final InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(getSearchInput().getWindowToken(), 0);
-            }
-
-            updateViewStateLoading();
-
-            doSearchProcess(query);
-
-            hasSearched = true;
-        }
-    };
-
     private final UseCaseCallback<List<Surah>> doSearchUseCaseCallback = new UseCaseCallback<List<Surah>>() {
         @Override
         public void onProgress(float progress) {
@@ -85,7 +66,23 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
             Toast.makeText(getContext(), "Keyword yang anda masukkan tidak memenuhi syarat minimum karakter.", Toast.LENGTH_SHORT).show();
         }
     };
+    private final ToolbarView.OnSearchListener searchListener = new ToolbarView.OnSearchListener() {
+        @Override
+        public void onSearch(String query) {
+            if (getSearchInput() != null) {
+                getSearchInput().clearFocus();
+                final InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getSearchInput().getWindowToken(), 0);
+            }
 
+            updateViewStateLoading();
+
+            doSearchProcess(query);
+
+            hasSearched = true;
+        }
+    };
+    private OnViewEventListener onViewEventListener;
     private final View.OnClickListener onCloseClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -94,7 +91,6 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
             }
         }
     };
-
     private final AdapterView.OnItemClickListener onSurahItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -104,8 +100,6 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
             }
         }
     };
-
-    private OnViewEventListener onViewEventListener;
 
     public SearchSurahView(Context context) {
         super(context);
@@ -351,6 +345,7 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
 
     public interface OnViewEventListener {
         void onSurahSelected(Surah selectedSurah, int lastReadingAyah);
+
         void onCloseClicked();
     }
 
