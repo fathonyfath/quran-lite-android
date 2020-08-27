@@ -63,6 +63,8 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
 
             unregisterAndClearUseCase();
 
+            updateViewStateInit();
+
             Toast.makeText(getContext(), "Keyword yang anda masukkan tidak memenuhi syarat minimum karakter.", Toast.LENGTH_SHORT).show();
         }
     };

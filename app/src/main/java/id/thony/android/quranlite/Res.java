@@ -21,14 +21,15 @@ public final class Res {
 
         public static final int searchSurahView = 0x0000000C;
         public static final int searchSurahView_surahListView = 0x0000000D;
-        public static final int searchSurahView_loadingView = 0x0000000E;
-        public static final int searchSurahView_enterSearchQueryView = 0x0000000F;
-        public static final int searchSurahView_noResultView = 0x00000010;
+        public static final int searchSurahView_enterSearchQueryView = 0x0000000E;
+        public static final int searchSurahView_noResultView = 0x000000F;
 
-        public static final int surahDetailView = 0x00000011;
-        public static final int surahDetailView_progressView = 0x00000012;
-        public static final int surahDetailView_retryView = 0x00000013;
-        public static final int surahDetailView_ayahListView = 0x00000014;
-        public static final int surahDetailView_ayahView_ayahTextView = 0x00000015;
+        public static final int surahDetailView = 0x00000010;
+        public static final int surahDetailView_progressView = 0x00000011;
+        public static final int surahDetailView_retryView = 0x00000012;
+        public static final int surahDetailView_ayahListView = 0x00000013;
+        public static final int surahDetailView_ayahView_ayahTextView = 0x00000014;
+
+        public static final int readTafsirDialog_containerScroller = 0x000000015;
     }
 }

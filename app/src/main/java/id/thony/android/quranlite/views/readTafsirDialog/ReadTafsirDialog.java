@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
+import id.thony.android.quranlite.Res;
 import id.thony.android.quranlite.models.SelectedTafsir;
 import id.thony.android.quranlite.themes.BaseTheme;
 import id.thony.android.quranlite.utils.ThemeContext;
@@ -37,6 +38,8 @@ public class ReadTafsirDialog extends Dialog {
         this.tafsirOwnerText = new LpmqTextView(context);
         this.separator = new View(context);
         this.tafsirText = new LpmqTextView(context);
+
+        this.containerScroller.setId(Res.Id.readTafsirDialog_containerScroller);
 
         initDialog();
         applyStyleBasedOnTheme();
