@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +21,7 @@ import id.thony.android.quranlite.Res;
 import id.thony.android.quranlite.models.Bookmark;
 import id.thony.android.quranlite.models.Surah;
 import id.thony.android.quranlite.models.config.DayNightPreference;
+import id.thony.android.quranlite.services.SurahDownloaderService;
 import id.thony.android.quranlite.themes.BaseTheme;
 import id.thony.android.quranlite.useCase.FetchAllSurahUseCase;
 import id.thony.android.quranlite.useCase.GetBookmarkUseCase;
@@ -35,6 +37,7 @@ import id.thony.android.quranlite.utils.dialogManager.DialogEventListener;
 import id.thony.android.quranlite.utils.viewLifecycle.ViewCallback;
 import id.thony.android.quranlite.views.common.BookmarkView;
 import id.thony.android.quranlite.views.common.DayNightSwitchButton;
+import id.thony.android.quranlite.views.common.DownloadView;
 import id.thony.android.quranlite.views.common.ProgressView;
 import id.thony.android.quranlite.views.common.RetryView;
 import id.thony.android.quranlite.views.common.SearchView;
@@ -51,6 +54,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
     private final RetryView retryView;
     private final BookmarkView bookmarkView;
     private final DayNightSwitchButton dayNightSwitchButton;
+    private final DownloadView downloadView;
     private final SearchView searchView;
     private final UseCaseCallback<DayNightPreference> dayNightPreferenceCallback = new UseCaseCallback<DayNightPreference>() {
         @Override
@@ -123,6 +127,13 @@ public class SurahListView extends WrapperView implements ViewCallback {
         @Override
         public void onClick(View v) {
             createAndRunPutDayNightPreferenceUseCase(dayNightSwitchButton.cycleNextPreference());
+        }
+    };
+    private final View.OnClickListener onDownloadClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Toast.makeText(getContext(), "Proses pengunduhan dimulai...", Toast.LENGTH_SHORT).show();
+            SurahDownloaderService.startService(getContext());
         }
     };
     private boolean isFailedToGetSurahList = false;
@@ -209,6 +220,9 @@ public class SurahListView extends WrapperView implements ViewCallback {
 
         this.dayNightSwitchButton = new DayNightSwitchButton(getContext());
         this.dayNightSwitchButton.setOnClickListener(this.onDayNightPreferenceClickListener);
+
+        this.downloadView = new DownloadView(getContext());
+        this.downloadView.setOnClickListener(this.onDownloadClickListener);
 
         this.searchView = new SearchView(getContext());
         this.searchView.setOnClickListener(this.onSearchClickListener);
@@ -414,6 +428,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
     private void refreshRightToolbar() {
         final LinkedHashSet<View> views = new LinkedHashSet<>();
         views.add(this.bookmarkView);
+        views.add(this.downloadView);
         views.add(this.dayNightSwitchButton);
         setToolbarRightViews(views);
     }
