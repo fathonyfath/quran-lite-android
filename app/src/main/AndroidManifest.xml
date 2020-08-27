@@ -6,16 +6,16 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
-        android:name="id.thony.android.quranlite.QuranApp"
+        android:name=".QuranApp"
         android:label="Qur'an Lite"
         android:theme="@android:style/Theme.Holo.Light.NoActionBar">
-        <activity android:name="id.thony.android.quranlite.MainActivity">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name="id.thony.android.quranlite.services.SurahDownloaderService" />
+        <service android:name=".services.SurahDownloaderService" />
     </application>
 
 </manifest>
