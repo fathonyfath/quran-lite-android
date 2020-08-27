@@ -30,9 +30,19 @@ public class QuranRepository {
 
     public List<Surah> fetchAllSurah(NetworkHelper.CancelSignal cancellationSignal,
                                      NetworkHelper.ProgressListener networkProgressListener) {
-        final JSONObject surahIndexJSON;
+        JSONObject surahIndexJSON;
         if (this.quranDiskSource.isSurahIndexExist()) {
             surahIndexJSON = this.quranDiskSource.getSurahIndex();
+            if (surahIndexJSON == null) {
+                // Maybe corrupt happen here, so we fetch again from service
+                surahIndexJSON = this.quranNetworkSource.getSurahIndex(
+                        cancellationSignal,
+                        networkProgressListener);
+
+                if (surahIndexJSON != null) {
+                    this.quranDiskSource.saveSurahIndex(surahIndexJSON);
+                }
+            }
         } else {
             surahIndexJSON = this.quranNetworkSource.getSurahIndex(
                     cancellationSignal,
@@ -60,9 +70,20 @@ public class QuranRepository {
     public SurahDetail fetchSurahDetail(Surah surah,
                                         NetworkHelper.CancelSignal cancellationSignal,
                                         NetworkHelper.ProgressListener networkProgressListener) {
-        final JSONObject surahDetailJSON;
+        JSONObject surahDetailJSON;
         if (this.quranDiskSource.isSurahDetailAtNumberExist(surah.getNumber())) {
             surahDetailJSON = this.quranDiskSource.getSurahDetailAtNumber(surah.getNumber());
+            if (surahDetailJSON == null) {
+                // Something corrupt at the level of file, we fetch again from service then overwrite it.
+                surahDetailJSON = this.quranNetworkSource.getSurahDetailAtNumber(
+                        surah.getNumber(),
+                        cancellationSignal,
+                        networkProgressListener);
+
+                if (surahDetailJSON != null) {
+                    this.quranDiskSource.saveSurahDetailAtNumber(surah.getNumber(), surahDetailJSON);
+                }
+            }
         } else {
             surahDetailJSON = this.quranNetworkSource.getSurahDetailAtNumber(
                     surah.getNumber(),
