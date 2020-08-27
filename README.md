@@ -10,7 +10,7 @@ Just your regular Qur'an apps on Android platform, except I'm trying to make it'
 * ~~[FEATURE] Switch between Light and Dark theme~~
 * ~~[FEATURE] Prefetch all the contents~~
 * ~~[FEATURE] Retry to load from cloud if there is a connection issue~~
-* [FEATURE] Search Surah
+* ~~[FEATURE] Search Surah~~
 
 Please report an Issue (<https://github.com/fathonyfath/quran-lite-android/issues>) if you encounter a problem while running the apps
 
