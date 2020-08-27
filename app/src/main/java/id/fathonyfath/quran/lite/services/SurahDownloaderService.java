@@ -1,6 +1,7 @@
 package id.fathonyfath.quran.lite.services;
 
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -8,12 +9,12 @@ import android.os.Build;
 import android.os.IBinder;
 
 import id.fathonyfath.quran.lite.models.Surah;
-import id.fathonyfath.quran.lite.useCase.DownloadAllSurahUseCase;
+import id.fathonyfath.quran.lite.useCase.FetchAllSurahDetailUseCase;
 import id.fathonyfath.quran.lite.useCase.UseCaseCallback;
 import id.fathonyfath.quran.lite.useCase.UseCaseProvider;
 import id.fathonyfath.quran.lite.utils.LocalBroadcastManager;
 
-public class SurahDownloaderService extends Service implements UseCaseCallback<Integer>, DownloadAllSurahUseCase.SurahProgress {
+public class SurahDownloaderService extends Service implements UseCaseCallback<Integer>, FetchAllSurahDetailUseCase.SurahProgress {
 
     private final static int NOTIFICATION_ID = 1;
 
@@ -36,27 +37,23 @@ public class SurahDownloaderService extends Service implements UseCaseCallback<I
         }
     }
 
-    public static void stopService(Context context) {
+    private static PendingIntent createStopServicePendingIntent(Context context) {
         final Intent intent = new Intent(context, SurahDownloaderService.class);
         intent.setAction(ACTION_STOP);
+        return PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(intent);
-        } else {
-            context.startService(intent);
-        }
     }
 
     private NotificationManager notificationManager;
 
-    private DownloadAllSurahUseCase useCase;
+    private FetchAllSurahDetailUseCase useCase;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         this.notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        this.useCase = UseCaseProvider.createUseCase(DownloadAllSurahUseCase.class);
+        initUseCase();
     }
 
     @Override
@@ -77,7 +74,9 @@ public class SurahDownloaderService extends Service implements UseCaseCallback<I
                                     "Memulai unduhan...",
                                     "",
                                     0,
-                                    false
+                                    false,
+                                    "Berhenti",
+                                    createStopServicePendingIntent(this)
                             )
                     );
                 } else {
@@ -105,15 +104,7 @@ public class SurahDownloaderService extends Service implements UseCaseCallback<I
 
         this.notificationManager = null;
 
-        if (this.useCase != null) {
-            this.useCase.cancel();
-            this.useCase.setCallback(null);
-            this.useCase.setSurahProgressCallback(null);
-        }
-
-        this.useCase = null;
-
-        UseCaseProvider.clearUseCase(DownloadAllSurahUseCase.class);
+        clearUseCase();
     }
 
     @Override
@@ -135,7 +126,9 @@ public class SurahDownloaderService extends Service implements UseCaseCallback<I
                         "Unduhan sedang berjalan...",
                         currentSurahNumber + "/" + maxSurahNumber,
                         (int) progressPercentage,
-                        false
+                        false,
+                        "Berhenti",
+                        createStopServicePendingIntent(this)
                 )
         );
     }
@@ -162,10 +155,34 @@ public class SurahDownloaderService extends Service implements UseCaseCallback<I
         intent.putExtra(DOWNLOAD_FAILURE_COUNT, data);
 
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
+        clearUseCase();
+        initUseCase();
+
+        stopForeground(false);
     }
 
     @Override
     public void onError(Throwable throwable) {
+        clearUseCase();
+        initUseCase();
+    }
 
+    private void initUseCase() {
+        this.useCase = UseCaseProvider.createUseCase(FetchAllSurahDetailUseCase.class);
+        this.useCase.setCallback(this);
+        this.useCase.setSurahProgressCallback(this);
+    }
+
+    private void clearUseCase() {
+        if (this.useCase != null) {
+            this.useCase.cancel();
+            this.useCase.setCallback(null);
+            this.useCase.setSurahProgressCallback(null);
+        }
+
+        this.useCase = null;
+
+        UseCaseProvider.clearUseCase(FetchAllSurahDetailUseCase.class);
     }
 }

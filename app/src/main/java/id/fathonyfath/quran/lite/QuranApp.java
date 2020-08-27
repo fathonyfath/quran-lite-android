@@ -16,6 +16,7 @@ import id.fathonyfath.quran.lite.data.source.network.QuranNetworkSource;
 import id.fathonyfath.quran.lite.data.source.preferences.BookmarkPreferencesSource;
 import id.fathonyfath.quran.lite.data.source.preferences.DayNightPreferencesSource;
 import id.fathonyfath.quran.lite.useCase.DoSearchUseCase;
+import id.fathonyfath.quran.lite.useCase.FetchAllSurahDetailUseCase;
 import id.fathonyfath.quran.lite.useCase.FetchAllSurahUseCase;
 import id.fathonyfath.quran.lite.useCase.FetchSurahDetailUseCase;
 import id.fathonyfath.quran.lite.useCase.GetBookmarkUseCase;
@@ -91,5 +92,6 @@ public class QuranApp extends Application {
         UseCaseProvider.registerFactory(GetDayNightPreferenceUseCase.class, new GetDayNightPreferenceUseCase.Factory(this.configRepository));
         UseCaseProvider.registerFactory(PutDayNightPreferenceUseCase.class, new PutDayNightPreferenceUseCase.Factory(this, this.configRepository));
         UseCaseProvider.registerFactory(DoSearchUseCase.class, new DoSearchUseCase.Factory(this.quranRepository, this.searchIndexRepository));
+        UseCaseProvider.registerFactory(FetchAllSurahDetailUseCase.class, new FetchAllSurahDetailUseCase.Factory(this.quranRepository));
     }
 }

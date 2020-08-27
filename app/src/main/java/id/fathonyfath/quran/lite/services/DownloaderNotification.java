@@ -3,6 +3,7 @@ package id.fathonyfath.quran.lite.services;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.os.Build;
 
@@ -20,6 +21,31 @@ public class DownloaderNotification {
                 .setContentText(description)
                 .setPriority(Notification.PRIORITY_LOW)
                 .setProgress(100, currentProgress, false);
+
+        notificationBuilder = setCategoryProgress(notificationBuilder);
+
+        if (isFinished) {
+            notificationBuilder = notificationBuilder.setSmallIcon(android.R.drawable.stat_sys_download_done);
+        } else {
+            notificationBuilder = notificationBuilder.setSmallIcon(android.R.drawable.stat_sys_download);
+        }
+
+        return notificationBuilder.build();
+    }
+
+    public static Notification createProgressNotification(Context context,
+                                                          String title,
+                                                          String description,
+                                                          int currentProgress,
+                                                          boolean isFinished,
+                                                          String cancelAction,
+                                                          PendingIntent intent) {
+        Notification.Builder notificationBuilder = createBuilder(context)
+                .setContentTitle(title)
+                .setContentText(description)
+                .setPriority(Notification.PRIORITY_LOW)
+                .setProgress(100, currentProgress, false)
+                .addAction(0, cancelAction, intent);
 
         notificationBuilder = setCategoryProgress(notificationBuilder);
 
@@ -57,7 +83,7 @@ public class DownloaderNotification {
 
     private static void createChannel(Context context, String id, String name, String description) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            int importance = NotificationManager.IMPORTANCE_LOW;
             final NotificationChannel channel = new NotificationChannel(id, name, importance);
             channel.setDescription(description);
             final NotificationManager notificationManager = context.getSystemService(NotificationManager.class);

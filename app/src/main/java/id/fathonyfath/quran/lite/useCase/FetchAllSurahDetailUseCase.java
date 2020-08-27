@@ -8,7 +8,7 @@ import id.fathonyfath.quran.lite.models.SurahDetail;
 import id.fathonyfath.quran.lite.utils.network.NetworkHelper;
 import id.fathonyfath.quran.lite.utils.scheduler.Schedulers;
 
-public class DownloadAllSurahUseCase extends BaseUseCase {
+public class FetchAllSurahDetailUseCase extends BaseUseCase {
 
     private static final int RETRY_THRESHOLD = 3;
 
@@ -24,11 +24,11 @@ public class DownloadAllSurahUseCase extends BaseUseCase {
     private NetworkHelper.CancelSignal cancellationSignal = new NetworkHelper.CancelSignal() {
         @Override
         public boolean isCancelled() {
-            return DownloadAllSurahUseCase.this.isCancelled();
+            return FetchAllSurahDetailUseCase.this.isCancelled();
         }
     };
 
-    DownloadAllSurahUseCase(QuranRepository quranRepository) {
+    FetchAllSurahDetailUseCase(QuranRepository quranRepository) {
         this.quranRepository = quranRepository;
     }
 
@@ -101,7 +101,7 @@ public class DownloadAllSurahUseCase extends BaseUseCase {
         void onProgress(Surah currentSurah, int currentSurahNumber, int maxSurahNumber, float progressPercentage);
     }
 
-    public static class Factory implements UseCaseFactory<DownloadAllSurahUseCase> {
+    public static class Factory implements UseCaseFactory<FetchAllSurahDetailUseCase> {
 
         private final QuranRepository quranRepository;
 
@@ -110,8 +110,8 @@ public class DownloadAllSurahUseCase extends BaseUseCase {
         }
 
         @Override
-        public DownloadAllSurahUseCase create() {
-            return new DownloadAllSurahUseCase(quranRepository);
+        public FetchAllSurahDetailUseCase create() {
+            return new FetchAllSurahDetailUseCase(quranRepository);
         }
     }
 }
