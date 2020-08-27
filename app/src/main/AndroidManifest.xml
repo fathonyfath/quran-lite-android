@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="id.fathonyfath.quran.lite">
+    package="id.thony.android.quranlite">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
-        android:name=".QuranApp"
+        android:name="id.thony.android.quranlite.QuranApp"
         android:label="Qur'an Lite"
         android:theme="@android:style/Theme.Holo.Light.NoActionBar">
-        <activity android:name=".MainActivity">
+        <activity android:name="id.thony.android.quranlite.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".services.SurahDownloaderService" />
+        <service android:name="id.thony.android.quranlite.services.SurahDownloaderService" />
     </application>
 
 </manifest>
