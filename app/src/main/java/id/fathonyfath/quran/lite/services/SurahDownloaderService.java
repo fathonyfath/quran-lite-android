@@ -69,4 +69,14 @@ public class SurahDownloaderService extends Service {
 
         notificationManager = null;
     }
+
+    @Override
+    public Object getSystemService(String name) {
+        Object service = super.getSystemService(name);
+        if (service != null) {
+            return service;
+        }
+
+        return getApplication().getSystemService(name);
+    }
 }

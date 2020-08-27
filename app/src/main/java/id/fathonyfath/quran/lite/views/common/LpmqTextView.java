@@ -6,6 +6,7 @@ import android.graphics.Typeface;
 import android.widget.TextView;
 
 import id.fathonyfath.quran.lite.MainActivity;
+import id.fathonyfath.quran.lite.QuranApp;
 import id.fathonyfath.quran.lite.data.FontProvider;
 import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
@@ -19,7 +20,7 @@ public class LpmqTextView extends TextView {
     public LpmqTextView(Context context) {
         super(context);
 
-        this.fontProvider = (FontProvider) context.getSystemService(MainActivity.FONT_PROVIDER_SERVICE);
+        this.fontProvider = (FontProvider) context.getSystemService(QuranApp.FONT_PROVIDER_SERVICE);
 
         applyTypeface();
         applyStyleBasedOnTheme();

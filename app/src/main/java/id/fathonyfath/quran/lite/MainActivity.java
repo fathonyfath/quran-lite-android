@@ -50,17 +50,8 @@ import id.fathonyfath.quran.lite.views.resumeBookmarkDialog.ResumeBookmarkDialog
 
 public class MainActivity extends Activity implements UseCaseCallback<DayNight>, DialogEventListener {
 
-    public static final String QURAN_REPOSITORY_SERVICE = "MainActivity.QuranRepository";
-    public static final String FONT_PROVIDER_SERVICE = "MainActivity.FontProvider";
-    public static final String BOOKMARK_REPOSITORY_SERVICE = "MainActivity.BookmarkRepository";
-    public static final String CONFIG_REPOSITORY_SERVICE = "MainActivity.ConfigRepository";
-    public static final String SEARCH_INDEX_REPOSITORY_SERVICE = "MainActivity.SearchIndexRepository";
     private final List<DialogEventListener> dialogEventListeners = new ArrayList<>();
-    private QuranRepository quranRepository;
-    private FontProvider fontProvider;
-    private BookmarkRepository bookmarkRepository;
-    private ConfigRepository configRepository;
-    private SearchIndexRepository searchIndexRepository;
+
     private MainView mainView = null;
     private BaseTheme activeTheme = new DayTheme();
 
@@ -71,8 +62,6 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight>,
         DownloaderNotification.createChannel(this);
         SurahDownloaderService.startForegroundService(this);
 
-        initService();
-        registerUseCaseFactory();
         registerDialogFactory();
 
         GetDayNightUseCase useCase = UseCaseProvider.createUseCase(GetDayNightUseCase.class);
@@ -92,6 +81,16 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight>,
     }
 
     @Override
+    public Object getSystemService(String name) {
+        Object service = super.getSystemService(name);
+        if (service != null) {
+            return service;
+        }
+
+        return getApplication().getSystemService(name);
+    }
+
+    @Override
     protected void onDestroy() {
         this.dialogEventListeners.clear();
 
@@ -107,22 +106,6 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight>,
         if (!this.mainView.onBackPressed()) {
             super.onBackPressed();
         }
-    }
-
-    @Override
-    public Object getSystemService(String name) {
-        if (name.equals(QURAN_REPOSITORY_SERVICE)) {
-            return quranRepository;
-        } else if (name.equals(FONT_PROVIDER_SERVICE)) {
-            return fontProvider;
-        } else if (name.equals(BOOKMARK_REPOSITORY_SERVICE)) {
-            return bookmarkRepository;
-        } else if (name.equals(CONFIG_REPOSITORY_SERVICE)) {
-            return configRepository;
-        } else if (name.equals(SEARCH_INDEX_REPOSITORY_SERVICE)) {
-            return searchIndexRepository;
-        }
-        return super.getSystemService(name);
     }
 
     @Override
@@ -154,35 +137,6 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight>,
     @Override
     public void onError(Throwable throwable) {
         // Not used
-    }
-
-    private void initService() {
-        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-        QuranDiskSource quranDiskSource = new QuranDiskSource(this.getApplicationContext());
-        QuranNetworkSource quranNetworkSource = new QuranNetworkSource();
-        FontRemoteSource fontRemoteSource = new FontRemoteSource();
-        BookmarkPreferencesSource bookmarkPreferencesSource = new BookmarkPreferencesSource(defaultSharedPreferences);
-        DayNightPreferencesSource dayNightPreferencesSource = new DayNightPreferencesSource(defaultSharedPreferences);
-        SearchIndexDiskSource searchIndexDiskSource = new SearchIndexDiskSource(this.getApplicationContext());
-
-        this.quranRepository = new QuranRepository(quranDiskSource, quranNetworkSource);
-        this.fontProvider = new FontProvider(this.getApplicationContext(), fontRemoteSource);
-        this.bookmarkRepository = new BookmarkRepository(bookmarkPreferencesSource);
-        this.configRepository = new ConfigRepository(dayNightPreferencesSource);
-        this.searchIndexRepository = new SearchIndexRepository(searchIndexDiskSource);
-    }
-
-    private void registerUseCaseFactory() {
-        UseCaseProvider.registerFactory(InstallFontIfNecessaryUseCase.class, new InstallFontIfNecessaryUseCase.Factory(this.fontProvider));
-        UseCaseProvider.registerFactory(FetchAllSurahUseCase.class, new FetchAllSurahUseCase.Factory(this.quranRepository));
-        UseCaseProvider.registerFactory(FetchSurahDetailUseCase.class, new FetchSurahDetailUseCase.Factory(this.quranRepository));
-        UseCaseProvider.registerFactory(GetBookmarkUseCase.class, new GetBookmarkUseCase.Factory(this.bookmarkRepository));
-        UseCaseProvider.registerFactory(PutBookmarkUseCase.class, new PutBookmarkUseCase.Factory(this.bookmarkRepository));
-        UseCaseProvider.registerFactory(GetDayNightUseCase.class, new GetDayNightUseCase.Factory(this, this.configRepository));
-        UseCaseProvider.registerFactory(GetDayNightPreferenceUseCase.class, new GetDayNightPreferenceUseCase.Factory(this.configRepository));
-        UseCaseProvider.registerFactory(PutDayNightPreferenceUseCase.class, new PutDayNightPreferenceUseCase.Factory(this, this.configRepository));
-        UseCaseProvider.registerFactory(DoSearchUseCase.class, new DoSearchUseCase.Factory(this.quranRepository, this.searchIndexRepository));
     }
 
     private void registerDialogFactory() {
