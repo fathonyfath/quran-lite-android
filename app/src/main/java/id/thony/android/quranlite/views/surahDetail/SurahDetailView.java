@@ -120,6 +120,35 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
             unregisterAndClearPutBookmarkUseCaseCallback();
         }
     };
+    private boolean isFailedToGetSurahDetail = false;
+    private Surah currentSurah;
+    private final AbsListView.OnItemLongClickListener onSurahLongClickListener = new AbsListView.OnItemLongClickListener() {
+
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            AyahDetailViewType ayahViewType = SurahDetailView.this.ayahDetailAdapter.getItem(position);
+            if (ayahViewType instanceof AyahDetailViewType.AyahViewModel) {
+                AyahDetailViewType.AyahViewModel ayahViewModel = (AyahDetailViewType.AyahViewModel) ayahViewType;
+                openAyahDetailDialog(ayahViewModel);
+
+                return true;
+            }
+            return false;
+        }
+    };
+    private final View.OnClickListener onRetryClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            SurahDetailView.this.isFailedToGetSurahDetail = false;
+
+            updateViewStateLoading();
+
+            if (!tryToRestoreFetchSurahDetailUseCase()) {
+                createAndRunFetchSurahDetailUseCase();
+            }
+        }
+    };
+    private SurahDetail currentSurahDetail;
     private final DialogEventListener dialogEventListener = new DialogEventListener() {
         @Override
         public void onEvent(DialogEvent event, Parcelable arguments) {
@@ -134,23 +163,6 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
                     putBookmark(selectedAyah);
                 }
             }
-        }
-    };
-    private boolean isFailedToGetSurahDetail = false;
-    private Surah currentSurah;
-    private SurahDetail currentSurahDetail;
-    private final AbsListView.OnItemLongClickListener onSurahLongClickListener = new AbsListView.OnItemLongClickListener() {
-
-        @Override
-        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-            AyahDetailViewType ayahViewType = SurahDetailView.this.ayahDetailAdapter.getItem(position);
-            if (ayahViewType instanceof AyahDetailViewType.AyahViewModel) {
-                AyahDetailViewType.AyahViewModel ayahViewModel = (AyahDetailViewType.AyahViewModel) ayahViewType;
-                openAyahDetailDialog(ayahViewModel);
-
-                return true;
-            }
-            return false;
         }
     };
     private int lastReadingAyah;
@@ -181,18 +193,6 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
 
             SurahDetailView.this.isFailedToGetSurahDetail = true;
             updateViewStateRetry();
-        }
-    };
-    private final View.OnClickListener onRetryClickListener = new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            SurahDetailView.this.isFailedToGetSurahDetail = false;
-
-            updateViewStateLoading();
-
-            if (!tryToRestoreFetchSurahDetailUseCase()) {
-                createAndRunFetchSurahDetailUseCase();
-            }
         }
     };
     private int firstAyahNumber = 0;
