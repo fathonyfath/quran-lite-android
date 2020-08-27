@@ -6,16 +6,18 @@ Just your regular Qur'an apps on Android platform, except I'm trying to make it'
 
 ## TODOs
 
-* ~~[FEATURE] Bookmark to your last reading page~~
-* ~~[FEATURE] Switch between Light and Dark theme~~
-* ~~[FEATURE] Prefetch all the contents~~
-* ~~[FEATURE] Retry to load from cloud if there is a connection issue~~
-* ~~[FEATURE] Search Surah~~
-
 Please report an Issue (<https://github.com/fathonyfath/quran-lite-android/issues>) if you encounter a problem while running the apps
 
 ## Version History
 
+* v1.3.0 (currently on rc)
+    * Add bookmark feature to save your last reading
+    * Add Dark-Light theme feature to save power and read easier in the eyes
+    * Add ability to prefetch all the content on background
+    * Add retry button when there is network issues (timeout in ~5 secs.)
+    * Add search functionality that will look for similar surah based on your query
+    * Add ability to read tafsir of current ayah
+    * Improved stability of the application
 * v1.2.0
     * Improved stability
 * v1.1.1
