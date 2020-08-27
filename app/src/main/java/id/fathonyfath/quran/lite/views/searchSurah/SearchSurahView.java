@@ -4,9 +4,13 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +25,7 @@ import id.fathonyfath.quran.lite.useCase.DoSearchUseCase;
 import id.fathonyfath.quran.lite.useCase.UseCaseCallback;
 import id.fathonyfath.quran.lite.useCase.UseCaseProvider;
 import id.fathonyfath.quran.lite.utils.ThemeContext;
+import id.fathonyfath.quran.lite.utils.UnitConverter;
 import id.fathonyfath.quran.lite.utils.ViewUtil;
 import id.fathonyfath.quran.lite.utils.viewLifecycle.ViewCallback;
 import id.fathonyfath.quran.lite.views.common.CloseView;
@@ -32,7 +37,12 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
 
     private final List<Surah> surahList = new ArrayList<>();
     private final ListView surahListView;
+    private final EnterSearchQueryView enterSearchQueryView;
+    private final NoResultView noResultView;
     private final SurahAdapter surahAdapter;
+    private final ProgressBar progressBar;
+
+    private boolean hasSearched = false;
 
     private final ToolbarView.OnSearchListener searchListener = new ToolbarView.OnSearchListener() {
         @Override
@@ -43,7 +53,11 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
                 imm.hideSoftInputFromWindow(getSearchInput().getWindowToken(), 0);
             }
 
+            updateViewStateLoading();
+
             doSearchProcess(query);
+
+            hasSearched = true;
         }
     };
 
@@ -62,9 +76,20 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
 
         @Override
         public void onError(Throwable throwable) {
+            hasSearched = false;
+
             unregisterAndClearUseCase();
 
             Toast.makeText(getContext(), "Keyword yang anda masukkan tidak memenuhi syarat minimum karakter.", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    private final View.OnClickListener onCloseClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (onViewEventListener != null) {
+                onViewEventListener.onCloseClicked();
+            }
         }
     };
 
@@ -76,17 +101,14 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
         setId(Res.Id.searchSurahView);
 
         this.surahListView = new ListView(getContext());
+        this.enterSearchQueryView = new EnterSearchQueryView(getContext());
+        this.noResultView = new NoResultView(getContext());
+        this.progressBar = new ProgressBar(getContext());
+
         this.surahAdapter = new SurahAdapter(getContext(), this.surahList);
 
         CloseView closeView = new CloseView(context);
-        closeView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (onViewEventListener != null) {
-                    onViewEventListener.onCloseClicked();
-                }
-            }
-        });
+        closeView.setOnClickListener(onCloseClickListener);
 
         this.setToolbarLeftView(closeView);
 
@@ -109,6 +131,7 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
         if (getSearchInput() != null) {
             viewState.searchQuery = getSearchInput().getText().toString();
         }
+        viewState.hasSearched = this.hasSearched;
         return viewState;
     }
 
@@ -121,6 +144,8 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
         if (getSearchInput() != null) {
             getSearchInput().setText(viewState.searchQuery, TextView.BufferType.EDITABLE);
         }
+
+        this.hasSearched = viewState.hasSearched;
     }
 
     @Override
@@ -130,6 +155,8 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
             final InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.showSoftInput(getSearchInput(), InputMethodManager.SHOW_IMPLICIT);
         }
+
+        updateViewStateInit();
     }
 
     @Override
@@ -137,6 +164,16 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
         tryToRestoreUseCase();
 
         this.setOnSearchListener(searchListener);
+
+        if (!hasSearched) {
+            updateViewStateInit();
+        } else {
+            if (this.surahList.isEmpty()) {
+                updateViewStateEmpty();
+            } else {
+                updateViewStateResult();
+            }
+        }
     }
 
     @Override
@@ -161,6 +198,8 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
         if (getSearchInput() != null) {
             getSearchInput().setText("", TextView.BufferType.EDITABLE);
         }
+
+        hasSearched = false;
     }
 
     private void initConfiguration() {
@@ -171,7 +210,37 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
         this.surahListView.setId(Res.Id.searchSurahView_surahListView);
         this.surahListView.setAdapter(this.surahAdapter);
 
+        final FrameLayout.LayoutParams enterSearchQueryParams = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        enterSearchQueryParams.gravity = Gravity.CENTER_HORIZONTAL;
+        enterSearchQueryParams.topMargin = (int) UnitConverter.fromDpToPx(getContext(), 72.0f);
+        this.enterSearchQueryView.setLayoutParams(enterSearchQueryParams);
+
+        final FrameLayout.LayoutParams noResultParams = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        noResultParams.gravity = Gravity.CENTER_HORIZONTAL;
+        noResultParams.topMargin = (int) UnitConverter.fromDpToPx(getContext(), 72.0f);
+
+        final FrameLayout.LayoutParams progressBarParams = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        progressBarParams.gravity = Gravity.CENTER;
+
+        this.enterSearchQueryView.setLayoutParams(enterSearchQueryParams);
+        this.noResultView.setLayoutParams(enterSearchQueryParams);
+        this.progressBar.setLayoutParams(progressBarParams);
+
+        this.progressBar.setIndeterminate(true);
+
         addView(this.surahListView);
+        addView(this.enterSearchQueryView);
+        addView(this.noResultView);
+        addView(this.progressBar);
     }
 
     private void applyStyleBasedOnTheme() {
@@ -186,6 +255,12 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
         this.surahAdapter.clear();
         this.surahAdapter.addAll(surahList);
         this.surahAdapter.notifyDataSetChanged();
+
+        if (surahList.isEmpty()) {
+            updateViewStateEmpty();
+        } else {
+            updateViewStateResult();
+        }
     }
 
     private void restoreSurahList(List<Surah> surahList) {
@@ -231,6 +306,34 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
         return false;
     }
 
+    private void updateViewStateInit() {
+        this.surahListView.setVisibility(View.GONE);
+        this.enterSearchQueryView.setVisibility(View.VISIBLE);
+        this.noResultView.setVisibility(View.GONE);
+        this.progressBar.setVisibility(View.GONE);
+    }
+
+    private void updateViewStateResult() {
+        this.surahListView.setVisibility(View.VISIBLE);
+        this.enterSearchQueryView.setVisibility(View.GONE);
+        this.noResultView.setVisibility(View.GONE);
+        this.progressBar.setVisibility(View.GONE);
+    }
+
+    private void updateViewStateEmpty() {
+        this.surahListView.setVisibility(View.GONE);
+        this.enterSearchQueryView.setVisibility(View.GONE);
+        this.noResultView.setVisibility(View.VISIBLE);
+        this.progressBar.setVisibility(View.GONE);
+    }
+
+    private void updateViewStateLoading() {
+        this.surahListView.setVisibility(View.GONE);
+        this.enterSearchQueryView.setVisibility(View.GONE);
+        this.noResultView.setVisibility(View.GONE);
+        this.progressBar.setVisibility(View.VISIBLE);
+    }
+
     public interface OnViewEventListener {
         void onCloseClicked();
     }
@@ -257,6 +360,7 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
 
         private List<Surah> surahList = new ArrayList<>();
         private String searchQuery = "";
+        private boolean hasSearched = false;
 
         public SearchSurahViewState(Parcel source, ClassLoader loader) {
             super(source);
@@ -269,6 +373,8 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
             this.surahList.addAll(Arrays.asList(surahArray));
 
             this.searchQuery = source.readString();
+
+            this.hasSearched = source.readInt() >= 1;
         }
 
         public SearchSurahViewState(Parcelable superState) {
@@ -284,6 +390,8 @@ public class SearchSurahView extends WrapperView implements ViewCallback {
             out.writeTypedArray(surahArray, flags);
 
             out.writeString(this.searchQuery);
+
+            out.writeInt((this.hasSearched) ? 1 : 0);
         }
     }
 }

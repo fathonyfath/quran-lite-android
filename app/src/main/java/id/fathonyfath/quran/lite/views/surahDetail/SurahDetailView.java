@@ -338,7 +338,7 @@ public class SurahDetailView extends WrapperView implements ViewCallback {
                 ViewGroup.LayoutParams.WRAP_CONTENT
         );
         retryParams.gravity = Gravity.CENTER;
-        this.retryView.setLayoutParams(progressParams);
+        this.retryView.setLayoutParams(retryParams);
         this.retryView.setId(Res.Id.surahDetailView_retryView);
         this.retryView.setOnRetryClickListener(this.onRetryClickListener);
 
