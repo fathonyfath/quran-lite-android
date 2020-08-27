@@ -88,4 +88,7 @@ public class QuranRepository {
         return null;
     }
 
+    public boolean isSurahDetailAvailable(Surah surah) {
+        return this.quranDiskSource.isSurahDetailAtNumberExist(surah.getNumber());
+    }
 }

@@ -7,14 +7,33 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
 
-import id.fathonyfath.quran.lite.utils.scheduler.Schedulers;
+import id.fathonyfath.quran.lite.models.Surah;
+import id.fathonyfath.quran.lite.useCase.DownloadAllSurahUseCase;
+import id.fathonyfath.quran.lite.useCase.UseCaseCallback;
+import id.fathonyfath.quran.lite.useCase.UseCaseProvider;
 
-public class SurahDownloaderService extends Service {
+public class SurahDownloaderService extends Service implements UseCaseCallback<Integer>, DownloadAllSurahUseCase.SurahProgress {
 
     private final static int NOTIFICATION_ID = 1;
 
-    public static void startForegroundService(Context context) {
+    private final static String ACTION_START = "ACTION_START";
+    private final static String ACTION_STOP = "ACTION_STOP";
+
+    public static void startService(Context context) {
         final Intent intent = new Intent(context, SurahDownloaderService.class);
+        intent.setAction(ACTION_START);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(intent);
+        } else {
+            context.startService(intent);
+        }
+    }
+
+    public static void stopService(Context context) {
+        final Intent intent = new Intent(context, SurahDownloaderService.class);
+        intent.setAction(ACTION_STOP);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(intent);
         } else {
@@ -24,36 +43,44 @@ public class SurahDownloaderService extends Service {
 
     private NotificationManager notificationManager;
 
+    private DownloadAllSurahUseCase useCase;
+
     @Override
     public void onCreate() {
         super.onCreate();
 
-        notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        this.notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        this.useCase = UseCaseProvider.createUseCase(DownloadAllSurahUseCase.class);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        startForeground(NOTIFICATION_ID, DownloaderNotification.createNotification(this));
+        String action = intent.getAction();
+        if (action == null) {
+            action = "";
+        }
 
-        final NotificationManager notificationManager = this.notificationManager;
-
-        Schedulers.Computation().execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(5000);
-                    Schedulers.Main().execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            notificationManager.notify(NOTIFICATION_ID, DownloaderNotification.createCompleteNotification(SurahDownloaderService.this));
-                            stopForeground(false);
-                        }
-                    });
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+        switch (action) {
+            case ACTION_START:
+                if (!useCase.isExecuted()) {
+                    useCase.run();
+                    startForeground(
+                            NOTIFICATION_ID,
+                            DownloaderNotification.createProgressNotification(
+                                    this,
+                                    "Memulai unduhan...",
+                                    "",
+                                    0,
+                                    false
+                            )
+                    );
                 }
-            }
-        });
+                break;
+            case ACTION_STOP:
+                stopForeground(false);
+                stopSelf();
+                break;
+        }
 
         return START_NOT_STICKY;
     }
@@ -67,7 +94,17 @@ public class SurahDownloaderService extends Service {
     public void onDestroy() {
         super.onDestroy();
 
-        notificationManager = null;
+        this.notificationManager = null;
+
+        if (this.useCase != null) {
+            this.useCase.cancel();
+            this.useCase.setCallback(null);
+            this.useCase.setSurahProgressCallback(null);
+        }
+
+        this.useCase = null;
+
+        UseCaseProvider.clearUseCase(DownloadAllSurahUseCase.class);
     }
 
     @Override
@@ -78,5 +115,43 @@ public class SurahDownloaderService extends Service {
         }
 
         return getApplication().getSystemService(name);
+    }
+
+    @Override
+    public void onProgress(Surah currentSurah, int currentSurahNumber, int maxSurahNumber, float progressPercentage) {
+        notificationManager.notify(
+                NOTIFICATION_ID,
+                DownloaderNotification.createProgressNotification(
+                        this,
+                        "Unduhan sedang berjalan...",
+                        currentSurahNumber + "/" + maxSurahNumber,
+                        (int) progressPercentage,
+                        false
+                )
+        );
+    }
+
+    @Override
+    public void onProgress(float progress) {
+
+    }
+
+    @Override
+    public void onResult(Integer data) {
+        notificationManager.notify(
+                NOTIFICATION_ID,
+                DownloaderNotification.createProgressNotification(
+                        this,
+                        "Unduhan telah selesai...",
+                        "",
+                        100,
+                        true
+                )
+        );
+    }
+
+    @Override
+    public void onError(Throwable throwable) {
+
     }
 }

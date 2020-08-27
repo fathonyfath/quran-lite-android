@@ -25,6 +25,10 @@ public abstract class BaseUseCase {
         setCancelled(true);
     }
 
+    public final boolean isExecuted() {
+        return executed.get();
+    }
+
     protected boolean isCancelled() {
         return this.cancelled;
     }

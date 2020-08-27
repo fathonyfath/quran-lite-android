@@ -2,40 +2,19 @@ package id.fathonyfath.quran.lite;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.preference.PreferenceManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import id.fathonyfath.quran.lite.data.BookmarkRepository;
-import id.fathonyfath.quran.lite.data.ConfigRepository;
-import id.fathonyfath.quran.lite.data.FontProvider;
-import id.fathonyfath.quran.lite.data.QuranRepository;
-import id.fathonyfath.quran.lite.data.SearchIndexRepository;
-import id.fathonyfath.quran.lite.data.font.FontRemoteSource;
-import id.fathonyfath.quran.lite.data.source.disk.QuranDiskSource;
-import id.fathonyfath.quran.lite.data.source.disk.SearchIndexDiskSource;
-import id.fathonyfath.quran.lite.data.source.network.QuranNetworkSource;
-import id.fathonyfath.quran.lite.data.source.preferences.BookmarkPreferencesSource;
-import id.fathonyfath.quran.lite.data.source.preferences.DayNightPreferencesSource;
 import id.fathonyfath.quran.lite.models.DayNight;
 import id.fathonyfath.quran.lite.services.DownloaderNotification;
 import id.fathonyfath.quran.lite.services.SurahDownloaderService;
 import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.themes.DayTheme;
 import id.fathonyfath.quran.lite.themes.NightTheme;
-import id.fathonyfath.quran.lite.useCase.DoSearchUseCase;
-import id.fathonyfath.quran.lite.useCase.FetchAllSurahUseCase;
-import id.fathonyfath.quran.lite.useCase.FetchSurahDetailUseCase;
-import id.fathonyfath.quran.lite.useCase.GetBookmarkUseCase;
-import id.fathonyfath.quran.lite.useCase.GetDayNightPreferenceUseCase;
 import id.fathonyfath.quran.lite.useCase.GetDayNightUseCase;
-import id.fathonyfath.quran.lite.useCase.InstallFontIfNecessaryUseCase;
-import id.fathonyfath.quran.lite.useCase.PutBookmarkUseCase;
-import id.fathonyfath.quran.lite.useCase.PutDayNightPreferenceUseCase;
 import id.fathonyfath.quran.lite.useCase.UseCaseCallback;
 import id.fathonyfath.quran.lite.useCase.UseCaseProvider;
 import id.fathonyfath.quran.lite.utils.DialogUtil;
@@ -60,7 +39,7 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight>,
         super.onCreate(savedInstanceState);
 
         DownloaderNotification.createChannel(this);
-        SurahDownloaderService.startForegroundService(this);
+        SurahDownloaderService.startService(this);
 
         registerDialogFactory();
 

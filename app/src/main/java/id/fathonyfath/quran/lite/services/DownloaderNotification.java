@@ -10,32 +10,24 @@ public class DownloaderNotification {
 
     private static final String CHANNEL_ID = "SurahDownloadNotificationChannel";
 
-    public static Notification createNotification(Context context) {
-        createChannel(context);
-
+    public static Notification createProgressNotification(Context context,
+                                                          String title,
+                                                          String description,
+                                                          int currentProgress,
+                                                          boolean isFinished) {
         Notification.Builder notificationBuilder = createBuilder(context)
-                .setContentTitle("Test")
-                .setContentText("FooBar")
-                .setSmallIcon(android.R.drawable.stat_sys_download)
+                .setContentTitle(title)
+                .setContentText(description)
                 .setPriority(Notification.PRIORITY_LOW)
-                .setProgress(100, 50, false);
+                .setProgress(100, currentProgress, false);
 
         notificationBuilder = setCategoryProgress(notificationBuilder);
 
-        return notificationBuilder.build();
-    }
-
-    public static Notification createCompleteNotification(Context context) {
-        createChannel(context);
-
-        Notification.Builder notificationBuilder = createBuilder(context)
-                .setContentTitle("Test")
-                .setContentText("Hoho haha")
-                .setSmallIcon(android.R.drawable.stat_sys_download_done)
-                .setPriority(Notification.PRIORITY_LOW)
-                .setProgress(100, 100, false);
-
-        notificationBuilder = setCategoryProgress(notificationBuilder);
+        if (isFinished) {
+            notificationBuilder = notificationBuilder.setSmallIcon(android.R.drawable.stat_sys_download_done);
+        } else {
+            notificationBuilder = notificationBuilder.setSmallIcon(android.R.drawable.stat_sys_download);
+        }
 
         return notificationBuilder.build();
     }
