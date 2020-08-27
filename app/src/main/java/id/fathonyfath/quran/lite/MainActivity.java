@@ -22,6 +22,8 @@ import id.fathonyfath.quran.lite.data.source.network.QuranNetworkSource;
 import id.fathonyfath.quran.lite.data.source.preferences.BookmarkPreferencesSource;
 import id.fathonyfath.quran.lite.data.source.preferences.DayNightPreferencesSource;
 import id.fathonyfath.quran.lite.models.DayNight;
+import id.fathonyfath.quran.lite.services.DownloaderNotification;
+import id.fathonyfath.quran.lite.services.SurahDownloaderService;
 import id.fathonyfath.quran.lite.themes.BaseTheme;
 import id.fathonyfath.quran.lite.themes.DayTheme;
 import id.fathonyfath.quran.lite.themes.NightTheme;
@@ -65,6 +67,9 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight>,
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        DownloaderNotification.createChannel(this);
+        SurahDownloaderService.startForegroundService(this);
 
         initService();
         registerUseCaseFactory();
