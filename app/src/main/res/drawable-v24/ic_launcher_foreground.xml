@@ -1,0 +1,35 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+  <group android:scaleX="0.297"
+      android:scaleY="0.297"
+      android:translateX="-5.4"
+      android:translateY="-5.4">
+    <path
+        android:pathData="M146.489,266.605 L145.928,144.625 255.376,135.318 482.653,362.529 362.783,482.399Z"
+        android:strokeLineJoin="miter"
+        android:strokeWidth="1"
+        android:strokeColor="#00000000"
+        android:strokeLineCap="butt">
+      <aapt:attr name="android:fillColor">
+        <gradient 
+            android:startY="316.25732"
+            android:startX="321.0258"
+            android:endY="176.18968"
+            android:endX="174.9351"
+            android:type="linear">
+          <item android:offset="0" android:color="#00000004"/>
+          <item android:offset="1" android:color="#44000000"/>
+        </gradient>
+      </aapt:attr>
+    </path>
+    <path
+        android:pathData="m160.145,134.194h92.681c2.039,0 3.709,1.669 3.709,3.709v103.437c-0.168,2.891 -3.899,2.958 -7.933,2.779L158.778,244.118c-5.58,0 -10.14,4.56 -10.14,10.14 0,5.58 4.56,10.14 10.14,10.14h89.824v-10.79h7.933v13.714c0,2.499 -2.039,4.538 -4.538,4.538h-92.826c-10.039,0.011 -18.252,-8.201 -18.252,-18.24v-100.199c0,-10.577 8.65,-19.226 19.226,-19.226h-0zM219.885,211.884c-2.599,1.681 -4.314,2.723 -5.131,3.104 -3.854,1.804 -7.944,2.7 -12.235,2.7 -7.955,0 -14.733,-2.812 -20.336,-8.414 -5.613,-5.613 -8.403,-12.381 -8.403,-20.336 0,-8.011 2.812,-14.801 8.448,-20.38 5.636,-5.58 12.481,-8.381 20.537,-8.381 5.927,0 11.641,1.927 17.131,5.77l-9.658,-1.95c-6.924,0 -12.818,2.431 -17.703,7.294 -4.863,4.863 -7.305,10.756 -7.305,17.647 0,6.846 2.431,12.717 7.283,17.613 4.84,4.896 10.666,7.327 17.467,7.327l9.904,-1.994 -0,-0zM208.928,185.633h8.358l2.611,-7.944 2.555,7.944h8.37l-6.767,4.896 2.555,7.977 -6.722,-4.907 -6.779,4.907 2.577,-7.977 -6.756,-4.896z"
+        android:strokeWidth="0.37716"
+        android:fillColor="#ffffff"
+        android:fillType="evenOdd"/>
+  </group>
+</vector>
