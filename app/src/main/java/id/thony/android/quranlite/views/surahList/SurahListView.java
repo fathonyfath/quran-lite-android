@@ -132,7 +132,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
     private final View.OnClickListener onDownloadClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Toast.makeText(getContext(), "Proses pengunduhan dimulai...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Proses pengunduhan dimulai. Cek notifikasi untuk mengetahui perkembangan proses unduh.", Toast.LENGTH_SHORT).show();
             SurahDownloaderService.startService(getContext());
         }
     };
