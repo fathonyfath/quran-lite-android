@@ -7,6 +7,8 @@
 
     <application
         android:name=".QuranApp"
+        android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@mipmap/ic_launcher"
         android:label="Qur'an Lite"
         android:roundIcon="@mipmap/ic_launcher_round"
