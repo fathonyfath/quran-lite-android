@@ -20,11 +20,11 @@ public class SearchIndex implements Parcelable {
     };
 
     private final Surah surah;
-    private final String[] indexes;
+    private final String[] indices;
 
-    public SearchIndex(Surah surah, String[] indexes) {
+    public SearchIndex(Surah surah, String[] indices) {
         this.surah = surah;
-        this.indexes = indexes;
+        this.indices = indices;
     }
 
     /**
@@ -32,15 +32,15 @@ public class SearchIndex implements Parcelable {
      */
     protected SearchIndex(Parcel in) {
         surah = in.readParcelable(Surah.class.getClassLoader());
-        indexes = in.createStringArray();
+        indices = in.createStringArray();
     }
 
     public Surah getSurah() {
         return surah;
     }
 
-    public String[] getIndexes() {
-        return indexes;
+    public String[] getIndices() {
+        return indices;
     }
 
     @SuppressWarnings("EqualsReplaceableByObjectsCall")
@@ -53,13 +53,13 @@ public class SearchIndex implements Parcelable {
 
         if (surah != null ? !surah.equals(that.surah) : that.surah != null) return false;
         // Probably incorrect - comparing Object[] arrays with Arrays.equals
-        return Arrays.equals(indexes, that.indexes);
+        return Arrays.equals(indices, that.indices);
     }
 
     @Override
     public int hashCode() {
         int result = surah != null ? surah.hashCode() : 0;
-        result = 31 * result + Arrays.hashCode(indexes);
+        result = 31 * result + Arrays.hashCode(indices);
         return result;
     }
 
@@ -71,6 +71,6 @@ public class SearchIndex implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeParcelable(surah, flags);
-        dest.writeStringArray(indexes);
+        dest.writeStringArray(indices);
     }
 }

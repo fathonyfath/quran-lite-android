@@ -3,5 +3,5 @@ package id.thony.android.quranlite.data.json;
 public class SearchIndexJSON {
 
     public SurahJSON surah;
-    public String[] indexes;
+    public String[] indices;
 }

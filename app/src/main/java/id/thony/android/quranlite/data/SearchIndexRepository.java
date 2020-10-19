@@ -20,21 +20,21 @@ public class SearchIndexRepository {
         this.searchIndexDiskSource = searchIndexDiskSource;
     }
 
-    public void saveSearchIndexes(List<SearchIndex> searchIndexes) {
+    public void saveSearchIndices(List<SearchIndex> searchIndices) {
         try {
-            List<SearchIndexJSON> searchIndexesJSON = SearchIndexToSearchIndexJSONMapper.map(searchIndexes);
-            JSONArray jsonArray = SearchIndexJSONParser.parseSearchIndexJSON(searchIndexesJSON);
-            searchIndexDiskSource.saveSearchIndexes(jsonArray);
+            List<SearchIndexJSON> searchIndicesJSON = SearchIndexToSearchIndexJSONMapper.map(searchIndices);
+            JSONArray jsonArray = SearchIndexJSONParser.parseSearchIndexJSON(searchIndicesJSON);
+            searchIndexDiskSource.saveSearchIndices(jsonArray);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    public List<SearchIndex> fetchSearchIndexes() {
+    public List<SearchIndex> fetchSearchIndices() {
         try {
-            JSONArray jsonArray = searchIndexDiskSource.getSearchIndexes();
-            List<SearchIndexJSON> searchIndexesJSON = SearchIndexJSONParser.parseJSONObject(jsonArray);
-            return SearchIndexJSONToSearchIndexMapper.map(searchIndexesJSON);
+            JSONArray jsonArray = searchIndexDiskSource.getSearchIndices();
+            List<SearchIndexJSON> searchIndicesJSON = SearchIndexJSONParser.parseJSONObject(jsonArray);
+            return SearchIndexJSONToSearchIndexMapper.map(searchIndicesJSON);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -42,7 +42,7 @@ public class SearchIndexRepository {
         return null;
     }
 
-    public boolean isSearchIndexesExist() {
-        return searchIndexDiskSource.isSearchIndexesExist();
+    public boolean isSearchIndicesExist() {
+        return searchIndexDiskSource.isSearchIndicesExist();
     }
 }

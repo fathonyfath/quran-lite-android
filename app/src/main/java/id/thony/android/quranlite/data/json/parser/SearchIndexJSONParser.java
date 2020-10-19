@@ -12,20 +12,20 @@ import id.thony.android.quranlite.data.json.SearchIndexJSON;
 public class SearchIndexJSONParser {
 
     public static List<SearchIndexJSON> parseJSONObject(JSONArray jsonArray) throws JSONException {
-        final List<SearchIndexJSON> searchIndexes = new ArrayList<>();
+        final List<SearchIndexJSON> searchIndices = new ArrayList<>();
 
         for (int i = 0; i < jsonArray.length(); i++) {
-            searchIndexes.add(parseJSONObjectToSearchIndexJSON(jsonArray.getJSONObject(i)));
+            searchIndices.add(parseJSONObjectToSearchIndexJSON(jsonArray.getJSONObject(i)));
         }
 
-        return searchIndexes;
+        return searchIndices;
     }
 
-    public static JSONArray parseSearchIndexJSON(List<SearchIndexJSON> searchIndexesJSON) throws JSONException {
+    public static JSONArray parseSearchIndexJSON(List<SearchIndexJSON> searchIndicesJSON) throws JSONException {
         final JSONArray jsonArray = new JSONArray();
 
-        for (int i = 0; i < searchIndexesJSON.size(); i++) {
-            jsonArray.put(parseSearchIndexJSONToJSONObject(searchIndexesJSON.get(i)));
+        for (int i = 0; i < searchIndicesJSON.size(); i++) {
+            jsonArray.put(parseSearchIndexJSONToJSONObject(searchIndicesJSON.get(i)));
         }
 
         return jsonArray;
@@ -33,14 +33,14 @@ public class SearchIndexJSONParser {
 
     private static SearchIndexJSON parseJSONObjectToSearchIndexJSON(JSONObject jsonObject) throws JSONException {
         final SearchIndexJSON searchIndex = new SearchIndexJSON();
-        final JSONArray indexesJSON = jsonObject.getJSONArray("indexes");
-        final String[] indexes = new String[indexesJSON.length()];
-        for (int i = 0; i < indexesJSON.length(); i++) {
-            indexes[i] = indexesJSON.getString(i);
+        final JSONArray indicesJSON = jsonObject.getJSONArray("indices");
+        final String[] indices = new String[indicesJSON.length()];
+        for (int i = 0; i < indicesJSON.length(); i++) {
+            indices[i] = indicesJSON.getString(i);
         }
 
         searchIndex.surah = SurahJSONParser.parseJSONObjectToSurahJSON(jsonObject.getJSONObject("surah"));
-        searchIndex.indexes = indexes;
+        searchIndex.indices = indices;
 
         return searchIndex;
     }
@@ -48,12 +48,12 @@ public class SearchIndexJSONParser {
     private static JSONObject parseSearchIndexJSONToJSONObject(SearchIndexJSON searchIndexJSON) throws JSONException {
         final JSONObject jsonObject = new JSONObject();
         final JSONArray jsonArray = new JSONArray();
-        for (int i = 0; i < searchIndexJSON.indexes.length; i++) {
-            jsonArray.put(searchIndexJSON.indexes[i]);
+        for (int i = 0; i < searchIndexJSON.indices.length; i++) {
+            jsonArray.put(searchIndexJSON.indices[i]);
         }
 
         jsonObject.put("surah", SurahJSONParser.parseSurahJSONToJSONObject(searchIndexJSON.surah));
-        jsonObject.put("indexes", jsonArray);
+        jsonObject.put("indices", jsonArray);
         return jsonObject;
     }
 }

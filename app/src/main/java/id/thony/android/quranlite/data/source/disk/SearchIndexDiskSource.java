@@ -23,7 +23,7 @@ public class SearchIndexDiskSource {
         this.destDir.mkdirs();
     }
 
-    public JSONArray getSearchIndexes() {
+    public JSONArray getSearchIndices() {
         final File indexFile = new File(this.destDir, searchIndexFileName);
         if (!indexFile.exists()) {
             return null;
@@ -43,12 +43,12 @@ public class SearchIndexDiskSource {
         return null;
     }
 
-    public boolean isSearchIndexesExist() {
+    public boolean isSearchIndicesExist() {
         final File indexFile = new File(this.destDir, searchIndexFileName);
         return indexFile.exists();
     }
 
-    public boolean saveSearchIndexes(JSONArray jsonArray) {
+    public boolean saveSearchIndices(JSONArray jsonArray) {
         final File indexFile = new File(this.destDir, searchIndexFileName);
         if (indexFile.exists()) {
             indexFile.delete();

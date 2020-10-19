@@ -10,19 +10,19 @@ import id.thony.android.quranlite.models.Surah;
 
 public class SearchIndexJSONToSearchIndexMapper {
 
-    public static List<SearchIndex> map(List<SearchIndexJSON> searchIndexesJSON) {
-        final List<SearchIndex> searchIndexes = new ArrayList<>();
-        for (int i = 0; i < searchIndexesJSON.size(); i++) {
-            searchIndexes.add(map(searchIndexesJSON.get(i)));
+    public static List<SearchIndex> map(List<SearchIndexJSON> searchIndicesJSON) {
+        final List<SearchIndex> searchIndices = new ArrayList<>();
+        for (int i = 0; i < searchIndicesJSON.size(); i++) {
+            searchIndices.add(map(searchIndicesJSON.get(i)));
         }
 
-        return searchIndexes;
+        return searchIndices;
     }
 
     private static SearchIndex map(SearchIndexJSON searchIndexJSON) {
         return new SearchIndex(
                 mapSurahJSONToSurah(searchIndexJSON.surah),
-                searchIndexJSON.indexes.clone()
+                searchIndexJSON.indices.clone()
         );
     }
 

@@ -57,84 +57,84 @@ public class DoSearchUseCase extends BaseUseCase {
     }
 
     private void startSearchProcess() {
-        if (!searchIndexRepository.isSearchIndexesExist() || !checkIfNGramsIsSame()) {
+        if (!searchIndexRepository.isSearchIndicesExist() || !checkIfNGramsIsSame()) {
             final List<Surah> surahList = quranRepository.fetchAllSurah(null, null);
             Schedulers.Computation().execute(new Runnable() {
                 @Override
                 public void run() {
-                    final List<SearchIndex> searchIndexes = createSearchIndexesForSurahList(surahList);
+                    final List<SearchIndex> searchIndices = createSearchIndicesForSurahList(surahList);
                     Schedulers.IO().execute(new Runnable() {
                         @Override
                         public void run() {
-                            searchIndexRepository.saveSearchIndexes(searchIndexes);
+                            searchIndexRepository.saveSearchIndices(searchIndices);
 
-                            getSearchIndexesAndDoSearch();
+                            getSearchIndicesAndDoSearch();
                         }
                     });
                 }
             });
         } else {
-            getSearchIndexesAndDoSearch();
+            getSearchIndicesAndDoSearch();
         }
     }
 
     private boolean checkIfNGramsIsSame() {
-        final List<SearchIndex> searchIndexes = searchIndexRepository.fetchSearchIndexes();
-        if (searchIndexes.isEmpty()) {
+        final List<SearchIndex> searchIndices = searchIndexRepository.fetchSearchIndices();
+        if (searchIndices.isEmpty()) {
             return false;
         }
 
-        final SearchIndex firstSearchIndex = searchIndexes.get(0);
-        if (firstSearchIndex.getIndexes().length == 0) {
+        final SearchIndex firstSearchIndex = searchIndices.get(0);
+        if (firstSearchIndex.getIndices().length == 0) {
             return false;
         }
 
-        final String index = firstSearchIndex.getIndexes()[0];
+        final String index = firstSearchIndex.getIndices()[0];
         return !index.isEmpty() && index.length() == nGramValue;
     }
 
-    private List<SearchIndex> createSearchIndexesForSurahList(List<Surah> surahList) {
-        final List<SearchIndex> searchIndexes = new ArrayList<>();
+    private List<SearchIndex> createSearchIndicesForSurahList(List<Surah> surahList) {
+        final List<SearchIndex> searchIndices = new ArrayList<>();
         for (Surah surah : surahList) {
-            searchIndexes.add(createSearchIndex(surah));
+            searchIndices.add(createSearchIndex(surah));
         }
 
-        return searchIndexes;
+        return searchIndices;
     }
 
     private SearchIndex createSearchIndex(Surah surah) {
         final String keywordsBuilder = surah.getNameInLatin() + " " + surah.getNumber();
         final String keywords = keywordsBuilder.toLowerCase();
-        final int indexesLength = keywords.length() - nGramValue + 1;
-        final String[] indexes = new String[indexesLength];
-        for (int i = 0; i < indexes.length; i++) {
-            indexes[i] = keywords.substring(i, i + nGramValue);
+        final int indicesLength = keywords.length() - nGramValue + 1;
+        final String[] indices = new String[indicesLength];
+        for (int i = 0; i < indices.length; i++) {
+            indices[i] = keywords.substring(i, i + nGramValue);
         }
 
-        return new SearchIndex(surah, indexes);
+        return new SearchIndex(surah, indices);
     }
 
-    private void getSearchIndexesAndDoSearch() {
-        final List<SearchIndex> searchIndexes = searchIndexRepository.fetchSearchIndexes();
+    private void getSearchIndicesAndDoSearch() {
+        final List<SearchIndex> searchIndices = searchIndexRepository.fetchSearchIndices();
         Schedulers.Computation().execute(new Runnable() {
             @Override
             public void run() {
-                doSearchOnSearchIndexes(searchIndexes);
+                doSearchOnSearchIndices(searchIndices);
             }
         });
     }
 
-    private void doSearchOnSearchIndexes(List<SearchIndex> searchIndexes) {
+    private void doSearchOnSearchIndices(List<SearchIndex> searchIndices) {
         Map<SearchIndex, Float> searchIndexToCoefficient = new HashMap<>();
 
-        String[] searchQueryIndexes = new String[this.searchQuery.length() - nGramValue + 1];
-        for (int i = 0; i < searchQueryIndexes.length; i++) {
-            searchQueryIndexes[i] = this.searchQuery.substring(i, i + nGramValue);
+        String[] searchQueryIndices = new String[this.searchQuery.length() - nGramValue + 1];
+        for (int i = 0; i < searchQueryIndices.length; i++) {
+            searchQueryIndices[i] = this.searchQuery.substring(i, i + nGramValue);
         }
 
-        for (SearchIndex searchIndex : searchIndexes) {
+        for (SearchIndex searchIndex : searchIndices) {
             searchIndexToCoefficient.put(searchIndex, calculateDifferentialsBetween(
-                    searchIndex.getIndexes(), searchQueryIndexes
+                    searchIndex.getIndices(), searchQueryIndices
             ));
         }
 
