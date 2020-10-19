@@ -80,6 +80,11 @@ public class DoSearchUseCase extends BaseUseCase {
 
     private boolean checkIfNGramsIsSame() {
         final List<SearchIndex> searchIndices = searchIndexRepository.fetchSearchIndices();
+
+        if (searchIndices == null) {
+            return false;
+        }
+
         if (searchIndices.isEmpty()) {
             return false;
         }
