@@ -27,7 +27,7 @@ public class DayNightSwitchButton extends View {
 
     private final Path brightnessLeftPath;
     private final Path brightnessRightPath;
-    private final Path[] raysPaths;
+    private final Path raysPath;
     private final Path moonPath;
 
     private DayNightPreference currentPreference = DayNightPreference.SYSTEM;
@@ -41,7 +41,7 @@ public class DayNightSwitchButton extends View {
 
         this.brightnessLeftPath = new Path();
         this.brightnessRightPath = new Path();
-        this.raysPaths = new Path[8];
+        this.raysPath = new Path();
         this.moonPath = new Path();
 
         initConfiguration();
@@ -164,7 +164,7 @@ public class DayNightSwitchButton extends View {
         this.brightnessRightPath.close();
 
         this.brightnessLeftPath.reset();
-        this.brightnessRightPath.arcTo(outerCircle.getBounds(), 90.0f, 180.0f);
+        this.brightnessLeftPath.arcTo(outerCircle.getBounds(), 90.0f, 180.0f);
         this.brightnessLeftPath.close();
     }
 
@@ -182,39 +182,33 @@ public class DayNightSwitchButton extends View {
 
         final float padding = UnitConverter.fromDpToPx(getContext(), 5.5f);
 
+        canvas.save();
+        for (int i = 0; i < 8; i++) {
+            canvas.rotate(i * 45.0f, centerX, centerY);
+            canvas.drawPath(this.raysPath, this.basePaint);
+        }
+        canvas.restore();
+
         canvas.drawCircle(centerX, centerY, radius - padding, this.basePaint);
 
-        for (Path path : this.raysPaths) {
-            canvas.drawPath(path, this.basePaint);
-        }
     }
 
     private void updateSunPath() {
-        for (int i = 0; i < this.raysPaths.length; i++) {
-            this.raysPaths[i] = generatePathForRays(i * 45.0f);
-        }
-    }
-
-    private Path generatePathForRays(float degree) {
-        final Path path = new Path();
-
         final float raysSize = UnitConverter.fromDpToPx(getContext(), 4.0f);
 
         Circle circle = RectHelper.findCircleOnRect(this.workingSpace, getMeasuredHeight(), getMeasuredWidth());
         Circle raysCircle = new Circle(new Vec2(circle.position.x, circle.position.y), circle.radius - raysSize);
 
-        Vec2 topTriangle = circle.getPointAtAngleDeg(degree);
-        Vec2 leftLeg = raysCircle.getPointAtAngleDeg(degree - 35.0f);
-        Vec2 rightLeg = raysCircle.getPointAtAngleDeg(degree + 35.0f);
+        Vec2 topTriangle = circle.getPointAtAngleDeg((float) 0);
+        Vec2 leftLeg = raysCircle.getPointAtAngleDeg((float) 0 - 35.0f);
+        Vec2 rightLeg = raysCircle.getPointAtAngleDeg((float) 0 + 35.0f);
 
-        path.reset();
-        path.moveTo(rightLeg.x, rightLeg.y);
-        path.lineTo(topTriangle.x, topTriangle.y);
-        path.lineTo(leftLeg.x, leftLeg.y);
-        path.arcTo(raysCircle.getBounds(), degree - 22.5f, 45.0f);
-        path.close();
-
-        return path;
+        raysPath.reset();
+        raysPath.moveTo(rightLeg.x, rightLeg.y);
+        raysPath.lineTo(topTriangle.x, topTriangle.y);
+        raysPath.lineTo(leftLeg.x, leftLeg.y);
+        raysPath.arcTo(raysCircle.getBounds(), (float) 0 - 22.5f, 45.0f);
+        raysPath.close();
     }
 
     private void drawMoon(final Canvas canvas) {
