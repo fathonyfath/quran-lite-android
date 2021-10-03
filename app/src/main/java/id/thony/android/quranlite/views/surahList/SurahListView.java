@@ -38,6 +38,7 @@ import id.thony.android.quranlite.utils.viewLifecycle.ViewCallback;
 import id.thony.android.quranlite.views.common.BookmarkView;
 import id.thony.android.quranlite.views.common.DayNightSwitchButton;
 import id.thony.android.quranlite.views.common.DownloadView;
+import id.thony.android.quranlite.views.common.GearView;
 import id.thony.android.quranlite.views.common.ProgressView;
 import id.thony.android.quranlite.views.common.RetryView;
 import id.thony.android.quranlite.views.common.SearchView;
@@ -55,6 +56,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
     private final BookmarkView bookmarkView;
     private final DayNightSwitchButton dayNightSwitchButton;
     private final DownloadView downloadView;
+    private final GearView gearView;
     private final SearchView searchView;
     private final UseCaseCallback<DayNightPreference> dayNightPreferenceCallback = new UseCaseCallback<DayNightPreference>() {
         @Override
@@ -195,6 +197,12 @@ public class SurahListView extends WrapperView implements ViewCallback {
             }
         }
     };
+    private final OnClickListener onGearClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View view) {
+
+        }
+    };
     private final OnClickListener onSearchClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -223,6 +231,9 @@ public class SurahListView extends WrapperView implements ViewCallback {
 
         this.downloadView = new DownloadView(getContext());
         this.downloadView.setOnClickListener(this.onDownloadClickListener);
+
+        this.gearView = new GearView(getContext());
+        this.gearView.setOnClickListener(this.onGearClickListener);
 
         this.searchView = new SearchView(getContext());
         this.searchView.setOnClickListener(this.onSearchClickListener);
@@ -428,8 +439,7 @@ public class SurahListView extends WrapperView implements ViewCallback {
     private void refreshRightToolbar() {
         final LinkedHashSet<View> views = new LinkedHashSet<>();
         views.add(this.bookmarkView);
-        views.add(this.downloadView);
-        views.add(this.dayNightSwitchButton);
+        views.add(this.gearView);
         setToolbarRightViews(views);
     }
 

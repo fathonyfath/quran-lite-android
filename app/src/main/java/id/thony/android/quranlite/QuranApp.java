@@ -51,16 +51,17 @@ public class QuranApp extends Application {
 
     @Override
     public Object getSystemService(String name) {
-        if (name.equals(QURAN_REPOSITORY_SERVICE)) {
-            return quranRepository;
-        } else if (name.equals(FONT_PROVIDER_SERVICE)) {
-            return fontProvider;
-        } else if (name.equals(BOOKMARK_REPOSITORY_SERVICE)) {
-            return bookmarkRepository;
-        } else if (name.equals(CONFIG_REPOSITORY_SERVICE)) {
-            return configRepository;
-        } else if (name.equals(SEARCH_INDEX_REPOSITORY_SERVICE)) {
-            return searchIndexRepository;
+        switch (name) {
+            case QURAN_REPOSITORY_SERVICE:
+                return quranRepository;
+            case FONT_PROVIDER_SERVICE:
+                return fontProvider;
+            case BOOKMARK_REPOSITORY_SERVICE:
+                return bookmarkRepository;
+            case CONFIG_REPOSITORY_SERVICE:
+                return configRepository;
+            case SEARCH_INDEX_REPOSITORY_SERVICE:
+                return searchIndexRepository;
         }
         return super.getSystemService(name);
     }

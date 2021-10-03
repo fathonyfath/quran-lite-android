@@ -41,14 +41,14 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight>,
     private MainView mainView = null;
     private BaseTheme activeTheme = new DayTheme();
 
-    private BroadcastReceiver downloadAlreadyStartedReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver downloadAlreadyStartedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Toast.makeText(context, "Proses pengunduhan sedang berjalan.", Toast.LENGTH_SHORT).show();
         }
     };
 
-    private BroadcastReceiver downloadFinishedReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver downloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             final int failedDownload = intent.getIntExtra(SurahDownloaderService.DOWNLOAD_FAILURE_COUNT, 0);
