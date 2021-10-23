@@ -10,7 +10,7 @@ Please report an Issue (<https://github.com/fathonyfath/quran-lite-android/issue
 
 ## Version History
 
-* v1.3.0 (currently on rc)
+* v1.3.0
     * Add bookmark feature to save your last reading
     * Add Dark-Light theme feature to save power and read easier in the eyes
     * Add ability to prefetch all the content on background
