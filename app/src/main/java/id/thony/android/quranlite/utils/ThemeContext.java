@@ -19,8 +19,8 @@ public class ThemeContext extends ContextWrapper {
         if (context instanceof ThemeContext) {
             ThemeContext themeContext = (ThemeContext) context;
             return themeContext.theme;
-        } else if (context instanceof ContextThemeWrapper) {
-            Context baseContext = ((ContextThemeWrapper) context).getBaseContext();
+        } else if (context instanceof ContextWrapper) {
+            Context baseContext = ((ContextWrapper) context).getBaseContext();
             if (baseContext != null) {
                 return saveUnwrapTheme(baseContext);
             }

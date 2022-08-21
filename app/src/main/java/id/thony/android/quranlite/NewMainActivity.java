@@ -14,6 +14,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import id.thony.android.quranlite.backstack.QuranBackstackHandler;
 import id.thony.android.quranlite.models.DayNight;
 import id.thony.android.quranlite.services.DownloaderNotification;
 import id.thony.android.quranlite.services.SurahDownloaderService;
@@ -48,6 +49,7 @@ public final class NewMainActivity extends Activity implements UseCaseCallback<D
     private FrameLayout container;
     private BaseTheme activeTheme = new DayTheme();
     private Navigator navigator;
+    private QuranBackstackHandler backstackHandler;
 
     private Bundle pendingSavedInstanceState = null;
 
@@ -84,7 +86,7 @@ public final class NewMainActivity extends Activity implements UseCaseCallback<D
         this.container = new FrameLayout(this);
         setContentView(this.container);
 
-        final BackstackHandler backstackHandler = new DefaultBackstackHandler(this, this.container);
+        this.backstackHandler = new QuranBackstackHandler(this, this.container);
         this.navigator = new Navigator(backstackHandler, Backstack.of(new FontDownloaderKey()));
 
         final GetDayNightUseCase useCase = UseCaseProvider.createUseCase(GetDayNightUseCase.class);
@@ -203,6 +205,8 @@ public final class NewMainActivity extends Activity implements UseCaseCallback<D
     }
 
     private void showViewWithActiveTheme() {
+        this.activeTheme = new NightTheme();
+        this.backstackHandler.updateTheme(this.activeTheme);
         this.navigator.onCreate(pendingSavedInstanceState);
         pendingSavedInstanceState = null;
     }
