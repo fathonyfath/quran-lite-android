@@ -29,6 +29,7 @@ import id.thony.android.quranlite.utils.ThemeContext;
 import id.thony.android.quranlite.utils.dialogManager.DialogEvent;
 import id.thony.android.quranlite.utils.dialogManager.DialogEventListener;
 import id.thony.android.quranlite.utils.dialogManager.DialogManager;
+import id.thony.android.quranlite.view.fontDownloader.FontDownloaderKey;
 import id.thony.android.quranlite.view.splash.SplashKey;
 import id.thony.android.quranlite.view.splash.SplashView;
 import id.thony.android.quranlite.views.ayahDetailDialog.AyahDetailDialog;
@@ -84,7 +85,7 @@ public final class NewMainActivity extends Activity implements UseCaseCallback<D
         setContentView(this.container);
 
         final BackstackHandler backstackHandler = new DefaultBackstackHandler(this, this.container);
-        this.navigator = new Navigator(backstackHandler, Backstack.of(new SplashKey()));
+        this.navigator = new Navigator(backstackHandler, Backstack.of(new FontDownloaderKey()));
 
         final GetDayNightUseCase useCase = UseCaseProvider.createUseCase(GetDayNightUseCase.class);
         if (useCase != null) {
