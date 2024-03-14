@@ -10,6 +10,8 @@ import android.graphics.RectF;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.jetbrains.annotations.NotNull;
+
 import dev.fathony.android.quranlite.themes.BaseTheme;
 import dev.fathony.android.quranlite.utils.ThemeContext;
 import dev.fathony.android.quranlite.utils.UnitConverter;
@@ -53,7 +55,7 @@ public class GearView extends View {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@NotNull Canvas canvas) {
         super.onDraw(canvas);
 
         drawGear(canvas);
@@ -111,8 +113,8 @@ public class GearView extends View {
         final float outerCircleOffset = UnitConverter.fromDpToPx(getContext(), 3f);
 
         final Rect circleRect = new Rect(this.workingSpace);
-        circleRect.left += outerCircleOffset;
-        circleRect.right -= outerCircleOffset;
+        circleRect.left += (int) outerCircleOffset;
+        circleRect.right -= (int) outerCircleOffset;
 
         final Circle outerCircle = RectHelper.findCircleOnRect(circleRect, getMeasuredHeight(), getMeasuredWidth());
         final Circle innerCircle = new Circle(

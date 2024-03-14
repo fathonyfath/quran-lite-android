@@ -13,7 +13,6 @@ public class ElevationView extends View {
         initOverlayColor();
     }
 
-    @SuppressWarnings("deprecation")
     private void initOverlayColor() {
         GradientDrawable drawable = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, new int[]{
                 Color.BLACK,

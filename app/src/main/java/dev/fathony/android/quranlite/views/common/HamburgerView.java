@@ -7,6 +7,8 @@ import android.graphics.Paint;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.jetbrains.annotations.NotNull;
+
 import dev.fathony.android.quranlite.themes.BaseTheme;
 import dev.fathony.android.quranlite.utils.ThemeContext;
 import dev.fathony.android.quranlite.utils.UnitConverter;
@@ -51,7 +53,7 @@ public class HamburgerView extends View {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@NotNull Canvas canvas) {
         super.onDraw(canvas);
 
         canvas.drawRect(getPaddingLeft(), getTopAt(1), getWidth() - getPaddingRight(), getTopAt(2), paint);

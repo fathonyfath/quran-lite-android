@@ -12,21 +12,6 @@ import dev.fathony.android.quranlite.views.common.LpmqTextView;
 
 public class ViewUtil {
 
-    public static void onBackPressed(View view) {
-        Activity hostingActivity = null;
-        Context context = view.getContext();
-        while (context instanceof ContextWrapper) {
-            if (context instanceof Activity) {
-                hostingActivity = (Activity) context;
-            }
-            context = ((ContextWrapper) context).getBaseContext();
-        }
-
-        if (hostingActivity != null) {
-            hostingActivity.onBackPressed();
-        }
-    }
-
     public static void recreateActivity(View view) {
         Activity hostingActivity = null;
         Context context = view.getContext();

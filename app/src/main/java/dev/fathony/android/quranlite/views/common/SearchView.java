@@ -9,6 +9,8 @@ import android.graphics.Rect;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.jetbrains.annotations.NotNull;
+
 import dev.fathony.android.quranlite.themes.BaseTheme;
 import dev.fathony.android.quranlite.utils.ThemeContext;
 import dev.fathony.android.quranlite.utils.UnitConverter;
@@ -52,7 +54,7 @@ public class SearchView extends View {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@NotNull Canvas canvas) {
         super.onDraw(canvas);
 
         drawGlassesSearch(canvas);

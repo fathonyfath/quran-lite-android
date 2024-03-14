@@ -10,6 +10,7 @@ import android.view.View;
 import dev.fathony.android.quranlite.MainActivity;
 import dev.fathony.android.quranlite.utils.dialogManager.Dialog;
 import dev.fathony.android.quranlite.utils.dialogManager.DialogEventListener;
+import dev.fathony.android.quranlite.utils.dialogManager.DialogEventListeners;
 
 public class DialogUtil {
 
@@ -58,8 +59,8 @@ public class DialogUtil {
             context = ((ContextWrapper) context).getBaseContext();
         }
 
-        if (hostingActivity instanceof MainActivity) {
-            MainActivity activity = (MainActivity) hostingActivity;
+        if (hostingActivity instanceof DialogEventListeners) {
+            DialogEventListeners activity = (DialogEventListeners) hostingActivity;
             activity.getDialogEventListeners().add(listener);
         }
     }
@@ -74,8 +75,8 @@ public class DialogUtil {
             context = ((ContextWrapper) context).getBaseContext();
         }
 
-        if (hostingActivity instanceof MainActivity) {
-            MainActivity activity = (MainActivity) hostingActivity;
+        if (hostingActivity instanceof DialogEventListeners) {
+            DialogEventListeners activity = (DialogEventListeners) hostingActivity;
             activity.getDialogEventListeners().remove(listener);
         }
     }

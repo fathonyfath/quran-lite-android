@@ -1,5 +1,6 @@
 package dev.fathony.android.quranlite.models;
 
+import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
 
