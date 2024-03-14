@@ -26,10 +26,10 @@ static def buildTime() {
 }
 
 android {
-    namespace 'id.thony.android.quranlite'
+    namespace 'dev.fathony.android.quranlite'
     compileSdk 34
     defaultConfig {
-        applicationId "id.thony.android.quranlite"
+        applicationId "dev.fathony.android.quranlite"
         minSdk 18
         targetSdk 34
         versionCode project.ext.version.code
@@ -43,6 +43,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.deprecation = true
 }
 
 dependencies {
