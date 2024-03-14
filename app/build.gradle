@@ -1,17 +1,5 @@
 import java.text.SimpleDateFormat
 
-apply plugin: 'com.android.application'
-
-static def gitSha() {
-    return 'git rev-parse --short HEAD'.execute().text.trim()
-}
-
-static def buildTime() {
-    def df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'")
-    df.setTimeZone(TimeZone.getTimeZone("UTC"))
-    return df.format(new Date())
-}
-
 buildscript {
     project.ext.version = [
             'major': 1,
@@ -23,12 +11,27 @@ buildscript {
     project.ext.version['code'] = project.ext.version.major * 10000000 + project.ext.version.minor * 10000 + project.ext.version.patch
 }
 
+plugins {
+    id 'com.android.application'
+}
+
+static def gitSha() {
+    return 'git rev-parse --short HEAD'.execute().text.trim()
+}
+
+static def buildTime() {
+    def df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'")
+    df.setTimeZone(TimeZone.getTimeZone("UTC"))
+    return df.format(new Date())
+}
+
 android {
-    compileSdkVersion 31
+    namespace 'id.thony.android.quranlite'
+    compileSdk 34
     defaultConfig {
         applicationId "id.thony.android.quranlite"
-        minSdkVersion 18
-        targetSdkVersion 31
+        minSdk 18
+        targetSdk 34
         versionCode project.ext.version.code
         versionName "${project.ext.version.name}-${gitSha()} (${buildTime()})"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -40,11 +43,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    namespace 'id.thony.android.quranlite'
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    compileOnly 'org.jetbrains:annotations:23.0.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
