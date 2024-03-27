@@ -1,8 +1,11 @@
 package id.thony.android.quranlite.utils;
 
+import android.Manifest;
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -40,6 +43,31 @@ public class ViewUtil {
         if (hostingActivity instanceof MainActivity) {
             MainActivity activity = (MainActivity) hostingActivity;
             activity.relaunchActivity();
+        }
+    }
+
+    public static void requestNotificationPermission(View view) {
+        Activity hostingActivity = null;
+        Context context = view.getContext();
+        while (context instanceof ContextWrapper) {
+            if (context instanceof Activity) {
+                hostingActivity = (Activity) context;
+            }
+            context = ((ContextWrapper) context).getBaseContext();
+        }
+
+        if (hostingActivity instanceof MainActivity) {
+            MainActivity activity = (MainActivity) hostingActivity;
+            activity.requestNotificationPermission();
+        }
+    }
+
+    public static boolean hasNotificationPermission(View view) {
+        NotificationManager notificationManager = (NotificationManager) view.getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            return notificationManager.areNotificationsEnabled();
+        } else {
+            return true;
         }
     }
 

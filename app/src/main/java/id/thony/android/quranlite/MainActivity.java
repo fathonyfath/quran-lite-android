@@ -1,11 +1,15 @@
 package id.thony.android.quranlite;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.widget.Toast;
@@ -32,6 +36,7 @@ import id.thony.android.quranlite.views.MainView;
 import id.thony.android.quranlite.views.ayahDetailDialog.AyahDetailDialog;
 import id.thony.android.quranlite.views.noBookmarkDialog.NoBookmarkDialog;
 import id.thony.android.quranlite.views.readTafsirDialog.ReadTafsirDialog;
+import id.thony.android.quranlite.views.requestNotificationPermissionDialog.ExplainNotificationPermissionDialog;
 import id.thony.android.quranlite.views.resumeBookmarkDialog.ResumeBookmarkDialog;
 
 public class MainActivity extends Activity implements UseCaseCallback<DayNight>, DialogEventListener {
@@ -107,6 +112,17 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight>,
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 301) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Proses pengunduhan dimulai. Cek notifikasi untuk mengetahui perkembangan proses unduh.", Toast.LENGTH_SHORT).show();
+                SurahDownloaderService.startService(this);
+            }
+        }
+    }
+
+    @Override
     public Object getSystemService(String name) {
         Object service = super.getSystemService(name);
         if (service != null) {
@@ -165,11 +181,17 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight>,
         // Not used
     }
 
+    @SuppressLint("InlinedApi")
+    public void requestNotificationPermission() {
+        requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 301);
+    }
+
     private void registerDialogFactory() {
         DialogManager.registerFactory(NoBookmarkDialog.class, new NoBookmarkDialog.Factory());
         DialogManager.registerFactory(ResumeBookmarkDialog.class, new ResumeBookmarkDialog.Factory());
         DialogManager.registerFactory(AyahDetailDialog.class, new AyahDetailDialog.Factory());
         DialogManager.registerFactory(ReadTafsirDialog.class, new ReadTafsirDialog.Factory());
+        DialogManager.registerFactory(ExplainNotificationPermissionDialog.class, new ExplainNotificationPermissionDialog.Factory());
     }
 
     private void showViewWithActiveTheme() {

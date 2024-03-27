@@ -39,7 +39,7 @@ public class SurahDownloaderService extends Service implements UseCaseCallback<I
     private static PendingIntent createStopServicePendingIntent(Context context) {
         final Intent intent = new Intent(context, SurahDownloaderService.class);
         intent.setAction(ACTION_STOP);
-        return PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+        return PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
     }
 

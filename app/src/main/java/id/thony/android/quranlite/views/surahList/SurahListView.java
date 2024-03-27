@@ -38,12 +38,12 @@ import id.thony.android.quranlite.utils.viewLifecycle.ViewCallback;
 import id.thony.android.quranlite.views.common.BookmarkView;
 import id.thony.android.quranlite.views.common.DayNightSwitchButton;
 import id.thony.android.quranlite.views.common.DownloadView;
-import id.thony.android.quranlite.views.common.GearView;
 import id.thony.android.quranlite.views.common.ProgressView;
 import id.thony.android.quranlite.views.common.RetryView;
 import id.thony.android.quranlite.views.common.SearchView;
 import id.thony.android.quranlite.views.common.WrapperView;
 import id.thony.android.quranlite.views.noBookmarkDialog.NoBookmarkDialog;
+import id.thony.android.quranlite.views.requestNotificationPermissionDialog.ExplainNotificationPermissionDialog;
 import id.thony.android.quranlite.views.resumeBookmarkDialog.ResumeBookmarkDialog;
 
 public class SurahListView extends WrapperView implements ViewCallback {
@@ -56,7 +56,6 @@ public class SurahListView extends WrapperView implements ViewCallback {
     private final BookmarkView bookmarkView;
     private final DayNightSwitchButton dayNightSwitchButton;
     private final DownloadView downloadView;
-    private final GearView gearView;
     private final SearchView searchView;
     private final UseCaseCallback<DayNightPreference> dayNightPreferenceCallback = new UseCaseCallback<DayNightPreference>() {
         @Override
@@ -134,8 +133,13 @@ public class SurahListView extends WrapperView implements ViewCallback {
     private final View.OnClickListener onDownloadClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Toast.makeText(getContext(), "Proses pengunduhan dimulai. Cek notifikasi untuk mengetahui perkembangan proses unduh.", Toast.LENGTH_SHORT).show();
-            SurahDownloaderService.startService(getContext());
+            boolean hasPermission = ViewUtil.hasNotificationPermission(SurahListView.this);
+            if (!hasPermission) {
+                DialogUtil.showDialog(SurahListView.this, ExplainNotificationPermissionDialog.class, null);
+            } else {
+                Toast.makeText(getContext(), "Proses pengunduhan dimulai. Cek notifikasi untuk mengetahui perkembangan proses unduh.", Toast.LENGTH_SHORT).show();
+                SurahDownloaderService.startService(getContext());
+            }
         }
     };
     private boolean isFailedToGetSurahList = false;
@@ -194,6 +198,8 @@ public class SurahListView extends WrapperView implements ViewCallback {
                     final Bookmark bookmark = (Bookmark) arguments;
                     resumeFromBookmark(bookmark);
                 }
+            } else if (event instanceof ExplainNotificationPermissionDialog.ProceedPermissionRequest) {
+                ViewUtil.requestNotificationPermission(SurahListView.this);
             }
         }
     };
@@ -231,9 +237,6 @@ public class SurahListView extends WrapperView implements ViewCallback {
 
         this.downloadView = new DownloadView(getContext());
         this.downloadView.setOnClickListener(this.onDownloadClickListener);
-
-        this.gearView = new GearView(getContext());
-        this.gearView.setOnClickListener(this.onGearClickListener);
 
         this.searchView = new SearchView(getContext());
         this.searchView.setOnClickListener(this.onSearchClickListener);
@@ -439,7 +442,8 @@ public class SurahListView extends WrapperView implements ViewCallback {
     private void refreshRightToolbar() {
         final LinkedHashSet<View> views = new LinkedHashSet<>();
         views.add(this.bookmarkView);
-        views.add(this.gearView);
+        views.add(this.downloadView);
+        views.add(this.dayNightSwitchButton);
         setToolbarRightViews(views);
     }
 
