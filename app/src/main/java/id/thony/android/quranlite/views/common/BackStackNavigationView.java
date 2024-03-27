@@ -15,8 +15,9 @@ import id.thony.android.quranlite.utils.viewLifecycle.ViewCallback;
 public abstract class BackStackNavigationView extends SwitchContainerView {
 
     private final Map<Class, Integer> mappedClassToIndex;
-
+    
     private ViewBackStack viewBackStack;
+
     private final ViewBackStack.Callback viewBackStackCallback = new ViewBackStack.Callback() {
         @Override
         public void onViewPushed(Class<? extends View> pushedView) {
@@ -93,12 +94,18 @@ public abstract class BackStackNavigationView extends SwitchContainerView {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
 
-        this.viewBackStack.setCallback(this.viewBackStackCallback);
-        if (this.viewBackStack.isEmpty()) {
-            initStack();
-        } else {
-            showViewBasedOnViewClass(this.viewBackStack.peekView());
-        }
+        postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                BackStackNavigationView.this.viewBackStack.setCallback(BackStackNavigationView.this.viewBackStackCallback);
+                if (BackStackNavigationView.this.viewBackStack.isEmpty()) {
+                    initStack();
+                } else {
+                    showViewBasedOnViewClass(BackStackNavigationView.this.viewBackStack.peekView());
+                }
+            }
+        }, 250L);
+
     }
 
     @Override
