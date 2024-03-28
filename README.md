@@ -10,6 +10,8 @@ Please report an Issue (<https://github.com/fathonyfath/quran-lite-android/issue
 
 ## Version History
 
+* v1.4.0
+    * Update support for Android 14
 * v1.3.0
     * Add bookmark feature to save your last reading
     * Add Dark-Light theme feature to save power and read easier in the eyes
