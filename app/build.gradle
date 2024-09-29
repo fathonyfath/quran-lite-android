@@ -19,11 +19,11 @@ static def gitSha() {
 
 android {
     namespace 'id.thony.android.quranlite'
-    compileSdk 34
+    compileSdk 35
     defaultConfig {
         applicationId "id.thony.android.quranlite"
         minSdk 18
-        targetSdk 34
+        targetSdk 35
         versionCode project.ext.version.code
         versionName "${project.ext.version.name}-${gitSha()}"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

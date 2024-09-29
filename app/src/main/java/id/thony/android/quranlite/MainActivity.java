@@ -9,9 +9,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Insets;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.view.WindowInsets;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -196,6 +198,8 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight>,
 
     private void showViewWithActiveTheme() {
         this.mainView = new MainView(new ThemeContext(this, this.activeTheme));
+        setWindowInsetsPadding();
+
         setContentView(MainActivity.this.mainView);
     }
 
@@ -213,6 +217,25 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight>,
     public void onEvent(DialogEvent event, Parcelable arguments) {
         for (DialogEventListener listener : this.dialogEventListeners) {
             listener.onEvent(event, arguments);
+        }
+    }
+
+    private void setWindowInsetsPadding() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            this.mainView.setOnApplyWindowInsetsListener((view, windowInsets) -> {
+                final int top;
+                final int bottom;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    final Insets insets = windowInsets.getInsets(WindowInsets.Type.systemBars());
+                    top = insets.top;
+                    bottom = insets.bottom;
+                } else {
+                    top = windowInsets.getSystemWindowInsetTop();
+                    bottom = windowInsets.getSystemWindowInsetBottom();
+                }
+                this.mainView.setPadding(0, top, 0, bottom);
+                return windowInsets;
+            });
         }
     }
 }
