@@ -1,10 +1,16 @@
 package id.thony.android.quranlite.utils.network;
 
+import android.os.Build;
+import android.util.Log;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
@@ -60,8 +66,58 @@ public class TLSSocketFactory extends SSLSocketFactory {
     }
 
     private Socket enableTLSOnSocket(Socket socket) {
-        if ((socket instanceof SSLSocket)) {
-            ((SSLSocket) socket).setEnabledProtocols(new String[]{"TLSv1.1", "TLSv1.2"});
+        if (socket instanceof SSLSocket) {
+            SSLSocket sslSocket = (SSLSocket) socket;
+
+            List<String> protocolsToEnable = new ArrayList<>();
+            String[] supportedProtocols = sslSocket.getSupportedProtocols();
+
+            // Prioritize TLSv1.3 (available API 29+)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                for (String protocol : supportedProtocols) {
+                    if (protocol.equals("TLSv1.3")) {
+                        protocolsToEnable.add(protocol);
+                        break;
+                    }
+                }
+            }
+            // Add TLSv1.2 (available widely, default enabled on API 20+)
+            for (String protocol : supportedProtocols) {
+                if (protocol.equals("TLSv1.2")) {
+                    if (!protocolsToEnable.contains("TLSv1.2")) { // Avoid duplicates
+                        protocolsToEnable.add(protocol);
+                    }
+                    break;
+                }
+            }
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT_WATCH) {
+                boolean strongerProtocolFound = false;
+                for (String enabled : protocolsToEnable) {
+                    // Check if TLSv1.3 or TLSv1.2 already added
+                    if ("TLSv1.3".equals(enabled) || "TLSv1.2".equals(enabled)) {
+                        strongerProtocolFound = true;
+                        break;
+                    }
+                }
+                if (!strongerProtocolFound) {
+                    for (String protocol : supportedProtocols) {
+                        if ("TLSv1.1".equals(protocol)) {
+                            protocolsToEnable.add(protocol);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (!protocolsToEnable.isEmpty()) {
+                try {
+                    sslSocket.setEnabledProtocols(protocolsToEnable.toArray(new String[0]));
+                } catch (IllegalArgumentException unused) {
+                    // If setting fails, the socket will use its default enabled protocols,
+                    // which are likely already good on modern Android.
+                }
+            }
         }
         return socket;
     }

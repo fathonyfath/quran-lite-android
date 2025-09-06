@@ -5,6 +5,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.view.View;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,8 +17,10 @@ import id.thony.android.quranlite.utils.viewLifecycle.ViewCallback;
 public abstract class BackStackNavigationView extends SwitchContainerView {
 
     private final Map<Class, Integer> mappedClassToIndex;
-    
+
     private ViewBackStack viewBackStack;
+
+    private StackEventListener stackEventListener;
 
     private final ViewBackStack.Callback viewBackStackCallback = new ViewBackStack.Callback() {
         @Override
@@ -24,6 +28,13 @@ public abstract class BackStackNavigationView extends SwitchContainerView {
             BackStackNavigationView.this.handleViewCallbackForPushedView(pushedView);
 
             BackStackNavigationView.this.showViewBasedOnViewClass(pushedView);
+
+            if (stackEventListener != null) {
+                stackEventListener.onStackChanged(
+                        Event.PUSHED,
+                        BackStackNavigationView.this.viewBackStack.size()
+                );
+            }
         }
 
         @Override
@@ -35,6 +46,13 @@ public abstract class BackStackNavigationView extends SwitchContainerView {
             }
 
             BackStackNavigationView.this.handleViewCallbackForPoppedView(poppedView);
+
+            if (stackEventListener != null) {
+                stackEventListener.onStackChanged(
+                        Event.POPPED,
+                        BackStackNavigationView.this.viewBackStack.size()
+                );
+            }
         }
     };
 
@@ -65,6 +83,10 @@ public abstract class BackStackNavigationView extends SwitchContainerView {
 
     protected <T extends View> T findChildWithClass(Class viewClass) {
         return this.findChildViewAtIndex(this.mappedClassToIndex.get(viewClass));
+    }
+
+    public void setStackEventListener(@Nullable StackEventListener stackEventListener) {
+        this.stackEventListener = stackEventListener;
     }
 
     public boolean onBackPressed() {
@@ -143,6 +165,14 @@ public abstract class BackStackNavigationView extends SwitchContainerView {
                 viewCallback.onStop();
             }
         }
+    }
+
+    public enum Event {
+        PUSHED, POPPED,
+    }
+
+    public interface StackEventListener {
+        void onStackChanged(Event event, int size);
     }
 
     private static class BackStackNavigationViewState extends BaseSavedState {

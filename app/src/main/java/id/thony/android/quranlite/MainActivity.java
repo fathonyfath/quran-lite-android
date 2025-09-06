@@ -15,6 +15,8 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.WindowInsets;
 import android.widget.Toast;
+import android.window.OnBackInvokedCallback;
+import android.window.OnBackInvokedDispatcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +49,7 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight>,
 
     private MainView mainView = null;
     private BaseTheme activeTheme = new DayTheme();
+    private OnBackInvokedCallback onBackInvokedCallback = null;
 
     private final BroadcastReceiver downloadAlreadyStartedReceiver = new BroadcastReceiver() {
         @Override
@@ -72,6 +75,10 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight>,
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            onBackInvokedCallback = () -> MainActivity.this.mainView.onBackPressed();
+        }
 
         DownloaderNotification.createChannel(this);
 
@@ -145,9 +152,17 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight>,
         super.onDestroy();
     }
 
+    /**
+     * Suppressed for below API level 33 compatibility.
+     */
+    @SuppressLint("GestureBackNavigation")
     @Override
     public void onBackPressed() {
-        if (!this.mainView.onBackPressed()) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            if (!this.mainView.onBackPressed()) {
+                super.onBackPressed();
+            }
+        } else {
             super.onBackPressed();
         }
     }
@@ -198,6 +213,15 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight>,
 
     private void showViewWithActiveTheme() {
         this.mainView = new MainView(new ThemeContext(this, this.activeTheme));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            this.mainView.setStackEventListener((event, size) -> {
+                if (size > 1) {
+                    getOnBackInvokedDispatcher().registerOnBackInvokedCallback(OnBackInvokedDispatcher.PRIORITY_DEFAULT, onBackInvokedCallback);
+                } else {
+                    getOnBackInvokedDispatcher().unregisterOnBackInvokedCallback(onBackInvokedCallback);
+                }
+            });
+        }
         setWindowInsetsPadding();
 
         setContentView(MainActivity.this.mainView);
