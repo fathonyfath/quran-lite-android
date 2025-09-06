@@ -6,10 +6,12 @@ Just your regular Qur'an apps on Android platform, except I'm trying to make it'
 
 ## TODOs
 
-Please report an Issue (<https://github.com/fathonyfath/quran-lite-android/issues>) if you encounter a problem while running the apps
+I'm considering this app as feature complete. Please report an Issue (<https://github.com/fathonyfath/quran-lite-android/issues>) if you encounter a problem while running the app.
 
 ## Version History
 
+* v1.5.0
+    * Update support for Android 16
 * v1.4.0
     * Update support for Android 14
 * v1.3.0
