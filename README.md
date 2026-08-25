@@ -1,3 +1,5 @@
+
+
 # Qur'an Lite
 
 > Read Qur'an on your Android phone
@@ -38,7 +40,7 @@ I'm considering this app as feature complete. Please report an Issue (<https://g
 
 Fathony Teguh Irawan – [@fathony_fath](https://twitter.com/fathony_fath)
 
-Distributed under the MIT license. See ``LICENSE`` for more information.
+Distributed under the MIT license. See ``LICENSE.md`` for more information.
 
 [https://github.com/fathonyfath](https://github.com/fathonyfath/)
 
