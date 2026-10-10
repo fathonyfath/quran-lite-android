@@ -1,0 +1,54 @@
+name: Release
+
+# Pushing a tag like v1.6.0 builds, signs and publishes the APK as a GitHub release.
+# The tag has to match the version in app/build.gradle.
+#
+# Required repository secrets:
+#   RELEASE_KEYSTORE_BASE64    the keystore file, base64 encoded
+#   RELEASE_KEYSTORE_PASSWORD  the keystore password
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - name: Decode keystore
+        env:
+          RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+        run: echo "$RELEASE_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/release.jks"
+
+      - name: Build and sign
+        env:
+          QURAN_KS_PASS: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+        run: ./release.sh "$RUNNER_TEMP/release.jks" upload
+
+      - name: Check tag matches app version
+        run: |
+          if [ ! -f "release/quran-lite-$GITHUB_REF_NAME.apk" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match the version in app/build.gradle:" >&2
+            ls release >&2
+            exit 1
+          fi
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" "release/quran-lite-$GITHUB_REF_NAME.apk" --title "$GITHUB_REF_NAME" --generate-notes
+
+      - name: Remove keystore
+        if: always()
+        run: rm -f "$RUNNER_TEMP/release.jks"

@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - 'release/**'
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - name: Lint, test and build
+        run: ./gradlew lint test assembleRelease
+
+      - name: Report APK size
+        run: echo "Unsigned release APK is $(stat -c %s app/build/outputs/apk/release/app-release-unsigned.apk) bytes" >> "$GITHUB_STEP_SUMMARY"
