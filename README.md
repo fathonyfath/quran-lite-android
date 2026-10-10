@@ -10,6 +10,8 @@ I'm considering this app as feature complete. Please report an Issue (<https://g
 
 ## Version History
 
+* v1.7.0
+    * Update support for Android 17
 * v1.6.0
     * New app icon
     * Fix back navigation on Android 12 to 15
