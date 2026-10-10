@@ -2,6 +2,7 @@ package id.thony.android.quranlite.views.common;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -61,6 +62,8 @@ public class ToolbarView extends RelativeLayout {
         this.titleView.setGravity(Gravity.CENTER_VERTICAL);
         this.titleView.setPadding((int) UnitConverter.fromDpToPx(getContext(), 16f), 0, 0, 0);
         this.titleView.setTextSize(18f);
+        this.titleView.setMaxLines(1);
+        this.titleView.setEllipsize(TextUtils.TruncateAt.END);
 
         this.searchInputText = new LpmqEditText(getContext());
         this.searchInputText.setLayoutParams(new RelativeLayout.LayoutParams(
