@@ -159,12 +159,25 @@ public class SurahDownloaderService extends Service implements UseCaseCallback<I
 
     @Override
     public void onError(Throwable throwable) {
+        notificationManager.notify(
+                NOTIFICATION_ID,
+                DownloaderNotification.createProgressNotification(
+                        this,
+                        "Unduhan gagal. Silahkan coba lagi.",
+                        "",
+                        0,
+                        true
+                )
+        );
+
         clearUseCase();
         initUseCase();
+
+        stopForeground(false);
     }
 
     private void initUseCase() {
-        this.useCase = UseCaseProvider.createUseCase(FetchAllSurahDetailUseCase.class);
+        this.useCase = UseCaseProvider.createDetachedUseCase(FetchAllSurahDetailUseCase.class);
         this.useCase.setCallback(this);
         this.useCase.setSurahProgressCallback(this);
     }
@@ -177,7 +190,5 @@ public class SurahDownloaderService extends Service implements UseCaseCallback<I
         }
 
         this.useCase = null;
-
-        UseCaseProvider.clearUseCase(FetchAllSurahDetailUseCase.class);
     }
 }

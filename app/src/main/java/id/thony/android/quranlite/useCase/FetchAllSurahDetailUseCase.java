@@ -52,18 +52,35 @@ public class FetchAllSurahDetailUseCase extends BaseUseCase {
 
     private void startDownloadAllSurahProcess() {
         final List<Surah> surahList = quranRepository.fetchAllSurah(cancellationSignal, null);
+        if (isCancelled()) {
+            return;
+        }
+
+        if (surahList == null) {
+            postErrorToMainThread(new NoResultException());
+            return;
+        }
+
         this.surahCount = surahList.size();
 
         for (int i = 0; i < surahList.size(); i++) {
+            if (isCancelled()) {
+                return;
+            }
+
             final Surah surah = surahList.get(i);
             postSurahProgressToMainThread(surah, i);
 
             SurahDetail currentlyDownloadedSurah = null;
             for (int j = 0; j < RETRY_THRESHOLD; j++) {
                 currentlyDownloadedSurah = quranRepository.fetchSurahDetail(surah, cancellationSignal, null);
-                if (currentlyDownloadedSurah != null) {
+                if (currentlyDownloadedSurah != null || isCancelled()) {
                     break;
                 }
+            }
+
+            if (isCancelled()) {
+                return;
             }
 
             if (currentlyDownloadedSurah == null) {
@@ -85,6 +102,17 @@ public class FetchAllSurahDetailUseCase extends BaseUseCase {
         });
     }
 
+    private void postErrorToMainThread(final Throwable throwable) {
+        Schedulers.Main().execute(new Runnable() {
+            @Override
+            public void run() {
+                if (callback != null) {
+                    callback.onError(throwable);
+                }
+            }
+        });
+    }
+
     private void postSurahProgressToMainThread(final Surah currentSurah, int progress) {
         final float currentProgress = ((float) progress / (float) surahCount) * 100.0f;
         Schedulers.Main().execute(new Runnable() {
@@ -95,6 +123,9 @@ public class FetchAllSurahDetailUseCase extends BaseUseCase {
                 }
             }
         });
+    }
+
+    public static class NoResultException extends RuntimeException {
     }
 
     public interface SurahProgress {

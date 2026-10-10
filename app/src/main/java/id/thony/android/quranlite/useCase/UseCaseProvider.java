@@ -28,6 +28,19 @@ public class UseCaseProvider {
         return useCase;
     }
 
+    /**
+     * Create a use case that is not held by this provider, so it is not affected by
+     * {@link #clearUseCase(Class)} or {@link #clearAllUseCase()}. The caller owns its lifecycle.
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends BaseUseCase> T createDetachedUseCase(Class<T> useCaseClass) {
+        UseCaseFactory<T> factory = UseCaseProvider.useCaseFactoryHolder.get(useCaseClass);
+        if (factory == null) {
+            throw new IllegalStateException("No factory registered for class " + useCaseClass.getCanonicalName());
+        }
+
+        return factory.create();
+    }
 
     @SuppressWarnings("unchecked")
     public static <T extends BaseUseCase> T getUseCase(Class<T> useCaseClass) {

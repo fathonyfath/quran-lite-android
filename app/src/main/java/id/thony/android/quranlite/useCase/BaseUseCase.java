@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public abstract class BaseUseCase {
 
     private AtomicBoolean executed = new AtomicBoolean(false);
-    private boolean cancelled = false;
+    private volatile boolean cancelled = false;
 
     public final void run() {
         if (this.executed.compareAndSet(false, true)) {

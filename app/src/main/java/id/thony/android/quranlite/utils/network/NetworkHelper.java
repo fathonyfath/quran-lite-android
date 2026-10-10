@@ -18,7 +18,20 @@ import javax.net.ssl.HttpsURLConnection;
 @SuppressWarnings("CharsetObjectCanBeUsed")
 public class NetworkHelper {
 
+    private static final int READ_TIMEOUT_MILLIS = 15000;
+
+    private static TLSSocketFactory socketFactory;
+
     private NetworkHelper() {
+    }
+
+    // Shared so connections to the same host can be reused between requests.
+    private static synchronized TLSSocketFactory getSocketFactory() throws KeyManagementException, NoSuchAlgorithmException {
+        if (socketFactory == null) {
+            socketFactory = new TLSSocketFactory();
+        }
+
+        return socketFactory;
     }
 
     public static String doGetRequest(String url, CancelSignal signal, ProgressListener listener) {
@@ -79,7 +92,8 @@ public class NetworkHelper {
             urlConnection.setRequestProperty("Accept-Encoding", "identity");
             urlConnection.setRequestMethod("GET");
             urlConnection.setConnectTimeout(2000);
-            urlConnection.setSSLSocketFactory(new TLSSocketFactory());
+            urlConnection.setReadTimeout(READ_TIMEOUT_MILLIS);
+            urlConnection.setSSLSocketFactory(getSocketFactory());
 
             urlConnection.connect();
 
