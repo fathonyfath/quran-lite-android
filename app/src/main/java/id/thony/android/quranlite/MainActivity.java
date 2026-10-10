@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import android.graphics.Insets;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.provider.Settings;
 import android.view.WindowInsets;
 import android.widget.Toast;
 import android.window.OnBackInvokedCallback;
@@ -50,6 +52,7 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight>,
     private MainView mainView = null;
     private BaseTheme activeTheme = new DayTheme();
     private OnBackInvokedCallback onBackInvokedCallback = null;
+    private boolean couldShowNotificationPermissionPrompt = false;
 
     private final BroadcastReceiver downloadAlreadyStartedReceiver = new BroadcastReceiver() {
         @Override
@@ -127,6 +130,11 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight>,
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Proses pengunduhan dimulai. Cek notifikasi untuk mengetahui perkembangan proses unduh.", Toast.LENGTH_SHORT).show();
                 SurahDownloaderService.startService(this);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                    && !this.couldShowNotificationPermissionPrompt
+                    && !shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+                // The system no longer shows the prompt, the permission can only be granted from settings.
+                openNotificationSettings();
             }
         }
     }
@@ -198,9 +206,29 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight>,
         // Not used
     }
 
-    @SuppressLint("InlinedApi")
     public void requestNotificationPermission() {
-        requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 301);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            this.couldShowNotificationPermissionPrompt = shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS);
+            requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 301);
+        } else {
+            // POST_NOTIFICATIONS doesn't exist below API level 33, notifications can only be enabled from settings.
+            openNotificationSettings();
+        }
+    }
+
+    private void openNotificationSettings() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            return;
+        }
+
+        Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+        intent.putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
+        try {
+            startActivity(intent);
+            Toast.makeText(this, "Aktifkan notifikasi, lalu ulangi pengunduhan.", Toast.LENGTH_LONG).show();
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, "Aktifkan notifikasi melalui pengaturan aplikasi, lalu ulangi pengunduhan.", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void registerDialogFactory() {
