@@ -20,9 +20,8 @@ public class DownloaderNotification {
                 .setContentTitle(title)
                 .setContentText(description)
                 .setPriority(Notification.PRIORITY_LOW)
+                .setCategory(Notification.CATEGORY_SERVICE)
                 .setProgress(100, currentProgress, false);
-
-        notificationBuilder = setCategoryProgress(notificationBuilder);
 
         if (isFinished) {
             notificationBuilder = notificationBuilder.setSmallIcon(android.R.drawable.stat_sys_download_done);
@@ -44,10 +43,9 @@ public class DownloaderNotification {
                 .setContentTitle(title)
                 .setContentText(description)
                 .setPriority(Notification.PRIORITY_LOW)
+                .setCategory(Notification.CATEGORY_SERVICE)
                 .setProgress(100, currentProgress, false)
                 .addAction(0, cancelAction, intent);
-
-        notificationBuilder = setCategoryProgress(notificationBuilder);
 
         if (isFinished) {
             notificationBuilder = notificationBuilder.setSmallIcon(android.R.drawable.stat_sys_download_done);
@@ -70,14 +68,6 @@ public class DownloaderNotification {
             return new Notification.Builder(context, CHANNEL_ID);
         } else {
             return new Notification.Builder(context);
-        }
-    }
-
-    private static Notification.Builder setCategoryProgress(Notification.Builder builder) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            return builder.setCategory(Notification.CATEGORY_SERVICE);
-        } else {
-            return builder;
         }
     }
 

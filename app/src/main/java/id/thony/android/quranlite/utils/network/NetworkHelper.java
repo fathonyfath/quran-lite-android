@@ -10,8 +10,6 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -20,18 +18,7 @@ public class NetworkHelper {
 
     private static final int READ_TIMEOUT_MILLIS = 15000;
 
-    private static TLSSocketFactory socketFactory;
-
     private NetworkHelper() {
-    }
-
-    // Shared so connections to the same host can be reused between requests.
-    private static synchronized TLSSocketFactory getSocketFactory() throws KeyManagementException, NoSuchAlgorithmException {
-        if (socketFactory == null) {
-            socketFactory = new TLSSocketFactory();
-        }
-
-        return socketFactory;
     }
 
     public static String doGetRequest(String url, CancelSignal signal, ProgressListener listener) {
@@ -93,7 +80,6 @@ public class NetworkHelper {
             urlConnection.setRequestMethod("GET");
             urlConnection.setConnectTimeout(2000);
             urlConnection.setReadTimeout(READ_TIMEOUT_MILLIS);
-            urlConnection.setSSLSocketFactory(getSocketFactory());
 
             urlConnection.connect();
 
@@ -124,10 +110,6 @@ public class NetworkHelper {
         } catch (MalformedURLException ignored) {
 
         } catch (IOException ignored) {
-
-        } catch (NoSuchAlgorithmException ignored) {
-
-        } catch (KeyManagementException ignored) {
 
         } finally {
             if (urlConnection != null) {
