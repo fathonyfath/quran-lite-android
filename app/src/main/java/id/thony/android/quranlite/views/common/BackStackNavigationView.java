@@ -90,8 +90,8 @@ public abstract class BackStackNavigationView extends SwitchContainerView {
     }
 
     public boolean onBackPressed() {
-        if (this.viewBackStack.size() == 1) {
-            this.viewBackStack.popView();
+        if (this.viewBackStack.size() <= 1) {
+            // Keep the root view on the stack, the activity may stay alive after handling back.
             return false;
         }
         return this.viewBackStack.popView();
@@ -110,6 +110,10 @@ public abstract class BackStackNavigationView extends SwitchContainerView {
         final BackStackNavigationViewState viewState = (BackStackNavigationViewState) state;
         super.onRestoreInstanceState(viewState.getSuperState());
         this.viewBackStack = viewState.viewBackStack;
+
+        if (this.stackEventListener != null) {
+            this.stackEventListener.onStackChanged(Event.RESTORED, this.viewBackStack.size());
+        }
     }
 
     @Override
@@ -168,7 +172,7 @@ public abstract class BackStackNavigationView extends SwitchContainerView {
     }
 
     public enum Event {
-        PUSHED, POPPED,
+        PUSHED, POPPED, RESTORED,
     }
 
     public interface StackEventListener {

@@ -166,11 +166,7 @@ public class MainActivity extends Activity implements UseCaseCallback<DayNight>,
     @SuppressLint("GestureBackNavigation")
     @Override
     public void onBackPressed() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            if (!this.mainView.onBackPressed()) {
-                super.onBackPressed();
-            }
-        } else {
+        if (!this.mainView.onBackPressed()) {
             super.onBackPressed();
         }
     }
