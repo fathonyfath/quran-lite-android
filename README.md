@@ -10,6 +10,13 @@ I'm considering this app as feature complete. Please report an Issue (<https://g
 
 ## Version History
 
+* v1.6.0
+    * New app icon
+    * Fix back navigation on Android 12 to 15
+    * Make downloading all surah more reliable
+    * Open notification settings when the permission prompt can't be shown
+    * Reduce the app size to about half
+    * Minimum supported version is now Android 5.0
 * v1.5.0
     * Update support for Android 16
 * v1.4.0
