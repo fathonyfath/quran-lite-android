@@ -14,20 +14,20 @@ plugins {
 }
 
 android {
-    namespace 'id.thony.android.quranlite'
-    compileSdkVersion 36
+    namespace = 'id.thony.android.quranlite'
+    compileSdk = 36
     defaultConfig {
-        applicationId "id.thony.android.quranlite"
-        minSdkVersion 18
-        targetSdkVersion 36
-        versionCode project.ext.version.code
-        versionName "${project.ext.version.name}"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        applicationId = "id.thony.android.quranlite"
+        minSdk = 18
+        targetSdk = 36
+        versionCode = project.ext.version.code
+        versionName = "${project.ext.version.name}"
+        testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled = true
+            shrinkResources = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
