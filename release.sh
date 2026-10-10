@@ -36,6 +36,8 @@ VERSION="$(version_part major).$(version_part minor).$(version_part patch)"
 
 UNSIGNED="app/build/outputs/apk/release/app-release-unsigned.apk"
 OUTPUT="release/quran-lite-v$VERSION.apk"
+# Needed to read stack traces of the obfuscated build.
+MAPPING="release/quran-lite-v$VERSION-mapping.txt"
 
 ./gradlew clean lint test assembleRelease
 
@@ -53,6 +55,7 @@ fi
 mkdir -p release
 "$APKSIGNER" sign "${SIGN_ARGS[@]}" --out "$OUTPUT" "$UNSIGNED"
 rm -f "$OUTPUT.idsig"
+cp app/build/outputs/mapping/release/mapping.txt "$MAPPING"
 
 "$APKSIGNER" verify --print-certs "$OUTPUT"
 
@@ -60,3 +63,4 @@ echo
 echo "Version: $VERSION"
 echo "APK:     $OUTPUT ($(stat -c %s "$OUTPUT") bytes)"
 echo "SHA-256: $(sha256sum "$OUTPUT" | cut -d ' ' -f 1)"
+echo "Mapping: $MAPPING"

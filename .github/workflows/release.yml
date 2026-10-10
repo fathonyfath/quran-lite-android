@@ -47,7 +47,7 @@ jobs:
       - name: Publish GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" "release/quran-lite-$GITHUB_REF_NAME.apk" --title "$GITHUB_REF_NAME" --generate-notes
+        run: gh release create "$GITHUB_REF_NAME" "release/quran-lite-$GITHUB_REF_NAME.apk" "release/quran-lite-$GITHUB_REF_NAME-mapping.txt" --title "$GITHUB_REF_NAME" --generate-notes
 
       - name: Remove keystore
         if: always()
