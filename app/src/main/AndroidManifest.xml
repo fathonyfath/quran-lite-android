@@ -12,7 +12,6 @@
         android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher"
         android:label="Qur'an Lite"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@android:style/Theme.Holo.Light.NoActionBar">
         <activity
             android:name=".MainActivity"
